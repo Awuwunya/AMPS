@@ -123,10 +123,10 @@ Z80_Start:
 	; The space from "Start" until the maximum pitch amount, is the space
 	; where data could potentially be pushed into, thanks to the sp.
 
-	; The sp will likely be from roughly FFF3 - 000C for the quotient of
-	; the pitch.  Now, FFF3 - FFFF will be fine, since that points to the
+	; The sp will likely be from roughly FFEF - 000F for the quotient of
+	; the pitch.  Now, FFEF - FFFF will be fine, since that points to the
 	; 68k window, which will be pointing to 68k ROM, so nothing will happen.
-	; But the address from 0000 - 000C points to the beginning of ROM, so
+	; But the address from 0000 - 000F points to the beginning of ROM, so
 	; this place must be free from use outside of V-blank.
 
 Z80_Stack:
