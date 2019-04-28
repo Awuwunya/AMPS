@@ -1,0 +1,722 @@
+Beach_Header:
+	sHeaderInit						; Z80 offset is $94E3
+	sHeaderTempo	$01, $40
+	sHeaderCh	$05, $03
+	sHeaderDAC	Beach_DAC1, $1C
+	sHeaderDAC	Beach_DAC2, $1C, dSnare
+	sHeaderFM	Beach_FM1, $F4, $06
+	sHeaderFM	Beach_FM2, $00, $00
+	sHeaderFM	Beach_FM3, $00, $00
+	sHeaderFM	Beach_FM4, $00, $00
+	sHeaderFM	Beach_FM5, $00, $05
+;	sHeaderFM	Beach_FM6, $00, $18
+	sHeaderPSG	Beach_PSG1, $E8-$0C, $02, $00, v00
+	sHeaderPSG	Beach_PSG2, $F4-$0C, $02, $00, v00
+	sHeaderPSG	Beach_PSG3, $F4-$0C, $02, $00, v00
+
+	; Patch $00
+	; $3E
+	; $04, $04, $04, $04,	$1F, $14, $14, $14
+	; $0A, $06, $0B, $0B,	$0F, $00, $00, $00
+	; $5F, $FF, $1F, $1F,	$23, $8C, $8A, $80
+	spAlgorithm	$06
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$04, $04, $04, $04
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$1F, $14, $14, $14
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$0A, $0B, $06, $0B
+	spSustainLv	$05, $01, $0F, $01
+	spDecayRt	$0F, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$23, $0A, $0C, $00
+
+	; Patch $01
+	; $3A
+	; $71, $0C, $33, $01,	$9C, $96, $5D, $8F
+	; $04, $09, $04, $07,	$00, $01, $03, $00
+	; $1F, $1F, $1F, $AF,	$25, $2F, $25, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$07, $03, $00, $00
+	spMultiple	$01, $03, $0C, $01
+	spRateScale	$02, $01, $02, $02
+	spAttackRt	$1C, $1D, $16, $0F
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$04, $04, $09, $07
+	spSustainLv	$01, $01, $01, $0A
+	spDecayRt	$00, $03, $01, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$25, $25, $2F, $00
+
+	; Patch $02
+	; $3A
+	; $31, $27, $41, $61,	$8E, $8E, $8D, $53
+	; $0E, $0E, $0E, $03,	$00, $00, $00, $00
+	; $1F, $FF, $1F, $0F,	$1B, $25, $25, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$03, $04, $02, $06
+	spMultiple	$01, $01, $07, $01
+	spRateScale	$02, $02, $02, $01
+	spAttackRt	$0E, $0D, $0E, $13
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$0E, $0E, $0E, $03
+	spSustainLv	$01, $01, $0F, $00
+	spDecayRt	$00, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$1B, $25, $25, $00
+
+	; Patch $03
+	; $3A
+	; $20, $23, $60, $01,	$1E, $1F, $1F, $1F
+	; $0A, $0A, $0B, $0A,	$05, $07, $0A, $08
+	; $AF, $8F, $9F, $7F,	$21, $25, $28, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$02, $06, $02, $00
+	spMultiple	$00, $00, $03, $01
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$1E, $1F, $1F, $1F
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$0A, $0B, $0A, $0A
+	spSustainLv	$0A, $09, $08, $07
+	spDecayRt	$05, $0A, $07, $08
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$21, $28, $25, $00
+
+	; Patch $04
+	; $3B
+	; $00, $00, $00, $01,	$1F, $1F, $1F, $5F
+	; $17, $17, $14, $0E,	$17, $17, $14, $0D
+	; $FF, $FF, $FF, $FF,	$18, $22, $07, $80
+	spAlgorithm	$03
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$00, $00, $00, $01
+	spRateScale	$00, $00, $00, $01
+	spAttackRt	$1F, $1F, $1F, $1F
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$17, $14, $17, $0E
+	spSustainLv	$0F, $0F, $0F, $0F
+	spDecayRt	$17, $14, $17, $0D
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$18, $07, $22, $00
+
+	; Patch $05
+	; $2A
+	; $21, $39, $31, $53,	$9E, $DF, $9F, $9F
+	; $17, $1B, $02, $0D,	$00, $08, $03, $0B
+	; $3F, $3F, $0F, $6F,	$0E, $24, $0D, $80
+	spAlgorithm	$02
+	spFeedback	$05
+	spDetune	$02, $03, $03, $05
+	spMultiple	$01, $01, $09, $03
+	spRateScale	$02, $02, $03, $02
+	spAttackRt	$1E, $1F, $1F, $1F
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$17, $02, $1B, $0D
+	spSustainLv	$03, $00, $03, $06
+	spDecayRt	$00, $03, $08, $0B
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$0E, $0D, $24, $00
+
+	; Patch $06
+	; $3A
+	; $00, $05, $00, $01,	$1F, $1F, $1E, $15
+	; $04, $05, $04, $03,	$00, $00, $00, $00
+	; $0F, $0F, $1F, $0F,	$1B, $47, $1F, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$00, $00, $05, $01
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$1F, $1E, $1F, $15
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$04, $04, $05, $03
+	spSustainLv	$00, $01, $00, $00
+	spDecayRt	$00, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$1B, $1F, $47, $00
+
+	; Patch $07
+	; $3D
+	; $01, $02, $02, $02,	$10, $50, $50, $50
+	; $07, $08, $08, $08,	$01, $00, $00, $00
+	; $2F, $1F, $1F, $1F,	$1C, $82, $82, $82
+	spAlgorithm	$05
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$01, $02, $02, $02
+	spRateScale	$00, $01, $01, $01
+	spAttackRt	$10, $10, $10, $10
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$07, $08, $08, $08
+	spSustainLv	$02, $01, $01, $01
+	spDecayRt	$01, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$1C, $02, $02, $02
+
+	; Patch $08
+	; $3A
+	; $31, $27, $41, $61,	$8E, $8E, $8D, $53
+	; $0E, $0E, $0E, $03,	$00, $00, $00, $00
+	; $1F, $FF, $1F, $0F,	$1B, $25, $25, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$03, $04, $02, $06
+	spMultiple	$01, $01, $07, $01
+	spRateScale	$02, $02, $02, $01
+	spAttackRt	$0E, $0D, $0E, $13
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$0E, $0E, $0E, $03
+	spSustainLv	$01, $01, $0F, $00
+	spDecayRt	$00, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$1B, $25, $25, $00
+
+	; Patch $09
+	; $3A
+	; $51, $01, $11, $01,	$0F, $10, $0F, $10
+	; $08, $0A, $00, $06,	$01, $01, $01, $01
+	; $1F, $1F, $1F, $1F,	$20, $2A, $2D, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$05, $01, $00, $00
+	spMultiple	$01, $01, $01, $01
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$0F, $0F, $10, $10
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$08, $00, $0A, $06
+	spSustainLv	$01, $01, $01, $01
+	spDecayRt	$01, $01, $01, $01
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$20, $2D, $2A, $00
+
+	; Patch $0A
+	; $3C
+	; $02, $01, $03, $01,	$1F, $1F, $1F, $1F
+	; $0A, $0A, $0A, $0A,	$02, $02, $02, $02
+	; $FF, $3F, $FF, $3F,	$22, $88, $1D, $88
+	spAlgorithm	$04
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$02, $03, $01, $01
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$1F, $1F, $1F, $1F
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$0A, $0A, $0A, $0A
+	spSustainLv	$0F, $0F, $03, $03
+	spDecayRt	$02, $02, $02, $02
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$22, $1D, $08, $08
+
+	; Patch $0B
+	; $32
+	; $71, $37, $33, $01,	$99, $55, $19, $56
+	; $02, $0A, $04, $0F,	$04, $06, $05, $04
+	; $1F, $2F, $FF, $1F,	$26, $24, $20, $88
+	spAlgorithm	$02
+	spFeedback	$06
+	spDetune	$07, $03, $03, $00
+	spMultiple	$01, $03, $07, $01
+	spRateScale	$02, $00, $01, $01
+	spAttackRt	$19, $19, $15, $16
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$02, $04, $0A, $0F
+	spSustainLv	$01, $0F, $02, $01
+	spDecayRt	$04, $05, $06, $04
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$26, $20, $24, $08
+
+	; Patch $0C
+	; $3A
+	; $01, $01, $01, $01,	$0B, $0C, $0C, $0E
+	; $07, $07, $08, $07,	$04, $04, $04, $05
+	; $2F, $2F, $2F, $2F,	$25, $27, $26, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$01, $01, $01, $01
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$0B, $0C, $0C, $0E
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$07, $08, $07, $07
+	spSustainLv	$02, $02, $02, $02
+	spDecayRt	$04, $04, $04, $05
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$25, $26, $27, $00
+
+	; Patch $0D
+	; $3C
+	; $01, $02, $0F, $04,	$8D, $52, $9F, $1F
+	; $09, $00, $00, $0D,	$00, $00, $00, $00
+	; $2F, $0F, $0F, $FF,	$15, $80, $1D, $87
+	spAlgorithm	$04
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$01, $0F, $02, $04
+	spRateScale	$02, $02, $01, $00
+	spAttackRt	$0D, $1F, $12, $1F
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$09, $00, $00, $0D
+	spSustainLv	$02, $00, $00, $0F
+	spDecayRt	$00, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$15, $1D, $00, $07
+
+	; Patch $0E
+	; $3A
+	; $01, $03, $01, $01,	$18, $10, $15, $14
+	; $0A, $0D, $08, $07,	$00, $00, $00, $00
+	; $0F, $FF, $0F, $1F,	$25, $22, $19, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$00, $00, $00, $00
+	spMultiple	$01, $01, $03, $01
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$18, $15, $10, $14
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$0A, $08, $0D, $07
+	spSustainLv	$00, $00, $0F, $01
+	spDecayRt	$00, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$25, $19, $22, $00
+
+	; Patch $0F
+	; $3A
+	; $71, $08, $01, $02,	$10, $10, $12, $10
+	; $0F, $0C, $00, $00,	$00, $00, $00, $00
+	; $1F, $1F, $0F, $0F,	$18, $3B, $33, $80
+	spAlgorithm	$02
+	spFeedback	$07
+	spDetune	$07, $00, $00, $00
+	spMultiple	$01, $01, $08, $02
+	spRateScale	$00, $00, $00, $00
+	spAttackRt	$10, $12, $10, $10
+	spAmpMod	$00, $00, $00, $00
+	spSustainRt	$0F, $00, $0C, $00
+	spSustainLv	$01, $00, $01, $00
+	spDecayRt	$00, $00, $00, $00
+	spReleaseRt	$0F, $0F, $0F, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv	$18, $33, $3B, $00
+
+	; Patch $10	; apparently they either fucked up and used wrong values for the total levels, or they were dicks
+	; $F2
+	; $E0, $C0, $EF, $00,	$E8, $08, $D5, $C4
+	; $0C, $06, $C1, $C4,	$0C, $06, $C1, $C4
+	; $C2, $0C, $1E, $0C,	$06, $BF, $C2, $0C
+	spAlgorithm	$02
+	spFeedback	$06
+	spDetune	$0E, $0E, $0C, $00
+	spMultiple	$00, $0F, $00, $00
+	spRateScale	$03, $03, $00, $03
+	spAttackRt	$08, $15, $08, $04
+	spAmpMod	$00, $01, $00, $01
+	spSustainRt	$0C, $01, $06, $04
+	spSustainLv	$0C, $01, $00, $00
+	spDecayRt	$0C, $C1, $06, $C4
+	spReleaseRt	$02, $0E, $0C, $0C
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv2	$06, $BF, $C2, $0C
+
+	; Patch $11	; apparently they either fucked up and used wrong values for the total levels, or they were dicks
+	; $06
+	; $BF, $C2, $C1, $0C,	$1E, $C4, $0C, $06
+	; $C1, $C4, $0C, $06,	$C1, $C4, $C2, $0C
+	; $1E, $0C, $06, $BF,	$C2, $0C, $06, $BF
+	spAlgorithm	$06
+	spFeedback	$00
+	spDetune	$0B, $0C, $0C, $00
+	spMultiple	$0F, $01, $02, $0C
+	spRateScale	$00, $00, $03, $00
+	spAttackRt	$1E, $0C, $04, $06
+	spAmpMod	$01, $00, $01, $00
+	spSustainRt	$01, $0C, $04, $06
+	spSustainLv	$01, $00, $00, $0B
+	spDecayRt	$C1, $C2, $C4, $0C
+	spReleaseRt	$0E, $06, $0C, $0F
+	spSSGEG		$00, $00, $00, $00
+	spTotalLv2	$C2, $0C, $06, $BF
+
+Beach_PSG2:
+	dc.b nRst, $01
+
+Beach_PSG1:
+	sVoice		vWOI_0D
+;	ssVolBase	$00
+	dc.b nRst, $01
+
+	ssDetune	$FF
+;	ssVolQuick	$05
+	ssVol		$05+$00
+	sCall		Beach_FM1_00
+
+.loop;	ssVolQuick	$03
+	ssVol		$03+$00
+	sCall		Beach_FM1_01
+;	ssVolQuick	$03
+	sCall		Beach_FM1_02
+
+;	ssVolQuick	$04
+	ssVol		$04+$00
+	sCall		Beach_FM1_03
+;	ssVolQuick	$04
+	sCall		Beach_FM1_04
+	sCall		Beach_FM1_05
+
+;	ssVolQuick	$03
+	ssVol		$03+$00
+	sCall		Beach_FM1_06
+
+;	ssVolQuick	$04
+	ssVol		$04+$00
+	sCall		Beach_FM1_07
+	sJump		.loop
+
+Beach_FM1:
+	sPan		spCenter, $00
+	sVoice		$00
+;	ssVolQuick	$05
+	ssVol		$05+$0F+$10
+	sCall		Beach_FM1_00
+
+.loop	sVoice		$05
+;	ssVolQuick	$03
+	ssVol		$03+$09+$10
+	sCall		Beach_FM1_01
+
+	sVoice		$09
+	sPan		spRight, $00
+;	ssVolQuick	$03
+	sCall		Beach_FM1_02
+
+	sVoice		$06
+	sPan		spLeft, $00
+;	ssVolQuick	$04
+	ssVol		$04+$09+$10
+	sCall		Beach_FM1_03
+
+	sPan		spRight, $00
+	sVoice		$0A
+;	ssVolQuick	$04
+	sCall		Beach_FM1_04
+
+	sPan		spLeft, $00
+	sVoice		$09
+	sCall		Beach_FM1_05
+
+	sVoice		$0B
+	sPan		spCenter, $00
+;	ssVolQuick	$03
+	ssVol		$03+$09+$10
+	sCall		Beach_FM1_06
+
+	sVoice		$05
+	sPan		spRight, $00
+;	ssVolQuick	$04
+	ssVol		$04+$09+$10
+	sCall		Beach_FM1_07
+	sJump		.loop
+
+Beach_FM1_00:
+	sNoteTimeOut	$08
+	dc.b nG5, $0C, $06, nE5, nG5, $0C, $06, nE5
+	dc.b nG5, nF5, $0C, $1E, $0C, $06, nD5, nF5
+	dc.b $0C, $06, nD5, nF5, nE5, $0C, $1E, nG5
+	dc.b $0C, $06, nE5, nG5, $0C, $06, nE5, nG5
+	dc.b nF5, $0C, $1E, $0C, $06, nD5, nF5, $0C
+	dc.b $06, nD5, nD5, nC5, $0C, $06, nRst, $06
+
+;	ssVolQuick	$05
+	dc.b nG3, nA3, nB3
+	sRet
+
+Beach_FM1_01:
+	saTranspose	$0C
+	sNoteTimeOut	$08
+	dc.b nE4, $0C, $06, $0C, $06, nE4, nE4, nF4
+	dc.b $0C, nD4, $18, nG3, $0C, nD4, nD4, $06
+	dc.b $0C, $06, nD4, nD4, nE4, $0C, nC4, $18
+	dc.b nG3, $0C, nE4, nE4, $06, $0C, $06, nE4
+	dc.b nE4, nG4, nF4, nE4, nF4, nD4, $0C, nG3
+	dc.b nG3, nG3, $06, $0C, $06, nA3, nB3, nC4
+	dc.b $24, nG4, $0C
+	saTranspose	$F4
+	sRet
+
+Beach_FM1_02:
+	sNoteTimeOut	$08
+	dc.b $06, nA4, $0C, nG4, $06, nC5, $0C, nC5
+	dc.b nA4, $06, nB4, $0C, nA4, $06, nD4, $0C
+	dc.b nA4
+	sRet
+
+Beach_FM1_03:
+	dc.b nB3, $06, nC4, $0C, nB3, $06, nG4, $0C
+	dc.b nG4, nE4, $06, nF4, $0C, nE4, $06, nC4
+	dc.b $0C, nG3
+	sRet
+
+Beach_FM1_04:
+	dc.b nG4, $06, nA4, $0C, nG4, $06, nC5, $0C
+	dc.b nC5, nA4, $06, nB4, $0C, nA4, $06, nD5
+	dc.b $0C, nA4
+	sRet
+
+Beach_FM1_05:
+	dc.b nG4, $06, nA4, $0C, nG4, $06, nRst, nG3
+	dc.b nA3, nB3, nC4, $24, nG4, $0C
+	sRet
+
+Beach_FM1_06:
+	dc.b $06, nC5, $0C, nE5, $06, nG5, $0C, nF5
+	dc.b $06, nE5, nG5, nF5, nE5, nF5, $1E, nRst
+	dc.b $06, nG5, nG5, nG5, nRst, nG5, nA5, nB5
+	dc.b nD6, nC6, nB5, nC6, nRst, nC6, nG5, nE5
+	dc.b nG5, nE5, nG5, nC6, nG5, nE5, nG5, nC6
+	dc.b nA5, nF5, nA5, nD6, nA5, nF5, nA5, nD6
+	dc.b nD6, nD6, nC6, nB5, nA5, nG5, nA5, nB5
+	dc.b nC6, nC6, nG5, nE5, nG5, nF5, nE5, nD5
+	sRet
+
+Beach_FM1_07:
+	saTranspose	$0C
+	sNoteTimeOut	$06
+	dc.b nE4, nG4, nC5, nE5, nE4, nG4, nC5, nE5
+	dc.b nF4, nA4, nD5, nF5, nF4, nA4, nD5, nF5
+	dc.b nD4, nF4, nG4, nB4, nD4, nF4, nG4, nB4
+	dc.b nE4, nG4, nC5, nG4, nE4, nC4, nG3, nE3
+	dc.b nE4, nG4, nC5, nE5, nE4, nG4, nC5, nE5
+	dc.b nF4, nA4, nD5, nF5, nF4, nA4, nD5, nF5
+	dc.b nG3, nD4, nF4, nG4, nG3, nD4, nF4, nG4
+	dc.b nC4, nC5, nG4, nE4, nC4, nC5, nG4, nE4
+	saTranspose	$F4
+	sRet
+
+Beach_FM2:
+	sPan		spCenter, $00
+	sVoice		$03
+;	ssVolQuick	$05
+	ssVol		$05+$0F+$10
+	dc.b nE4, $12, nG4, nC5, $0C, nA4, $12, nF4
+	dc.b nD4, $0C, nB3, $12, nD4, nG4, $0C, nC5
+	dc.b $12, nC4, nG3, $0C, nE4, $12, nG4, nC5
+	dc.b $0C, nA4, $12, nF4, nD4, $0C, nB3, $12
+	dc.b nD4, nG4, $0C, $12, nC4, nG3, $0C
+
+Beach_Jump2:
+	sVoice		$07
+;	ssVolQuick	$05
+	ssVol		$05+$0F+$10
+	sNoteTimeOut	$08
+	sCall		Beach_FM2_00
+;	sNoteTimeOut	$00
+	sVoice		$03
+;	ssVolQuick	$05
+	sNoteTimeOut	$08
+	sCall		Beach_FM2_00
+;	sNoteTimeOut	$00
+	sVoice		$0D
+;	ssVolQuick	$05
+	sNoteTimeOut	$08
+	sCall		Beach_FM2_01
+;	sNoteTimeOut	$00
+	sVoice		$10
+;	ssVolQuick	$05
+	sNoteTimeOut	$07
+	sCall		Beach_FM2_01
+;	sNoteTimeOut	$00
+	sJump		Beach_Jump2
+
+Beach_FM2_00:
+	dc.b nE4, $12, nG4, nC5, $0C, nA4, $12, nF4
+	dc.b nD4, $0C, nB3, $12, nD4, nG4, $0C, $12
+	dc.b nC4, nG3, $0C, nE4, $12, nG4, nC5, $0C
+	dc.b nA4, $12, nF4, nD4, $0C, nB3, $12, nD4
+	dc.b nG4, $0C, nC5, $12, nC4, nG3, $0C
+	sRet
+
+Beach_FM2_01:
+	dc.b nE5, $12, nG5, nE5, $0C, nF5, $12, nA5
+	dc.b nF5, $0C, nD5, $12, nF5, nD5, $0C, nC5
+	dc.b $06, nB4, nA4, nG4, sHold, nG4, $18, nE5
+	dc.b $12, nG5, nE5, $0C, nF5, $12, nA5, nF5
+	dc.b $0C, nG5, $12, nF5, nE5, $0C, nD5, $06
+	dc.b nC5, nB4, nC5, sHold, nC5, $18
+	sRet
+
+Beach_FM3:
+	sPan		spCenter, $00
+	sVoice		$02
+	sNoteTimeOut	$08
+;	ssVolQuick	$06
+	ssVol		$06+$12+$10
+	sCall		Beach_FM3_00
+;	sNoteTimeOut	$00
+
+Beach_Jump3:
+	sVoice		$06
+;	ssVolQuick	$05
+	ssVol		$05+$0F+$10
+	sNoteTimeOut	$08
+	sCall		Beach_FM3_00
+;	sNoteTimeOut	$00
+	sVoice		$08
+;	ssVolQuick	$05
+	sNoteTimeOut	$08
+	dc.b nC4, $0C, nC4, $06, nE4, $12, nG4, $0C
+	dc.b nF4, nF4, $06, nD4, $12, nF4, $0C, nG3
+	dc.b nG3, $06, nB3, $12, nF4, $0C, nE4, nE4
+	dc.b $06, nC4, $12, nG4, $0C, nC4, nC4, $06
+	dc.b nE4, $12, nG4, $0C, nF4, nF4, $06, nD4
+	dc.b $12, nF4, $0C, nG4, $06, nG3, $0C, $12
+	dc.b nA3, $06, nB3, nC4, nG4, $0C, nE5, $06
+	dc.b nF5, nE5, nD5, $0C
+;	sNoteTimeOut	$00
+	sVoice		$0E
+;	ssVolQuick	$05
+	saTranspose	$E8
+	sNoteTimeOut	$08
+	dc.b nC4, $12, nC4, nC4, $0C, nD4, $12, nD4
+	dc.b nD4, $0C, nG3, $12, nG3, nG3, $0C, nG4
+	dc.b $12, nG3, $0C, $06, nA3, nB3, nC4, $12
+	dc.b nC4, nC4, $0C, nD4, $12, nD4, nD4, $0C
+	dc.b nG3, $12, nG4, nG3, $0C, nC4, $30
+;	sNoteTimeOut	$00
+	saTranspose	$18-$0C
+	sVoice		$0E
+;	ssVolQuick	$05
+;	saTranspose	$F4
+	sNoteTimeOut	$08
+	dc.b $12, nC4, nC4, $0C, nD4, $12, nD4, nD4
+	dc.b $0C, nG3, $12, nG3, nG3, $0C, nG4, $12
+	dc.b nG3, $0C, $06, nA3, nB3, nC4, $12, nC4
+	dc.b nC4, $0C, nD4, $12, nD4, nD4, $0C, nG3
+	dc.b $12, nG4, nG3, $0C, nC4, $06, nRst, $2A
+;	sNoteTimeOut	$00
+	saTranspose	$0C
+	sJump		Beach_Jump3
+
+Beach_FM3_00:
+	dc.b nC4, $0C, $06, nE4, $12, nG4, $0C, nF4
+	dc.b nF4, $06, nD4, $12, nB3, $0C, nG3, nG3
+	dc.b $06, nB3, $12, nF4, $0C, nE4, nE4, $06
+	dc.b nC4, $12, nG3, $0C, nC4, nC4, $06, nE4
+	dc.b $12, nG4, $0C, nF4, nF4, $06, nD4, $12
+	dc.b nB3, $0C, nG3, nG3, $06, nB3, $12, nF4
+	dc.b $0C, nE4, nE4, $06, nC4, $12, nG3, $0C
+	sRet
+
+Beach_PSG3:
+	sVoice		vWOI_0C
+;	ssVolBase	$00
+	dc.b nRst, $02
+	sCall		Beach_FM4_00
+.loop	sCall		Beach_FM4_00
+
+;	ssVolQuick	$0A
+	ssVol		$0A+$00
+	sCall		Beach_FM4_01
+
+;	ssVolQuick	$04
+	sCall		Beach_FM4_02
+	sJump		.loop
+
+Beach_FM4:
+	sCall		Beach_FM4_00
+.loop	sCall		Beach_FM4_00
+
+	sPan		spLeft, $00
+	sVoice		$11
+;	ssVolQuick	$0A
+	ssVol		$0A+$1E+$10
+	sCall		Beach_FM4_01
+
+	sPan		spCenter, $00
+	sVoice		$0F
+;	ssVolQuick	$04
+	ssVol		$04+$0C+$10
+	sCall		Beach_FM4_02
+	sJump		.loop
+
+Beach_FM4_00:
+	dc.b nRst, $60, nRst, nRst, nRst
+	sRet
+
+Beach_FM4_01:
+;	ssVolBase	$06
+	ssMod68k	$10, $01, $02, $08
+	dc.b nE5, $30, nF5, nF5, nG5, nE5, nF5, nG5
+	dc.b $18, nF5, nE5, $0C, nD5, nC5, $18
+	sRet
+
+Beach_FM4_02:
+;	ssVolBase	$00
+	saTranspose	$F4
+	ssMod68k	$20, $01, $02, $04
+
+.loop	sNoteTimeOut	$08
+	dc.b nE5, $12, nG5, nE5, $0C, nF5, $12, nA5
+	dc.b nF5, $0C, nD5, $12, nF5, nD5, $0C, nC5
+	dc.b $06, nB4, nA4
+	sNoteTimeOut	$00
+	dc.b nG4, sHold, nG4, $0B, nRst, $0D
+	sNoteTimeOut	$08
+	dc.b nE5, $12, nG5, nE5, $0C, nF5, $12, nA5
+	dc.b nF5, $0C, nG5, $12, nF5, nE5, $0C, nD5
+	dc.b $06, nC5, nB4
+	sNoteTimeOut	$00
+	dc.b nC5, sHold, nC5, $0B, nRst, $0D
+	sLoop		$00, $02, .loop
+	saTranspose	$0C
+	sRet
+
+Beach_FM5:
+	sPan		spCenter, $00
+	sVoice		$01
+	sNoteTimeOut	$08
+;	ssVolQuick	$04
+	ssVol		$04+$0C+$10
+
+.loop	dc.b nC2, $0C, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C, nD2, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C, nD2, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C, nC2, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C, nC2, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C, nD2, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C, nD2, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C, nC2, nG2, $06, nG1, $0C, $06, nG2
+	dc.b $0C
+;	sNoteTimeOut	$00
+	sJump		.loop
+
+;Beach_FM6:
+;	sPan		spCenter, $00
+;	sVoice		$04
+
+Beach_DAC2:
+	dc.b nRst, $0C, nG4, $06, $06, nRst, $0C, nG4
+	dc.b $0C, nD4, $06, nG4, nG4, nG4, nRst, $0C
+	dc.b nG4
+	sJump		Beach_DAC2
+
+Beach_DAC1:
+	sStop

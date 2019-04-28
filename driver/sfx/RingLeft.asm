@@ -1,0 +1,11 @@
+	sHeaderInit
+	sHeaderPrio	$80
+	sHeaderCh	$01
+	sHeaderSFX	$80, ctFM4, .FM4, $00, $05
+
+.FM4	sPan	spLeft
+	sVoice	pRings
+
+SFX_Ring1:
+	dc.b nE5, $04, nG5, $05, nC6, $1B
+	sStop

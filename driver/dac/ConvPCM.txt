@@ -1,0 +1,2 @@
+Sample Rate:	14000
+Interpolation:	FURTHEST
