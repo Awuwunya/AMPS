@@ -3,7 +3,7 @@
 ; DEFINE HELPERS
 z80prg =	0		; 0 IN 68K MODE, 1 IN Z80 MODE
 ztemp =		0		; TEMPORARY REGISTER
-zundoc =	1		; SET TO 0 TO USE UNDOCUMENTED OPCODES
+zundoc =	0		; SET TO 0 TO USE UNDOCUMENTED OPCODES
 zchkoffs =	1		; SET TO 0 TO NOT CHECK IX/IY AND JR OFFSETS
 z80regstr	EQUS "a b c d e h l bc de hl sp af ix iy i r ixh ixl iyh iyl (bc) (de) (hl) (sp) af' (ix) (iy)"
 
@@ -900,7 +900,7 @@ dec	macro reg
 			inform 2,"Undocumented opcodes are not enabled."
 		endif
 
-		dc.b $FD+((ztemp&$02)*$10), $24+((ztemp&$01)*$08); dec ixh, ixl, iyh, iyl
+		dc.b $DD+((ztemp&$02)*$10), $25+((ztemp&$01)*$08); dec ixh, ixl, iyh, iyl
 
 	else
 		inform 2,"Invalid or unsupported register '\reg'!"
@@ -1609,7 +1609,7 @@ zreg2 =	ztemp
 
 		dc.b $DD+((zreg1&$02)*$10), $60+((zreg1&$01)*$08)+zreg2; ld ixh, ixl, iyh, iyl,a, b, c, d, e
 
-	elseif (zreg2>=zixh)&(zreg2>=ziyl)&((zreg1<=za)&(zreg1<>zh)&(zreg1<>zl))
+	elseif (zreg2>=zixh)&(zreg2<=ziyl)&((zreg1<=za)&(zreg1<>zh)&(zreg1<>zl))
 		if zundoc
 			inform 2,"Undocumented opcodes are not enabled."
 		endif

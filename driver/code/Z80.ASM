@@ -3,26 +3,6 @@
 ; DUAL-PCM - by MarkeyJester
 ; ---------------------------------------------------------------------------
 
-x =		0DDh
-y =		0FDh
-
-ldin		macro	TYPE, DEST, SOURCE
-		dc.b	\TYPE				; 04	; load to/from index register
-		ld	\DEST,\SOURCE			; ??	; ''
-		endm
-
-deci		macro	TYPE, REG
-		dc.b	\TYPE				; 04	; decrement register
-		dec	\REG				; 04	; ''
-		endm
-
-inci		macro	TYPE, REG
-		dc.b	\TYPE				; 04	; increment register
-		inc	\REG				; 04	; ''
-		endm
-
-; ---------------------------------------------------------------------------
-
 M_Read		macro
 		ldi					; 16	; copy from window to buffer, and increment register
 		zadd	a,b				; 04	; add dividend
@@ -139,7 +119,7 @@ Z80_Stack:
 ; ---------------------------------------------------------------------------
 
 BreakLate:
-		deci	y,h				; 08	; set "restore mode"
+		dec	iyh				; 08	; set "restore mode"
 		ld	sp,Z80_Stack			; 10	; load valid stack address
 		push	af				; 11	; store a and flags
 		jp	BVB_Check			; 10	; jump to V-blank routine
@@ -178,7 +158,7 @@ BreakVBlank:
 		ld	(YM_Buffer),a			; 13	; update...
 
 BVB_Check:
-		ldin	y,a,l				; 08	; load iyl
+		ld	a,iyl				; 08	; load iyl
 		zor	a				; 04	; check read status (FF = Bank | 00 = Non-Read | 01 = Window)
 		jp	nz,BreakDMA			; 10	; if the interrupt is happening during bank or window reading, branch
 
@@ -281,11 +261,11 @@ BDMA_Flush01:
 ; Restore interrupt instructions
 ; ---------------------------------------------------------------------------
 
-		ldin	y,a,h				; 08	; load restore mode
+		ld	a,iyh				; 08	; load restore mode
 		zor	a				; 04	; has it been set?
 		jp	z,BDMA_NoRestore		; 10	; if not, branch
 		xor	a				; 04	; prepare "nop" instruction
-		ldin	y,h,a				; 08	; clear restore mode
+		ld	iyh,a				; 08	; clear restore mode
 		ld	(Int1_nop),a			; 13	; change instructions
 		ld	(Int2_nop),a			; 13	; ''
 		ld	a,07Eh				; 07	; prepare "ld  a,(hl)" instruction
@@ -304,7 +284,7 @@ BDMA_NoRestore:
 ; YM2612 flushing
 ; ---------------------------------------------------------------------------
 
-YM_FlushTimer:	ldin	x,h,002h
+YM_FlushTimer:	ld	ixh,002h
 
 		ld	sp,YM_Buffer1			; 16	; load buffer 1 address
 		ld	a,(YM_Buffer)			; 13	; load buffer we're writing to
@@ -322,7 +302,7 @@ YMF_Buff1:
 			exx					; 04	; switch registers back
 
 YM_Flush:
-			ldin	x,l,010h/002h			; 11	; set ix low byte to number of bytes to flush
+			ld	ixl,010h/002h			; 11	; set ix low byte to number of bytes to flush
 
 YMF_NextByte:
 			M_Flush02				; 59	; flush a byte to the YM2612
@@ -357,13 +337,13 @@ Z80_DelayYM2:	ld	b,006h				; 07	; delay a little longer...
 		ld	l,b				; 04	; move address to 4000
 		ld	(hl),02Ah			; 10	; reset YM2612 to DAC port address
 			exx					; 04	; switch registers
-			deci	x,l				; 08	; decrease ix low byte counter
+			dec	ixl				; 08	; decrease ix low byte counter
 			jp	nz,YMF_NextByte			; 10	; if it hasn't finished, branch
 
 	; --- Advance/Wrap OUT buffers ---
 
 			M_Wrap
-			deci	x,h				; 08	; decrease ix high byte counter
+			dec	ixh				; 08	; decrease ix high byte counter
 			jp	YM_Flush			; 10	; loop back...
 
 YMF_Finish02:
@@ -386,7 +366,7 @@ PCM_Flush_exx:
 			exx
 
 PCM_Flush:
-			ldin	x,l,010h/002h			; 11	; set ix low byte to number of bytes to flush
+			ld	ixl,010h/002h			; 11	; set ix low byte to number of bytes to flush
 
 PCM_NextByte:
 			M_Flush02				; 59	; flush a byte to the YM2612
@@ -403,14 +383,14 @@ Z80_DelayEnd2:	ld	b,00Ch				; 07	; delay a little longer...
 YMF_Enter01:	djnz	*				; 13 08	; ''
 
 			exx					; 04	; switch registers
-			deci	x,l				; 08	; decrease ix low byte counter
+			dec	ixl				; 08	; decrease ix low byte counter
 			jp	nz,PCM_NextByte			; 10	; if it hasn't finished, branch
 
 	; --- Advance/Wrap OUT buffers ---
 
 			M_Wrap
 
-			deci	x,h				; 08	; decrease ix high byte counter
+			dec	ixh				; 08	; decrease ix high byte counter
 			jp	p,PCM_Flush			; 10	; if we're not ready to go back to main loop, branch
 		exx					; 04	; switch registers down again...
 
@@ -539,7 +519,7 @@ Z80_Int2:	;ei
 
 PCM1_MuteRet:
 		ld	hl,06001h			; 10	; load bank switch register port
-		deci	y,l				; 08	; set bank interrupt
+		dec	iyl				; 08	; set bank interrupt
 Int1_nop:	znop					; 04	; CANNOT CHANGE "ld  (hl),h" since it's altered by Z80 elsewhere
 PCM1_Switch:	ld	(hl),h				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		ld	(hl),h				; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
@@ -550,7 +530,7 @@ PCM1_Switch:	ld	(hl),h				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		ld	(hl),h				; 07	; 0010 0000 0   2MB -   4MB (200000 -  400000)
 		ld	(hl),h				; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
 		ld	(hl),h				; 07	; 1000 0000 0   8MB -  16MB (800000 - 1000000)
-		inci	y,l				; 08	; set non-read interrupt
+		inc	iyl				; 08	; set non-read interrupt
 PCM1_OverflwCur:ld	bc,Z80E_Read			; 10	; prepare amount to get to end of window
 		ld	hl,(PCM1_SampCur+001h)		; 16	; load sample current address
 		ld	a,(PCM1_PitchCur+001h)		; 13	; ''
@@ -560,7 +540,7 @@ PCM1_OverflwDiv:zadd	a,000h				; 07	; add fraction overflow
 			exx					; 04	; switch registers
 			M_Flush01				; 59	; flush a byte to the YM2612
 			exx					; 04	; switch registers
-		inci	y,l				; 08	; set window interrupt
+		inc	iyl				; 08	; set window interrupt
 Int1_lda:	ld	a,(hl)				; 07	; load PCM byte at the next ending address
 		zor	a				; 04	; is it an end marker? (00)
 		jp	z,PCM1_Mute			; 10	; if so, branch to mute...
@@ -629,7 +609,7 @@ PCM1_PreInst16:	M_Read
 PCM1_PreInst17:	M_Read
 PCM1_PreInst18:	M_Read
 		ld	sp,Z80_Stack			; 10	; set valid stack
-		deci	y,l				; 08	; set non-read interrupt
+		dec	iyl				; 08	; set non-read interrupt
 		ld	(UPD1_Buffer+001h),de		; 20	; update IN buffer address
 			exx					; 04	; switch registers
 			ex	af,af				; 04	; store dividend
@@ -645,7 +625,7 @@ PCM1_PreInst18:	M_Read
 
 PCM2_MuteRet:
 		ld	hl,06001h			; 10	; load bank switch register port
-		deci	y,l				; 08	; set bank interrupt
+		dec	iyl				; 08	; set bank interrupt
 Int2_nop:	znop					; 04	; CANNOT CHANGE "ld  (hl),h" since it's altered by Z80 elsewhere
 PCM2_Switch:	ld	(hl),h				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		ld	(hl),h				; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
@@ -656,7 +636,7 @@ PCM2_Switch:	ld	(hl),h				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		ld	(hl),h				; 07	; 0010 0000 0   2MB -   4MB (200000 -  400000)
 		ld	(hl),h				; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
 		ld	(hl),h				; 07	; 1000 0000 0   8MB -  16MB (800000 - 1000000)
-		inci	y,l				; 08	; set non-read interrupt
+		inc	iyl				; 08	; set non-read interrupt
 PCM2_OverflwCur:ld	bc,Z80E_Read			; 10	; prepare amount to get to end of window
 		ld	hl,(PCM2_SampCur+001h)		; 16	; load sample current address
 			exx					; 04	; switch registers
@@ -666,7 +646,7 @@ PCM2_OverflwCur:ld	bc,Z80E_Read			; 10	; prepare amount to get to end of window
 PCM2_OverflwDiv:zadd	a,000h				; 07	; add fraction overflow
 		adc	hl,bc				; 15	; advance address
 		jp	p,PCM2_PrepReset		; 10	; if the address has gone outside the window, branch
-		inci	y,l				; 08	; set window interrupt
+		inc	iyl				; 08	; set window interrupt
 Int2_lda:	ld	a,(hl)				; 07	; load PCM byte at the next ending address
 		zor	a				; 04	; is it an end marker? (00)
 		jp	z,PCM2_Mute			; 10	; if so, branch to mute...
@@ -740,7 +720,7 @@ PCM2_PreInst18:	ldi					; 16	; copy from window to buffer, and increment registe
 		zadd	a,b				; 04	; add dividend
 		adc	hl,sp				; 15	; add quotient
 		ld	sp,Z80_Stack			; 10	; set valid stack
-		deci	y,l				; 08	; set non-read interrupt
+		dec	iyl				; 08	; set non-read interrupt
 		ld	(PCM2_Buffer+001h),de		; 20	; update IN buffer address
 		ld	(PCM2_SampCur+001h),hl		; 16	; update sample address
 		ld	(PCM2_PitchCur+001h),a		; 13	; update pitch fraction
@@ -936,7 +916,7 @@ CU_Flush:
 ; ---------------------------------------------------------------------------
 
 			exx					; 04	; switch registers back
-			ldin	x,l,010h/002h			; 11	; set ix low byte to number of bytes to flush
+			ld	ixl,010h/002h			; 11	; set ix low byte to number of bytes to flush
 
 FL_NextByte:
 			M_Flush02				; 59	; flush a byte to the YM2612
@@ -951,7 +931,7 @@ Z80_Flush2:	ld	b,00Ch
 		djnz	*
 			exx					; 04	; switch registers
 
-			deci	x,l				; 08	; decrease ix low byte counter
+			dec	ixl				; 08	; decrease ix low byte counter
 			jp	nz,FL_NextByte			; 10	; if it hasn't finished, branch
 
 	; --- Advance/Wrap OUT buffers ---
@@ -965,7 +945,7 @@ Z80_Flush2:	ld	b,00Ch
 ; ---------------------------------------------------------------------------
 
 PCM1_Mute:
-		deci	y,l				; 08	; set non-read interrupt
+		dec	iyl				; 08	; set non-read interrupt
 		ld	a,(PCM1_PitchQuo+001h)		; 13	; load quotient
 		inc	a				; 04	; increase by 1 (because FF00 is stopped), is it playing normally?
 		jp	p,PCM1_Normal			; 10	; if so, branch
@@ -1018,7 +998,7 @@ PCM1_PrepLoc:	ld	hl,(PCM1_PrepTable)		; 10	; load correct LDI instruction to cha
 			M_Flush01				; 59	; flush a byte to the YM2612
 			exx					; 04	; switch registers
 		ld	h,080h				; 07	; set h to negative address (for V-blank)
-		inci	y,l				; 08	; set window interrupt
+		inc	iyl				; 08	; set window interrupt
 Int1_jp:	jp	PCM1_PrepRet			; 10	; return
 
 ; ===========================================================================
@@ -1044,7 +1024,7 @@ PCM1_ValueAdd:	ld	de,00000h			; 10	; load to de
 
 		ld	sp,Z80_Stack			; 10	; set valid stack
 
-		deci	y,l				; 08	; set non-read interrupt
+		dec	iyl				; 08	; set non-read interrupt
 
 		ld	a,011010010b			; 07	; set bank change request flag
 		ld	(PCM1_ChangeBank),a		; 13	; ''
@@ -1058,7 +1038,7 @@ PCM1_ValueAdd:	ld	de,00000h			; 10	; load to de
 		zadd	a,(hl)				; 07	; increment/decrement the bank address
 
 		ld	hl,06001h			; 10	; load bank switch register port
-		deci	y,l				; 08	; set bank interrupt
+		dec	iyl				; 08	; set bank interrupt
 Int1_ldhl:	ld	(hl),a				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		rrca					; 04
 		ld	(hl),a				; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
@@ -1076,7 +1056,7 @@ Int1_ldhl:	ld	(hl),a				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		ld	(hl),a				; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
 		ld	(hl),h	; clear			; 07	; 1000 0000 0   8MB -  16MB (800000 - 1000000)
 
-		inci	y,l				; 08	; set non-read interrupt
+		inc	iyl				; 08	; set non-read interrupt
 
 PCM1_ResInst:	ld	hl,00000h			; 10	; load instruction address to change back to "LDI"
 		ld	(hl),0EDh			; 10	; change to LDI again
@@ -1085,7 +1065,7 @@ PCM1_ResSamp:	ld	hl,00000h			; 10	; restore registers
 PCM1_ResBuff:	ld	de,00000h			; 10	; ''
 PCM1_ResDiv:	ld	bc,00000h			; 10	; ''
 PCM1_ResPitCur:	ld	a,000h				; 07	; ''
-		inci	y,l				; 08	; set window interrupt
+		inc	iyl				; 08	; set window interrupt
 PCM1_ResQuo:	ld	sp,00000h			; 10	; restore stack AFTER iy setting
 
 PCM1_ResJump:	jp	00000h				; 10	; jump back to correct LDI instruction
@@ -1126,7 +1106,7 @@ PCM1_NewReverse:
 ; ---------------------------------------------------------------------------
 
 PCM2_Mute:
-		deci	y,l				; 08	; set non-read interrupt
+		dec	iyl				; 08	; set non-read interrupt
 		ld	a,(PCM2_PitchQuo+001h)		; 13	; load quotient
 		inc	a				; 04	; increase by 1 (because FF00 is stopped), is it playing normally?
 		jp	p,PCM2_Normal			; 10	; if so, branch
@@ -1176,7 +1156,7 @@ PCM2_PrepLoc:	ld	hl,(PCM2_PrepTable)		; 10	; load correct LDI instruction to cha
 		ld	(PCM2_ResJump+001h),hl		; 16	; ''
 		ld	(hl),011000111b|PCM2_ResetJmp	; 10	; change LDI to "rst 30h"
 		ld	h,080h				; 07	; set h to negative address (for V-blank)
-		inci	y,l				; 08	; set window interrupt
+		inc	iyl				; 08	; set window interrupt
 Int2_jp:	jp	PCM2_PrepRet			; 10	; return
 
 ; ===========================================================================
@@ -1202,7 +1182,7 @@ PCM2_ValueAdd:	ld	de,00000h			; 10	; load to de
 
 		ld	sp,Z80_Stack			; 10	; set valid stack
 
-		deci	y,l				; 08	; set non-read interrupt
+		dec	iyl				; 08	; set non-read interrupt
 
 		ld	a,011010010b			; 07	; set bank change request flag
 		ld	(PCM2_ChangeBank),a		; 13	; ''
@@ -1216,7 +1196,7 @@ PCM2_ValueAdd:	ld	de,00000h			; 10	; load to de
 		zadd	a,(hl)				; 07	; increment/decrement the bank address
 
 		ld	hl,06001h			; 10	; load bank switch register port
-		deci	y,l				; 08	; set bank interrupt
+		dec	iyl				; 08	; set bank interrupt
 Int2_ldhl:	ld	(hl),a				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		rrca					; 04
 		ld	(hl),a				; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
@@ -1234,7 +1214,7 @@ Int2_ldhl:	ld	(hl),a				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
 		ld	(hl),a				; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
 		ld	(hl),h	; clear			; 07	; 1000 0000 0   8MB -  16MB (800000 - 1000000)
 
-		inci	y,l				; 08	; set non-read interrupt
+		inc	iyl				; 08	; set non-read interrupt
 
 PCM2_ResInst:	ld	hl,00000h			; 10	; load instruction address to change back to "LDI"
 		ld	(hl),0EDh			; 10	; change to LDI again
@@ -1243,7 +1223,7 @@ PCM2_ResSamp:	ld	hl,00000h			; 10	; restore registers
 PCM2_ResBuff:	ld	de,00000h			; 10	; ''
 PCM2_ResDiv:	ld	bc,00000h			; 10	; ''
 PCM2_ResPitCur:	ld	a,000h				; 07	; ''
-		inci	y,l				; 08	; set window interrupt
+		inc	iyl				; 08	; set window interrupt
 PCM2_ResQuo:	ld	sp,00000h			; 10	; restore stack AFTER iy setting
 
 PCM2_ResJump:	jp	00000h				; 10	; jump back to correct LDI instruction
