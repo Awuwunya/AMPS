@@ -118,7 +118,7 @@ Z80_Start:
 		ld	i,a				; 08	; ''
 		jp	Z80_Init			; 10	; jump to the rest of the init routine
 
-		align	00Ch
+		align	MaxPitch/$100
 
 	; The space from "Start" until the maximum pitch amount, is the space
 	; where data could potentially be pushed into, thanks to the sp.
