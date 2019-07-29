@@ -270,14 +270,9 @@ AMPS_DebugR_VolEnvID:
 ; ---------------------------------------------------------------------------
 
 AMPS_Debug_VolEnvCmd	macro
-	cmp.b	#eLast,d0	; check against max
-	bhs.s	.fail		; if too much, bra
-	cmp.b	#$80,d0		; check against min
-	blo.s	.fail		; if too little, bra
 	btst	#0,d0		; check if even
 	beq.s	.ok		; if is, branch
 
-.fail
 	if def(RaiseError)	; check if Vladik's debugger is active
 		RaiseError2 "Volume envelope command invalid: %<.b d0>", AMPS_Debug_Console_Channel
 	else
