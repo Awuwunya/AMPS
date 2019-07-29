@@ -27,8 +27,9 @@ enum	macro	num, lable
 	enum nB6+1, nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
 
 ; ---------------------------------------------------------------------------------------------
-; PSG volume envelope equates
+; Other Equates
 v00 =	$00
+m00 =	$00
 
 ; ---------------------------------------------------------------------------------------------
 ; Header Macros
@@ -313,6 +314,16 @@ sVoice		macro val
 	dc.b $E8, \val
     endm
 
+; E8xx - Set volume envelope to xx (INSTRUMENT - INS_C_PSG)
+sVolEnv		macro val
+	dc.b $E8, \val
+    endm
+
+; F2xx - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
+sModEnv		macro val
+	dc.b $F2, \val
+    endm
+
 ; E9xx - Set music speed shoes tempo to xx (TEMPO - TEMPO_SET_SPEED)
 ssTempoShoes	macro val
 	dc.b $E9, \val
@@ -321,16 +332,6 @@ ssTempoShoes	macro val
 ; EAxx - Set music tempo to xx (TEMPO - TEMPO_SET)
 ssTempo		macro val
 	dc.b $EA, \val
-    endm
-
-; EB - Turn on Modulation (MOD_SET - MODS_ON)
-sModOn		macro
-	dc.b $EB
-    endm
-
-; EC - Turn off Modulation (MOD_SET - MODS_OFF)
-sModOff		macro
-	dc.b $EC
     endm
 
 ; EDxx - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
@@ -366,14 +367,19 @@ ssMod68k	macro wait, speed, step, count
 	dc.b $F0, \wait,\speed,\step,\count
     endm
 
-; F1 - Use sample DAC mode (DAC_MODE - DACM_SAMP)
-sModeSampDAC	macro
-	dc.b $F1
+; F1xx - Set portamento speed to xx frames. 0 means portamento is disabled (PORTAMENTO)
+ssPortamento	macro vol
+	dc.b $F1, \vol
     endm
 
-; F2 - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
-sModePitchDAC	macro
-	dc.b $F2
+; FF00 - Turn on Modulation (MOD_SET - MODS_ON)
+sModOn		macro
+	dc.b $FF, $00
+    endm
+
+; FF04 - Turn off Modulation (MOD_SET - MODS_OFF)
+sModOff		macro
+	dc.b $FF, $04
     endm
 
 ; F3xx - PSG4 noise mode xx (PSG_NOISE - PNOIS_AMPS)
@@ -441,90 +447,95 @@ sCmdYM		macro reg, val
 	dc.b $FE, \reg,\val
     endm
 
-; FF00xx - Play sample xx on DAC1 (PLAY_DAC - PLAY_DAC1)
-sPlaySamp1	macro id
-	dc.b $FF,$00, \id
-    endm
-
-; FF01xx - Play sample xx on DAC1 (PLAY_DAC - PLAY_DAC2)
-sPlaySamp2	macro id
-	dc.b $FF,$01, \id
-    endm
-
-; FF02xxxx - Set channel frequency to xxxx (CHFREQ_SET)
+; FF08xxxx - Set channel frequency to xxxx (CHFREQ_SET)
 ssFreq		macro freq
-	dc.b $FF,$02
+	dc.b $FF,$08
 	dc.w \freq
     endm
 
-; FF03xx - Set channel frequency to note xx (CHFREQ_SET - CHFREQ_NOTE)
+; FF0Cxx - Set channel frequency to note xx (CHFREQ_SET - CHFREQ_NOTE)
 ssFreqNote	macro note
-	dc.b $FF,$03, \note^$80
+	dc.b $FF,$0C, \note^$80
     endm
 
-; FF04 - Increment spindash rev counter (SPINDASH_REV - SDREV_INC)
+; FF10 - Increment spindash rev counter (SPINDASH_REV - SDREV_INC)
 sSpinRev	macro
-	dc.b $FF,$04
+	dc.b $FF,$10
     endm
 
-; FF05 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
+; FF14 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
 sSpinReset	macro
-	dc.b $FF,$05
+	dc.b $FF,$14
     endm
 
-; FF06xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
+; FF18xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
 saTempoSpeed	macro tempo
-	dc.b $FF,$06, \tempo
+	dc.b $FF,$18, \tempo
     endm
 
-; FF07xx - Add xx to music tempo (TEMPO - TEMPO_ADD)
+; FF1Cxx - Add xx to music tempo (TEMPO - TEMPO_ADD)
 saTempo		macro tempo
-	dc.b $FF,$07, \tempo
+	dc.b $FF,$1C, \tempo
     endm
 
-; FF08xyzz - Get RAM address pointer offset by y, compare zz with it using condition x (COMM_CONDITION - COMM_SPEC)
+; FF20xyzz - Get RAM address pointer offset by y, compare zz with it using condition x (COMM_CONDITION - COMM_SPEC)
 sCondReg	macro off, cond, val
-	dc.b $FF,$08, \off|(\cond<<4),\val
+	dc.b $FF,$20, \off|(\cond<<4),\val
     endm
 
-; FF09xx - Play another music/sfx (SND_CMD)
+; FF24xx - Play another music/sfx (SND_CMD)
 sPlayMus	macro id
-	dc.b $FF,$09, \id
+	dc.b $FF,$24, \id
     endm
 
-; FF0A - Enable raw frequency mode (RAW_FREQ)
+; FF28 - Enable raw frequency mode (RAW_FREQ)
 sFreqOn		macro freq
-	dc.b $FF,$0A
+	dc.b $FF,$28
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
-; FF0B - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
+; FF2C - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
 sFreqOff	macro freq
-	dc.b $FF,$0B
+	dc.b $FF,$2C
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
-; FF0C - Enable FM3 special mode (SPC_FM3)
+; FF30 - Enable FM3 special mode (SPC_FM3)
 sSpecFM3	macro freq
-	dc.b $FF,$0C
+	dc.b $FF,$30
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
-; FF0Dxx - Set DAC filter bank address (DAC_FILTER)
+; FF34xx - Set DAC filter bank address (DAC_FILTER)
 ssFilter	macro bank
-	dc.b $FF,$0D, \bank
+	dc.b $FF,$34, \bank
     endm
 
-; FF0E - Freeze 68k. Debug flag (DEBUG_STOP_CPU)
+; FF38 - Load the last song from back-up (FADE_IN_SONG)
+sBackup		macro
+	dc.b $FF,$38
+    endm
+
+; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
+sModeSampDAC	macro
+	dc.b $EB
+    endm
+
+; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+sModePitchDAC	macro
+	dc.b $EC
+    endm
+
+; FF40 - Freeze 68k. Debug flag (DEBUG_STOP_CPU)
 sFreeze		macro
 	if safe=1
-		dc.b $FF,$0E
+		dc.b $FF,$40
 	endif
     endm
 
-; FF0F - Bring up tracker debugger at end of frame. Debug flag (DEBUG_PRINT_TRACKER)
+; FF44 - Bring up tracker debugger at end of frame. Debug flag (DEBUG_PRINT_TRACKER)
 sCheck		macro
 	if safe=1
-		dc.b $FF,$0F
+		dc.b $FF,$44
 	endif
     endm

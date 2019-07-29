@@ -1339,12 +1339,11 @@ Dis_DAC2:
 ; now at $600
 
 .loop2	sCall		Dis_PWM4_3			; PWM3 and 4
-	dc.b nRst, p84, p84, nRst, p84, p84, p84	; $180 * 4 = $600
-	dc.b p84
+	dc.b $06, $0C, $06, $06, $06, $06		; $180 * 4 = $600
 	sLoop		$00, $04, .loop2
 
 	sCall		Dis_PWM4_3			; PWM4		; $180
-	dc.b nRst, $30
+	dc.b sHold, nRst, $30-6
 	sJump		.loop				; TOTAL $D80
 
 Dis_PWM12_1:
@@ -1365,12 +1364,9 @@ Dis_PWM4_1:
 	sRet
 
 Dis_PWM4_3:
-	dc.b p89, $06, p84, nRst, p84, nRst, p84, p84
-	dc.b nRst, p84, nRst, p84, nRst, p84, nRst, p84
-	dc.b nRst, p84, nRst, p84, p84, nRst, p84, p84
-	dc.b nRst, p84, nRst, p84, nRst, p84, nRst, p84
-	dc.b p84, nRst, p84, nRst, p84, p84, nRst, p84
-	dc.b p84, nRst, p84, p84, nRst, p84, p84, nRst
-	dc.b p84, nRst, p84, nRst, p84, p84, nRst, p84
-	dc.b p84
+	dc.b p89, $12, p84, $0C, $06, $0C, $0C, $0C
+	dc.b $0C, $0C, $0C, $06, $0C, $06, $0C, $0C
+	dc.b $0C, $0C, $06, $0C, $0C, $06, $0C, $06
+	dc.b $0C, $06, $0C, $06, $0C, $0C, $0C, $06
+	dc.b $0C, $06, $0C
 	sRet

@@ -1626,7 +1626,7 @@ zreg2 =	ztemp
 			mexit
 		endif
 
-		dc.b $DD+((zreg1&$02)*$10), $60+((zreg1&$01)*$08)+(zreg2&$01); ld ixh, ixl, iyh, iyl,ixh, ixl, iyh, iyl
+		dc.b $DD+((zreg1&$02)*$10), $64+((zreg1&$01)*$08)+(zreg2&$01); ld ixh, ixl, iyh, iyl,ixh, ixl, iyh, iyl
 
 	else
 		inform 2,"Invalid or unsupported register combination '\reg1' and '\reg2'!"
@@ -1743,6 +1743,10 @@ jpc	macro off
 	z80word \off
     endm
 
+jpnv	macro off
+	jppo	\off
+    endm
+
 jppo	macro off
 	if narg=0
 		inform 2,"No jump address supplied!"
@@ -1759,6 +1763,10 @@ jpp	macro off
 
 	dc.b $F2
 	z80word \off
+    endm
+
+jpv	macro off
+	jppe	\off
     endm
 
 jppe	macro off

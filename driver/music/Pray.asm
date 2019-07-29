@@ -311,7 +311,7 @@ Pray_FM3:
 	sPan		spCentre, $00
 	ssMod68k	$01, $01, $00, $00
 ;	saVol		$04
-	sPan		spCenter, $00
+;	sPan		spCenter, $00
 	sVoice		$04
 	sNoteTimeOut	$03
 
@@ -371,8 +371,11 @@ Pray_FM4:
 
 Pray_Cond5:
 Pray_Jump5:
+	ssPortamento	$00
 	sVoice		$05
-	dc.b nC4, $0C, nRst, $08, nG3, $04, nBb3, $08
+	dc.b nC4, $0C
+	ssPortamento	$08
+	dc.b nRst, $08, nG3, $04, nBb3, $08
 	dc.b nD4, $04, nRst, $08, nC4, $04, nRst, $08
 	dc.b nG3, $04, nRst, $08, nBb3, $04, nRst, $08
 	dc.b nD4, $04, nF4, $0C, nE4, nRst, $08, nG3
@@ -388,6 +391,7 @@ Pray_Jump5:
 	saTranspose	$FB
 	sCall		Pray_Call2
 	saTranspose	$05
+	ssPortamento	$04
 	dc.b nG5, $30, sHold, $17, nRst, $01
 	;sNoteTimeIn	$01
 	dc.b nE5, $08, nF5, $04, nG5, $08, nF5, $04
@@ -439,6 +443,7 @@ Pray_Jump4:
 	dc.b nRst, $09
 	saVol		$0A
 	sPan		spLeft, $00
+	ssPortamento	$08
 	dc.b nC4, $0C, nRst, $08, nG3, $04, nBb3, $08
 	dc.b nD4, $04, nRst, $08, nC4, $04, nRst, $08
 	dc.b nG3, $04, nRst, $08, nBb3, $04, nRst, $03
@@ -467,6 +472,7 @@ Pray_Jump4:
 	saTranspose	$FB
 	sCall		Pray_Call2
 	saTranspose	$05
+	ssPortamento	$04
 	dc.b nG5, $30, sHold, $17, nRst, $01
 	;sNoteTimeIn	$01
 	dc.b nE5, $08, nF5, $04, nG5, $05
@@ -648,7 +654,9 @@ Pray_Jump9:
 	sJump		Pray_Jump9
 
 Pray_Call2:
-	dc.b nC5, $0F, nD5, $01, nE5, $02, nF5, $01
+	ssPortamento	$00
+	dc.b nC5, $0F
+	dc.b nD5, $01, nE5, $02, nF5, $01
 	dc.b nG5, $02, nA5, $01, nBb5, $02
 	sRet
 

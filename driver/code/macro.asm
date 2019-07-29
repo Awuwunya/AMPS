@@ -15,6 +15,12 @@ safe =	1
 ; 1 = Counter method.
 
 tempo =	0
+
+FEATURE_MODULATION =	1	; set to 1 to enable software modulation effect
+FEATURE_PORTAMENTO =	1	; set to 1 to enable portamento flag
+FEATURE_MODENV =	1	; set to 1 to enable modulation envelopes
+FEATURE_BACKUP =	1	; set to 1 to enable back-up channels. Used for the 1-up SFX in Sonic 1, 2 and 3K...
+FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Used for the 1-up SFX.
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Channel configuration
@@ -36,16 +42,32 @@ cVoice		rs.b 1		; YM2612 voice ID. FM only
 cDuration	rs.b 1		; current note duration
 cLastDur	rs.b 1		; last note duration
 cFreq		rs.w 1		; channel base frequency
+
+	if FEATURE_MODULATION
 cModDelay	rs.b 0		; delay before modulation starts
 cMod		rs.l 1		; modulation data address
 cModFreq	rs.w 1		; modulation frequency offset
 cModSpeed	rs.b 1		; number of frames til next modulation step
 cModStep	rs.b 1		; modulation frequency offset per step
 cModCount	rs.b 1		; number of modulation steps until reversal
+	endif
+
+	if FEATURE_PORTAMENTO
+cPortaSpeed	rs.b 1		; number of frames for each portamento to complete. 0 means it is disabled.
+cPortaFreq	rs.w 1		; frequency offset for portamento.
+cPortaDisp	rs.w 1		; frequency displacement per frame for portamento.
+	endif
+
+	if FEATURE_MODENV
+cModEnv		rs.b 1		; modulation envelope ID
+cModEnvPos	rs.b 1		; modulation envelope position
+cModEnvSens	rs.b 1		; sensitivity of modulation envelope
+	endif
+
 cLoop		rs.b 3		; loop counter values
+cSizeSFX	rs.w 0		; size of each SFX track (this also sneakily makes sure the memory is aligned to word always. Additional loop counter may be added if last byte is odd byte)
 cStatPSG4 =	__rs-1		; PSG4 type value. PSG3 only
 cPrio =		__rs-2		; sound effect channel priority. SFX only
-cSizeSFX	rs.w 0		; size of each SFX track
 
 cNoteTimeCur	rs.b 1		; frame counter to note off. Music only
 cNoteTimeMain	rs.b 1		; copy of frame counter to note off. Music only
@@ -133,7 +155,6 @@ dPSG =		$C00011		; quick reference to PSG port
 	rsset Drvmem		; Insert your RAM definition here!
 mFlags		rs.b 1		; various driver flags, see below
 mCtrPal		rs.b 1		; frame counter fo 50hz fix
-mVctMus		rs.l 1		; address of voice table for music
 mComm		rs.b 8		; communications bytes
 mMasterVolFM	rs.b 0		; master volume for FM channels
 mFadeAddr	rs.l 1		; fading program address
@@ -143,6 +164,7 @@ mTempo		rs.b 1		; current tempo we are using right now
 mTempoCur	rs.b 1		; tempo counter/accumulator
 mQueue		rs.b 3		; sound queue
 mMasterVolPSG	rs.b 1		; master volume for PSG channels
+mVctMus		rs.l 1		; address of voice table for music
 mMasterVolDAC	rs.b 1		; master volume for DAC channels
 mSpindash	rs.b 1		; spindash rev counter
 mContCtr	rs.b 1		; continous sfx loop counter
@@ -166,6 +188,26 @@ mSFXFM5		rs.b cSizeSFX	; SFX FM 5 data
 mSFXPSG1	rs.b cSizeSFX	; SFX PSG 1 data
 mSFXPSG2	rs.b cSizeSFX	; SFX PSG 2 data
 mSFXPSG3	rs.b cSizeSFX	; SFX PSG 3 data
+mChannelEnd	rs.w 0		; used to determine where channel RAM ends
+
+	if FEATURE_BACKUP
+mBackDAC1	rs.b cSize	; back-up DAC 1 data
+mBackDAC2	rs.b cSize	; back-up DAC 2 data
+mBackFM1	rs.b cSize	; back-up FM 1 data
+mBackFM2	rs.b cSize	; back-up FM 2 data
+mBackFM3	rs.b cSize	; back-up FM 3 data
+mBackFM4	rs.b cSize	; back-up FM 4 data
+mBackFM5	rs.b cSize	; back-up FM 5 data
+mBackPSG1	rs.b cSize	; back-up PSG 1 data
+mBackPSG2	rs.b cSize	; back-up PSG 2 data
+mBackPSG3	rs.b cSize	; back-up PSG 3 data
+
+mBackTempoMain	rs.b 1		; back-up music normal tempo
+mBackTempoSpeed	rs.b 1		; back-up music speed shoes tempo
+mBackTempo	rs.b 1		; back-up current tempo we are using right now
+mBackTempoCur	rs.b 1		; back-up tempo counter/accumulator
+mBackVctMus	rs.l 1		; back-up address of voice table for music
+	endif
 
 	if safe=1
 msChktracker	rs.b 1		; safe mode only: If set, bring up debugger
@@ -181,6 +223,7 @@ mfbRing		rs.b 1		; if set, change speaker (play different sfx)
 mfbSpeed	rs.b 1		; if set, speed shoes are active
 mfbWater	rs.b 1		; if set, underwater mode is active
 mfbNoPAL	rs.b 1		; if set, play songs slowly in PAL region
+mfbBacked	rs.b 1		; if set, a song has been backed up already
 mfbPaused =	$07		; if set, sound driver is paused
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -236,6 +279,10 @@ eReset		rs.w 1		; 80 - Restart from position 0
 eHold		rs.w 1		; 82 - Hold volume at current level
 eLoop		rs.w 1		; 84 - Jump back/forwards according to next byte
 eStop		rs.w 1		; 86 - Stop current note and envelope
+
+; these next ones are only valid for modulation envelopes. These are ignored for volume envelopes.
+esSens		rs.w 1		; 88 - Set the sensitivity of the modulation envelope
+eaSens		rs.w 1		; 8A - Add to the sensitivity of the modulation envelope
 eLast		rs.w 0		; safe mode equate
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -316,6 +363,23 @@ volenv		macro name
 v\name =	__venv			; create SMPS2ASM equate
 		dc.l vd\name		; create pointer
 __venv =	__venv+1		; increase ID
+	shift				; shift next argument into view
+	endr
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Create modulation envelope table, and SMPS2ASM equates
+; ---------------------------------------------------------------------------
+
+modenv		macro name
+	rept narg			; repeate for all arguments
+m\name =	__menv			; create SMPS2ASM equate
+
+	if FEATURE_MODENV
+		dc.l md\name		; create pointer
+	endif
+
+__menv =	__menv+1		; increase ID
 	shift				; shift next argument into view
 	endr
     endm

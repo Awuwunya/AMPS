@@ -541,9 +541,11 @@ Pelimusa_FM3:
 .jousi	ssVol		$16
 	sVoice		pJousi
 	ssMod68k	$06, $01, $04, $02
+	ssPortamento	$00
 
-.jousi2	dc.b nE5, $30, nF5, nG4, nD5, nE5, nF5
-	dc.b nD5, $60
+.jousi2	dc.b nE5, $30
+	ssPortamento	$0A
+	dc.b nF5, nG4, nD5, nE5, nF5, nD5, $60
 	sLoop		$00, $02, .jousi2
 	sRet
 ; ---------------------------------------------------------------------------
@@ -585,8 +587,10 @@ Pelimusa_FM34_Volume2	macro volume
 Pelimusa_FM3_Pattern8:
 	sVoice		pMelodia
 	ssMod68k	$01, $01, -$02, $08
+	ssPortamento	$00
 
 .loop	Pelimusa_FM34_Volume nA4, 64, 8, 32, 8, 48, 8, 32, 8
+	ssPortamento	$02
 	Pelimusa_FM34_Volume nF4, 48, 8, 32, 8
 	Pelimusa_FM34_Volume nA4, 48, 8
 	Pelimusa_FM34_Volume nF4, 48, 8
@@ -623,8 +627,10 @@ Pelimusa_FM4:
 .jousi	ssVol		$17
 	sVoice		pJousi
 	ssMod68k	$04, $01, $04, $03
+	ssPortamento	$00
 
 .jousi2	dc.b nA4, $60
+	ssPortamento	$0A
 	dc.b nC4, $30, nG4
 	dc.b nA4, $60, nG4
 	sLoop		$00, $02, .jousi2
@@ -635,6 +641,7 @@ Pelimusa_FM4:
 Pelimusa_FM4_Pattern8:
 	sVoice		pMelodia
 	ssMod68k	$02, $01, -$03, $08
+	ssPortamento	$02
 
 .loop	dc.b nRst, $06
 	Pelimusa_FM34_Volume nA4, 32, 4, 16, 4, 24, 4, 16, 4
@@ -673,6 +680,8 @@ Pelimusa_FM5:
 ; ---------------------------------------------------------------------------
 
 .jousi	ssMod68k	$03, $01, $03, $02
+	ssPortamento	$0A
+
 .jousi2	dc.b nC5, $60
 	dc.b nE4, $30, nB4
 	dc.b nC5, $60, nB4

@@ -26,13 +26,6 @@ LoadDualPCM:
 		move.b	(a0)+,(a1)+		; copy the Dual PCM driver into Z80 RAM
 		dbf	d1,.load		; write every single byte
 
-		lea	SampleList(pc),a0	; load address for the stop sample data into a0
-		lea	dZ80+MuteSample,a1	; load address in Dual PCM to write into a1
-
-	rept 6
-		move.b	(a0)+,(a1)+		; copy all required data
-	endr
-
 		moveq	#2,d0			; set flush timer for 60hz systems
 		btst	#6,Region.w		; is this a PAL Mega Drive?
 		beq.s	.ntsc			; if not, branch
@@ -111,8 +104,8 @@ dUpdateAllAMPS:
 	if safe=1
 		AMPS_Debug_FadeCmd		; check if this command is valid
 	endif
-		lea	dFadeCommands-$80(pc),a2; load fade commands pointer table to a2
-		jsr	(a2,d0.w)		; run the fade command code
+		lea	dFadeCommands(pc),a2	; load fade commands pointer table to a2
+		jsr	-$80(a2,d0.w)		; run the fade command code
 		clr.b	mFadeAddr+1.w		; mark the fade program as completed
 		bra.s	.chkregion		; go check the region
 
@@ -226,7 +219,7 @@ dAMPSdoDAC:
 	dNoteToutDAC	 			; handle DAC-specific note timeout behavior
 
 	dCalcFreq				; calculate channel base frequency
-	dModulate dAMPSdoFM, dAMPSdoDAC, 4	; run modulation code
+	dModPorta dAMPSdoFM, dAMPSdoDAC, 4	; run modulation + portamento code
 		bsr.w	dUpdateFreqDAC		; if frequency needs changing, do it
 
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
@@ -253,7 +246,7 @@ dAMPSdoDAC:
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
 .pcnote
-	dProcNote 0, 0				; reset necessary channel memory
+	dProcNote 0, -1				; reset necessary channel memory
 
 		tst.b	d6			; check if channel was resting
 		bmi.s	.noplay			; if yes, we do not want to note on anymore
@@ -332,9 +325,19 @@ dUpdateFreqOffDAC:
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add it to d6
 
+	if FEATURE_PORTAMENTO
+		jsr	dModEnvProg(pc)		; process modulation envelope
+	endif
+
+	if FEATURE_PORTAMENTO
+		add.w	cPortaFreq(a5),d6	; add portamento speed to frequency
+	endif
+
+	if FEATURE_MODULATION
 		btst	#cfbMod,(a5)		; check if channel is modulating
 		beq.s	dUpdateFreqDAC3		; if not, branch
 		add.w	cModFreq(a5),d6		; add modulation frequency offset to d6
+	endif
 		bra.s	dUpdateFreqDAC3
 
 dUpdateFreqDAC:
@@ -386,7 +389,8 @@ dCalcDuration:
 		moveq	#0,d1			; clear upper bytes (for dbf)
 		move.b	cTick(a5),d1		; get tick multiplier to d1
 
-.multiply	add.b	d5,d0			; add duration value to d0
+.multiply
+		add.b	d5,d0			; add duration value to d0
 		dbf	d1,.multiply		; multiply by tick rate
 
 		move.b	d0,cLastDur(a5)		; save as the new duration
@@ -402,14 +406,14 @@ dAMPSdoSFX:
 dAMPSdoDACSFX:
 		add.w	#cSizeSFX,a5		; go to the next channel
 		tst.b	(a5)			; check if channel is running a tracker
-		bpl.s	.next			; if not, branch
+		bpl.w	.next			; if not, branch
 
 		lea	SampleList(pc),a6	; get SampleList to a6 for quick access
 		subq.b	#1,cDuration(a5)	; decrease note duration
 		beq.w	.update			; if timed out, update channel
 
 	dCalcFreq				; calculate channel base frequency
-	dModulate dAMPSdoFMSFX, dAMPSdoDAC, 5	; run modulation code
+	dModPorta dAMPSdoFMSFX, dAMPSdoDAC, 5	; run modulation + portamento code
 		bsr.w	dUpdateFreqDAC2		; if frequency needs changing, do it
 
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
@@ -435,7 +439,7 @@ dAMPSdoDACSFX:
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
 .pcnote
-	dProcNote 1, 0				; reset necessary channel memory
+	dProcNote 1, -1				; reset necessary channel memory
 		tst.b	d6			; check if channel was resting
 		bmi.s	.noplay			; if yes, we do not want to note on anymore
 		bsr.w	dNoteOnDAC		; do hardware note-on behavior
@@ -635,8 +639,6 @@ dPlaySnd:
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_Music:
-		jsr	dStopMusic(pc)		; mute hardware and reset all driver memory
-		jsr	dResetVolume(pc)	; reset volumes and end any fades
 ; ---------------------------------------------------------------------------
 ; To save few cycles, we don't directly substract the music offset from
 ; the ID, and instead offset the table position. In practice this will
@@ -646,7 +648,7 @@ dPlaySnd_Music:
 		lea	MusicIndex-(MusOff*4)(pc),a4; get music pointer table with an offset
 		add.w	d7,d7			; quadruple music ID
 		add.w	d7,d7			; since each entry is 4 bytes in size
-		move.b	(a4,d7.w),mTempoSpeed.w	; load speed shoes tempo from the unused 8 bits
+		move.b	(a4,d7.w),d6		; load speed shoes tempo from the unused 8 bits
 		movea.l	(a4,d7.w),a4		; get music header pointer from the table
 
 	if safe=1
@@ -655,7 +657,55 @@ dPlaySnd_Music:
 		move.l	d0,a4			; to show the address correctly. Move ptr back to a4
 		AMPS_Debug_PlayTrackMus		; check if this was valid music
 	endif
+; ---------------------------------------------------------------------------
+; The following code will 'back-up' every song by copying its data to
+; other memory location. There is another piece of code that will copy
+; back once the other song ends. This will do proper restoration of the
+; channels into hardware! The 6th bit of tick multiplier is used to
+; determine whether to back-up or not...
+; ---------------------------------------------------------------------------
 
+	if FEATURE_BACKUP
+		btst	#6,(a4)			; check if this song should cause the last one to be backed up
+		beq.s	.clrback		; if not, skip
+		bset	#mfbBacked,mFlags.w	; check if song was backed up (and if not, set the bit)
+		bne.s	.noback			; if yes, preserved the backed up song
+
+		move.l	mTempoMain.w,mBackTempoMain.w; backup tempo settings
+		move.l	mVctMus.w,mBackVctMus.w	; backup voice table address
+
+		lea	mDAC1.w,a2		; load source address to a0
+		lea	mBackDAC1.w,a1		; load destination address to a1
+		move.w	#(mSFXDAC1-mDAC1)/4-1,d0; load backup size to d0
+
+.backup
+		move.l	(a2)+,(a1)+		; back up data for every channel
+		dbf	d0, .backup		; loop for each longword
+
+		moveq	#$FF-(1<<cfbInt)-(1<<cfbVol),d0; each other bit except interrupted and volume update bits
+
+.ch =		mBackDAC1			; start at backup DAC1
+		rept Mus_Ch			; do for all music channels
+			and.b	d0,.ch.w	; remove the interrupted by sfx bit
+.ch =			.ch+cSize		; go to next channel
+		endr
+		bra.s	.noback
+
+.clrback
+		bclr	#mfbBacked,mFlags.w	; set as no song backed up
+
+.noback
+	endif
+; ---------------------------------------------------------------------------
+; EArlier we used to stop the channels immediately, but due to requiring
+; the channel back-up feature, this was moved here instead. It still works
+; out the exact same though...
+; ---------------------------------------------------------------------------
+
+		jsr	dStopMusic(pc)		; mute hardware and reset all driver memory
+		jsr	dResetVolume(pc)	; reset volumes and end any fades
+
+		move.b	d6,mTempoSpeed.w	; save loaded value into tempo speed setting
 		move.l	a4,a3			; copy pointer to a3
 		addq.w	#4,a4			; go to DAC1 data section
 
@@ -678,12 +728,13 @@ dPlaySnd_Music:
 
 		move.b	(a3),d4			; load the tick multiplier to d4
 		bpl.s	.noPAL			; branch if the loaded value was positive
-		and.w	#$7F,d4			; keep value in range
 		or.b	#1<<mfbNoPAL,mFlags.w	; disable PAL fix
 
 .noPAL
 		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbVol),d2; prepare running tracker and volume flags into d2
 		moveq	#$FFFFFFC0,d1		; prepare panning value of centre to d1
+
+		and.w	#$3F,d4			; keep tick multiplier value in range
 		moveq	#cSize,d6		; prepare channel size to d6
 		moveq	#1,d5			; prepare duration of 0 frames to d5
 
@@ -816,7 +867,7 @@ dPlaySnd_Music:
 		moveq	#$FFFFFFB4+2,d0		; YM address: Panning and LFO (FM3/6)
 		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
 
-		move.w	#fLog>>$0F,d0		; use linear filter
+		move.w	#fLog>>$0F,d0		; use logarithmic filter
 		jsr	dSetFilter(pc)		; set filter
 ; ---------------------------------------------------------------------------
 ; This piece of code here handles SFX overriding our newly loaded
@@ -868,6 +919,8 @@ dPlaySnd_Music:
 		jsr	dMutePSGmus(pc)		; mute PSG channel if not interrupted
 		adda.w	d6,a5			; go to the next channel
 		dbf	d4,.mutePSG		; repeat for all FM channels
+
+locret_PlaySnd:
 		rts
 
 ; ===========================================================================
@@ -884,6 +937,11 @@ dPSGtypeVals:	dc.b ctPSG1, ctPSG2, ctPSG3
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_SFX:
+	if FEATURE_BACKUP&FEATURE_BACKUPNOSFX
+		btst	#mfbBacked,mFlags.w	; check if a song has been queued
+		bne.s	locret_PlaySnd		; branch if so
+	endif
+
 ; ---------------------------------------------------------------------------
 ; This is a little special case with Sonic 1 - 3K, where the ring
 ; sound effect would change panning each time it is played. AMPS
@@ -1125,6 +1183,8 @@ dFadeCommands:
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_Stop:
+		bclr	#mfbBacked,mFlags.w	; reset backed up song bit
+
 ; Not needed,	moveq	#$2B,d0			; YM command: DAC Enable
 ; Dual PCM does	moveq	#$FFFFFF80,d1		; FM6 acts as DAC
 ; this for us	jsr	WriteYM_Pt1(pc)		; write to YM global register
@@ -1133,15 +1193,16 @@ dPlaySnd_Stop:
 		moveq	#0,d1			; disable timers and channel 3 special mode
 		jsr	WriteYM_Pt1(pc)		; write to YM global register
 
-		lea	mSFXDAC1.w,a1		; prepare SFX DAC 1 to start clearing fromn
-
-	rept (mSize-mSFXDAC1)/4
+		lea	mSFXDAC1.w,a1		; prepare SFX DAC 1 to start clearing from
+		move.w	#(mChannelEnd-mSFXDAC1)/4-1,d1; load repeat count to d7
+.clear
 		clr.l	(a1)+			; clear entire SFX RAM (others done below)
-	endr
+		dbf	d1,.clear		; loop for each longword to clear it...
 
-	if (mSize-mSFXDAC1)&2
-		clr.w	(a1)			; if there is an extra word, clear it too
+	if (mChannelEnd-mSFXDAC1)&2
+		clr.w	(a1)+			; if there is an extra word, clear it too
 	endif
+
 	; continue straight to stopping music
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -1149,25 +1210,23 @@ dPlaySnd_Stop:
 ; ---------------------------------------------------------------------------
 
 dStopMusic:
-		lea	mFlags.w,a1		; load driver RAM start to a1
-		move.w	(a1),d3			; load driver flags and PAL counter to d3
-		move.b	mMasterVolDAC.w,d4	; load DAC master volume to d4
-		move.l	mQueue.w,d5		; load sound queue and PSG master volume to d5
-		movem.l	mComm.w,d0-d2		; load communications bytes, FM master volume and fade address to d0-d2
+		lea	mVctMus.w,a1		; load driver RAM start to a1
+		move.b	mMasterVolDAC.w,d0	; load DAC master volume to d4
 
-	rept (mSFXDAC1-mFlags)/4
+		move.w	#(mSFXDAC1-mVctMus)/4-1,d1; load repeat count to d7
+.clear
 		clr.l	(a1)+			; clear driver and music channel memory
-	endr
+		dbf	d1,.clear		; loop for each longword to clear it...
 
-	if (mSFXDAC1-mFlags)&2
-		clr.w	(a1)			; if there is an extra word, clear it too
+	if (mSFXDAC1-mVctMus)&2
+		clr.w	(a1)+			; if there is an extra word, clear it too
 	endif
 
-		move.w	d3,mFlags.w		; save driver flags and PAL counter
-		move.b	d4,mMasterVolDAC.w	; save DAC master volume
-		move.l	d5,mQueue.w		; save sound queue and PSG master volume
-		movem.l	d0-d2,mComm.w		; save communications bytes, FM master volume and fade address
+	if safe=1
+		clr.b	msChktracker.w		; if in safe mode, also clear the check tracker variable!
+	endif
 
+		move.b	d0,mMasterVolDAC.w	; save DAC master volume
 		bsr.s	dMutePSG		; hardware mute PSG
 		jsr	dMuteDAC(pc)		; hardware mute DAC
 	; continue straight to hardware muting FM
@@ -1232,6 +1291,19 @@ dFadeOutDataLog:
 	dc.b $4C, $5A, $0C,  $54, $62, $0D,  $5C, $6B, $0D,  $60, $76, $0E
 	dc.b $6C, $7C, $0E,  $74, $7F, $0F,  $7F, $7F, $0F,  fReset
 
+	if FEATURE_BACKUP		; this data is only needed when backup feature is enabled also.
+dFadeInDataLog:				; you may enable this regardless for personal uses
+	dc.b $7F, $7F, $0F,  $74, $7F, $0F,  $6C, $7C, $0E,  $60, $76, $0E
+	dc.b $5C, $6B, $0D,  $54, $62, $0D,  $4C, $5A, $0C,  $46, $54, $0B
+	dc.b $40, $4C, $0A,  $3C, $44, $0A,  $34, $3E, $09,  $30, $39, $08
+	dc.b $2C, $34, $08,  $26, $2E, $07,  $22, $28, $07,  $20, $24, $06
+	dc.b $1C, $1F, $06,  $1A, $1C, $05,  $16, $18, $05,  $14, $15, $05
+	dc.b $11, $13, $04,  $10, $11, $04,  $0E, $10, $04,  $0C, $0E, $03
+	dc.b $0A, $0C, $03,  $09, $0B, $03,  $07, $09, $03,  $06, $08, $02
+	dc.b $05, $07, $02,  $04, $06, $02,  $04, $05, $01,  $03, $05, $01
+	dc.b $02, $04, $01,  $02, $02, $00,  $01, $01, $00,  fEnd
+	endif
+
 ;dFadeOutDataLinear:
 ;	dc.b $01, $00, $00,  $02, $01, $00,  $02, $01, $01,  $03, $02, $01
 ;	dc.b $04, $02, $01,  $04, $03, $02,  $05, $03, $02,  $06, $04, $02
@@ -1276,8 +1348,10 @@ dLoadFade:
 		bpl.s	.search			; branch if this is not a command
 
 .nofade
+		move.b	(a1)+,mMasterVolFM.w	; save new FM master volume
+		move.b	(a1)+,mMasterVolDAC.w	; save new DAC master volume
+		move.b	(a1)+,mMasterVolPSG.w	; save new PSG master volume
 		move.l	a1,mFadeAddr.w		; save new fade program address to memory
-		move.b	d0,mMasterVolFM.w	; save new FM master volume
 		rts
 
 .search
@@ -1366,9 +1440,14 @@ dUpdateVolumeAll:
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_ShoesOn:
+		bset	#mfbSpeed,mFlags.w	; enable speed shoes flag
 		move.b	mTempoSpeed.w,mTempoCur.w; set tempo accumulator/counter to speed shoes one
 		move.b	mTempoSpeed.w,mTempo.w	; set main tempor to speed shoes one
-		bset	#mfbSpeed,mFlags.w	; enable speed shoes flag
+
+	if FEATURE_BACKUP
+		move.b	mBackTempoSpeed.w,mBackTempoCur.w; do the same for backup tempos
+		move.b	mBackTempoSpeed.w,mBackTempo.w
+	endif
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -1383,9 +1462,14 @@ dPlaySnd_Reset:
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_ShoesOff:
+		bclr	#mfbSpeed,mFlags.w	; disable speed shoes flag
 		move.b	mTempoMain.w,mTempoCur.w; set tempo accumulator/counter to normal one
 		move.b	mTempoMain.w,mTempo.w	; set main tempor to normal one
-		bclr	#mfbSpeed,mFlags.w	; disable speed shoes flag
+
+	if FEATURE_BACKUP
+		move.b	mBackTempoMain.w,mBackTempoCur.w; do the same for backup tempos
+		move.b	mBackTempoMain.w,mBackTempo.w
+	endif
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -1508,7 +1592,7 @@ dAMPSnextFMSFX:
 		beq.w	.update			; if timed out, update channel
 
 	dCalcFreq				; calculate channel base frequency
-	dModulate dAMPSdoPSGSFX, dAMPSnextFMSFX, 1; run modulation code
+	dModPorta dAMPSdoPSGSFX, dAMPSnextFMSFX, 1; run modulation + portamento code
 		bsr.w	dUpdateFreqFM3		; send FM frequency to hardware
 
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
@@ -1563,7 +1647,7 @@ dAMPSnextFM:
 
 	dNoteToutFM.w				; handle FM-specific note timeout behavior
 	dCalcFreq				; calculate channel base frequency
-	dModulate dAMPSdoPSG, dAMPSnextFM, 0	; run modulation code
+	dModPorta dAMPSdoPSG, dAMPSnextFM, 0	; run modulation + portamento code
 		bsr.w	dUpdateFreqFM2		; send FM frequency to hardware
 
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
@@ -1616,9 +1700,19 @@ dUpdateFreqFM:
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add to channel base frequency to d6
 
+	if FEATURE_PORTAMENTO
+		jsr	dModEnvProg(pc)		; process modulation envelope
+	endif
+
+	if FEATURE_PORTAMENTO
+		add.w	cPortaFreq(a5),d6	; add portamento speed to frequency
+	endif
+
+	if FEATURE_MODULATION
 		btst	#cfbMod,(a5)		; check if channel is modulating
 		beq.s	dUpdateFreqFM2		; if not, branch
 		add.w	cModFreq(a5),d6		; add channel modulation frequency offset to d6
+	endif
 
 dUpdateFreqFM2:
 		btst	#cfbInt,(a5)		; is the channel interrupted by SFX?
@@ -1822,12 +1916,12 @@ dAMPSdoPSGSFX:
 dAMPSnextPSGSFX:
 		add.w	#cSizeSFX,a5		; go to the next channel
 		tst.b	(a5)			; check if channel is running a tracker
-		bpl.s	.next			; if not, branch
+		bpl.w	.next			; if not, branch
 		subq.b	#1,cDuration(a5)	; decrease note duration
 		beq.w	.update			; if timed out, update channel
 
 	dCalcFreq				; calculate channel base frequency
-	dModulate				; run modulation code
+	dModPorta .endm, -1, -1			; run modulation + portamento code
 		bsr.w	dUpdateFreqPSG3		; if frequency needs changing, do it
 
 .endm
@@ -1889,7 +1983,7 @@ dAMPSnextPSG:
 
 	dNoteToutPSG				; handle PSG-specific note timeout behavior
 	dCalcFreq				; calculate channel base frequency
-	dModulate				; run modulation code
+	dModPorta .endm, -1, -1			; run modulation + portamento code
 		bsr.w	dUpdateFreqPSG2		; if frequency needs changing, do it
 
 .endm
@@ -1935,9 +2029,19 @@ dUpdateFreqPSG:
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add to channel base frequency to d6
 
+	if FEATURE_PORTAMENTO
+		jsr	dModEnvProg(pc)		; process modulation envelope
+	endif
+
+	if FEATURE_PORTAMENTO
+		add.w	cPortaFreq(a5),d6	; add portamento speed to frequency
+	endif
+
+	if FEATURE_MODULATION
 		btst	#cfbMod,(a5)		; check if channel is modulating
 		beq.s	dUpdateFreqPSG2		; if not, branch
 		add.w	cModFreq(a5),d6		; add modulation frequency offset to d6
+	endif
 
 dUpdateFreqPSG2:
 		btst	#cfbInt,(a5)		; is channel interrupted by sfx?
@@ -2013,10 +2117,13 @@ dEnvProgPSG2:
 
 dEnvProgPSG3:
 		move.b	cEnvPos(a5),d1		; get envelope position to d1
-		move.b	(a1,d1.w),d0		; get the date in that position
-		bmi.s	dEnvCommand		; if it is a command, handle it
+		move.b	(a1,d1.w),d0		; get the data in that position
+		bpl.s	.value			; if positive, its a normal value
 
-		addq.b	#1,cEnvPos(a5)		; increment envelope position
+		cmp.b	#eLast-2,d0		; check if this is a command
+		ble.s	dEnvCommand		; if it is handle it
+
+.value		addq.b	#1,cEnvPos(a5)		; increment envelope position
 		add.b	d0,d5			; add envelope volume to d5
 	; continue to update PSG volume
 ; ===========================================================================
@@ -2068,7 +2175,9 @@ dEnvCommand:
 		bra.s	.reset			; 80 - Loop back to beginning
 		bra.s	.hold			; 82 - Hold the envelope at current level
 		bra.s	.loop			; 84 - Go to position defined by the next byte
-	;	bra.s	.stop			; 86 - Stop current note and envelope
+		bra.s	.stop			; 86 - Stop current note and envelope
+		bra.s	.ignore			; 88 - ignore
+		bra.s	.ignore			; 8A - ignore
 ; ---------------------------------------------------------------------------
 
 .stop
@@ -2089,6 +2198,11 @@ dEnvCommand:
 .loop
 		move.b	1(a1,d1.w),cEnvPos(a5)	; set envelope position to the next byte
 		jmp	dEnvProgPSG3(pc)	; run the program again
+; ---------------------------------------------------------------------------
+
+.ignore
+		addq.b	#2,cEnvPos(a5)		; skip the command and the next byte
+		jmp	dEnvProgPSG3(pc)	; run the program again
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Routine for hardware muting a PSG channel
@@ -2105,8 +2219,126 @@ dMutePSGsfx:
 
 locret_MutePSG:
 		rts
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Routine for running modulation envelope programs
+; ---------------------------------------------------------------------------
 
-	dc.b "AMPS 1.0"				; not required, just here to make my life easier
+dModEnvProg:
+	if FEATURE_MODENV
+		moveq	#0,d4
+		move.b	cModEnv(a5),d4		; load modulation envelope ID to d4
+		beq.s	locret_MutePSG		; if 0, return
+
+	if safe=1
+		AMPS_Debug_ModEnvID		; check if modulation envelope ID is valid
+	endif
+
+		lea	ModEnvs-4(pc),a1	; load modulation envelope data array
+		add.w	d4,d4			; quadruple modulation envelope ID
+		add.w	d4,d4			; (each entry is 4 bytes in size)
+		move.l	(a1,d4.w),a1		; get pointer to modulation envelope data
+
+		moveq	#0,d1
+		moveq	#0,d0
+
+dModEnvProg2:
+		move.b	cModEnvPos(a5),d1	; get envelope position to d1
+		move.b	(a1,d1.w),d0		; get the data in that position
+		bpl.s	.value			; if positive, its a normal value
+
+		cmp.b	#eLast-2,d0		; check if this is a command
+		ble.s	dModEnvCommand		; if it is handle it
+
+.value
+		move.b	cModEnvSens(a5),d1	; load sensitivity to d1 (unsigned value - effective range is ~ -$7000 to $8000)
+		addq.w	#1,d1			; increment sensitivity by 1 (range of 1 to $100)
+		muls	d1,d0			; signed multiply loaded value with sensitivity
+
+		addq.b	#1,cModEnvPos(a5)	; increment envelope position
+		add.w	d0,d6			; add the frequency to channel frequency
+		rts
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Subroutine for handling modulation envelope commands
+; ---------------------------------------------------------------------------
+
+dModEnvCommand:
+	if safe=1
+		AMPS_Debug_VolEnvCmd		; check if command is valid
+	endif
+
+		jmp	.comm-$80(pc,d0.w)	; jump to command handler
+
+.comm
+		bra.s	.reset			; 80 - Loop back to beginning
+		bra.s	.hold			; 82 - Hold the envelope at current level
+		bra.s	.loop			; 84 - Go to position defined by the next byte
+		bra.s	.stop			; 86 - Stop current note and envelope
+		bra.s	.seset			; 88 - Set the sensitivity of the modulation envelope
+		bra.s	.seadd			; 8A - Add to the sensitivity of the modulation envelope
+; ---------------------------------------------------------------------------
+
+.hold
+		subq.b	#1,cModEnvPos(a5)	; decrease envelope position
+		jmp	dModEnvProg2(pc)	; run the program again (make sure volume fades work)
+; ---------------------------------------------------------------------------
+
+.reset
+		clr.b	cModEnvPos(a5)		; set envelope position to 0
+		jmp	dModEnvProg2(pc)	; run the program again
+; ---------------------------------------------------------------------------
+
+.loop
+		move.b	1(a1,d1.w),cModEnvPos(a5); set envelope position to the next byte
+		jmp	dModEnvProg2(pc)	; run the program again
+; ---------------------------------------------------------------------------
+
+.seset
+		move.b	1(a1,d1.w),cModEnvSens(a5); set modulation envelope sensitivity
+		bra.s	.ignore
+; ---------------------------------------------------------------------------
+
+.seadd
+		move.b	1(a1,d1.w),d0		; load sensitivity to d0
+		add.b	d0,cModEnvSens(a5)	; add to modulation envelope sensitivity
+; ---------------------------------------------------------------------------
+
+.ignore		addq.b	#2,cModEnvPos(a5)	; skip the command and the next byte
+		jmp	dModEnvProg2(pc)	; run the program again
+; ---------------------------------------------------------------------------
+
+.stop
+		bset	#cfbRest,(a5)		; set channel resting bit
+	dStopChannel	1			; stop channel operation
+; ---------------------------------------------------------------------------
+	endif
+
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Flags section. None of this is required, but I added it here to
+; make it easier to debug built ROMS! If you would like easier
+; assistance from Natsumi, please keep this section intact!
+; ---------------------------------------------------------------------------
+	dc.b "AMPS-1.1  "		; ident str
+
+	if FEATURE_MODULATION
+		dc.b "MO"		; modulation enabled
+	endif
+
+	if FEATURE_MODENV
+		dc.b "ME"		; modulation envelope enabled
+	endif
+
+	if FEATURE_PORTAMENTO
+		dc.b "PM"		; portamento enabled
+	endif
+
+	if FEATURE_BACKUP
+		dc.b "BA"		; backup enabled
+	endif
+
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Routine to execute tracker commands
@@ -2141,14 +2373,14 @@ dCommands:
 	bra.w	dcVoice		; E8 - Set Voice/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
 	bra.w	dcsTempoShoes	; E9 - Set music speed shoes tempo to xx (TEMPO - TEMPO_SET_SPEED)
 	bra.w	dcsTempo	; EA - Set music tempo to xx (TEMPO - TEMPO_SET)
-	bra.w	dcModOn		; EB - Turn on Modulation (MOD_SET - MODS_ON)
-	bra.w	dcModOff	; EC - Turn off Modulation (MOD_SET - MODS_OFF)
+	bra.w	dcSampDAC	; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
+	bra.w	dcPitchDAC	; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
 	bra.w	dcaVolume	; ED - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
 	bra.w	dcsVolume	; EE - Set channel volume to xx (VOLUME - VOL_CN_ABS)
 	bra.w	dcsLFO		; EF - Set LFO (SET_LFO - LFO_AMSEN)
 	bra.w	dcMod68K	; F0 - Modulation (MOD_SETUP)
-	bra.w	dcSampDAC	; F1 - Use sample DAC mode (DAC_MODE - DACM_SAMP)
-	bra.w	dcPitchDAC	; F2 - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+	bra.w	dcPortamento	; F1 - Portamento enable/disable flag (PORTAMENTO)
+	bra.w	dcModEnv	; F2 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
 	bra.w	dcNoisePSG	; F3 - PSG4 mode to xx (PSG_NOISE - PNOIS_AMPS)
 	bra.w	dcCont		; F4 - Do a continuous SFX loop (CONT_SFX)
 	bra.w	dcStop		; F5 - End of channel (TRK_END - TEND_STD)
@@ -2159,7 +2391,7 @@ dCommands:
 	bra.w	dcsComm		; FA - Set communications byte yy to xx (SET_COMM - SPECIAL)
 	bra.w	dcCond		; FB - Get comms byte y, and compare zz using condition x (COMM_CONDITION)
 	bra.w	dcResetCond	; FC - Reset condition (COMM_RESET)
-	bra.w	dcTimeout	; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL
+	bra.w	dcTimeout	; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL)
 	bra.w	dcYM		; FE - YM command (YMCMD)
 				; FF - META
 ; ===========================================================================
@@ -2169,8 +2401,6 @@ dCommands:
 
 .metacall
 		move.b	(a4)+,d5		; get next command byte
-		add.w	d5,d5			; quadruple ID
-		add.w	d5,d5			; since each entry is again 4 bytes large
 		jmp	.meta(pc,d5.w)		; jump to appropriate meta handler
 
 .falsecomm
@@ -2181,24 +2411,25 @@ dCommands:
 ; ---------------------------------------------------------------------------
 
 .meta
-	bra.w	dcWriteDAC1	; FF 00 - Play sample xx on DAC1 (PLAY_DAC - PLAY_DAC1)
-	bra.w	dcWriteDAC2	; FF 01 - Play sample xx on DAC2 (PLAY_DAC - PLAY_DAC2)
-	bra.w	dcsFreq		; FF 02 - Set channel frequency to xxxx (CHFREQ_SET)
-	bra.w	dcsFreqNote	; FF 03 - Set channel frequency to note xx (CHFREQ_SET - CHFREQ_NOTE)
-	bra.w	dcSpRev		; FF 04 - Increment spindash rev counter (SPINDASH_REV - SDREV_INC)
-	bra.w	dcSpReset	; FF 05 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
-	bra.w	dcaTempoShoes	; FF 06 - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
-	bra.w	dcaTempo	; FF 07 - Add xx to music tempo (TEMPO - TEMPO_ADD)
-	bra.w	dcCondReg	; FF 08 - Get RAM table offset by y, and chk zz with cond x (COMM_CONDITION - COMM_SPEC)
-	bra.w	dcSound		; FF 09 - Play another music/sfx (SND_CMD)
-	bra.w	dcFreqOn	; FF 0A - Enable raw frequency mode (RAW_FREQ)
-	bra.w	dcFreqOff	; FF 0B - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
-	bra.w	dcSpecFM3	; FF 0C - Enable FM3 special mode (SPC_FM3)
-	bra.w	dcFilter	; FF 0D - Set DAC filter bank. (DAC_FILTER)
+	bra.w	dcModOn		; FF 00 - Turn on Modulation (MOD_SET - MODS_ON)
+	bra.w	dcModOff	; FF 04 - Turn off Modulation (MOD_SET - MODS_OFF)
+	bra.w	dcsFreq		; FF 08 - Set channel frequency to xxxx (CHFREQ_SET)
+	bra.w	dcsFreqNote	; FF 0C - Set channel frequency to note xx (CHFREQ_SET - CHFREQ_NOTE)
+	bra.w	dcSpRev		; FF 10 - Increment spindash rev counter (SPINDASH_REV - SDREV_INC)
+	bra.w	dcSpReset	; FF 14 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
+	bra.w	dcaTempoShoes	; FF 18 - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
+	bra.w	dcaTempo	; FF 1C - Add xx to music tempo (TEMPO - TEMPO_ADD)
+	bra.w	dcCondReg	; FF 20 - Get RAM table offset by y, and chk zz with cond x (COMM_CONDITION - COMM_SPEC)
+	bra.w	dcSound		; FF 24 - Play another music/sfx (SND_CMD)
+	bra.w	dcFreqOn	; FF 28 - Enable raw frequency mode (RAW_FREQ)
+	bra.w	dcFreqOff	; FF 2C - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
+	bra.w	dcSpecFM3	; FF 30 - Enable FM3 special mode (SPC_FM3)
+	bra.w	dcFilter	; FF 34 - Set DAC filter bank. (DAC_FILTER)
+	bra.w	dcBackup	; FF 38 - Load the last song from back-up (FADE_IN_SONG)
 
 	if safe=1
-		bra.w	dcFreeze	; FF 0E - Freeze CPU. Debug flag (DEBUG_STOP_CPU)
-		bra.w	dcTracker	; FF 0F - Bring up tracker debugger at end of frame. Debug flag (DEBUG_PRINT_TRACKER)
+		bra.w	dcFreeze	; FF 40 - Freeze CPU. Debug flag (DEBUG_STOP_CPU)
+		bra.w	dcTracker	; FF 44 - Bring up tracker debugger at end of frame. Debug flag (DEBUG_PRINT_TRACKER)
 	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -2226,9 +2457,9 @@ dCommands:
 	addq.w	#1,a4
 	rts			; EA - Set Voice/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
 	rts
-	rts			; EB - Turn on Modulation (MOD_SET - MODS_ON)
+	rts			; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
 	rts
-	rts			; EC - Turn off Modulation (MOD_SET - MODS_OFF)
+	rts			; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
 	addq.w	#1,a4
 	rts			; ED - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
 	addq.w	#1,a4
@@ -2237,10 +2468,10 @@ dCommands:
 	rts			; EF - Set LFO (SET_LFO - LFO_AMSEN)
 	addq.w	#4,a4
 	rts			; F0 - Modulation (MOD_SETUP)
-	rts
-	rts			; F1 - Use sample DAC mode (DAC_MODE - DACM_SAMP)
-	rts
-	rts			; F2 - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+	addq.w	#1,a4
+	rts			; F1 - Portamento enable/disable flag (PORTAMENTO)
+	addq.w	#1,a4
+	rts			; F2 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
 	addq.w	#1,a4
 	rts			; F3 - PSG4 mode to xx (PSG_NOISE - PNOIS_SET)
 	addq.w	#2,a4
@@ -2263,23 +2494,6 @@ dCommands:
 	addq.w	#1,a4
 	rts			; FE - YM command (YMCMD)
 	bra.w	.metacall	; FF - META
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Tracker commands for writing direct DAC samples to Dual PCM.
-; Note that this will override any DAC already being played,
-; and in turn trackers may override these DAC samples at any
-; time. Use with caution!
-; ---------------------------------------------------------------------------
-
-dcWriteDAC1:
-		moveq	#0,d0
-		move.b	(a4)+,d0		; get note to write
-		jmp	dNoteWriteDAC1(pc)	; note-on
-
-dcWriteDAC2:
-		moveq	#0,d0
-		move.b	(a4)+,d0		; get note to write
-		jmp	dNoteWriteDAC2(pc)	; note-on
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker commands for handling spindash revving.
@@ -2625,10 +2839,25 @@ dcLoop:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Tracker command for initializing portamento
+; ---------------------------------------------------------------------------
+
+dcPortamento:
+	if FEATURE_PORTAMENTO
+		move.b	(a4)+,cPortaSpeed(a5)	; load the portamento speed value
+		bne.s	.rts			; if non-zero, branch
+		clr.w	cPortaFreq(a5)		; clear portamento frequency
+.rts		rts
+	else
+		AMPS_Debug_dcPortamento		; display an error if disabled
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; Tracker command for initializing modulation
 ; ---------------------------------------------------------------------------
 
 dcMod68K:
+	if FEATURE_MODULATION
 		move.l	a4,cMod(a5)		; set modulation data address
 		move.b	(a4)+,cModDelay(a5)	; load modulation delay from tracker to channel
 		move.b	(a4)+,cModSpeed(a5)	; load modulation speed from tracker to channel
@@ -2639,18 +2868,30 @@ dcMod68K:
 		move.b	d0,cModCount(a5)	; save as modulation step count to channel
 		clr.w	cModFreq(a5)		; reset modulation frequency offset to 0
 	; continue to enabling modulation
+
+	else
+		AMPS_Debug_dcModulate		; display an error if disabled
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker commands for enabling and disabling modulation
 ; ---------------------------------------------------------------------------
 
 dcModOn:
+	if FEATURE_MODULATION
 		bset	#cfbMod,(a5)		; enable modulation
 		rts
+	else
+		AMPS_Debug_dcModulate		; display an error if disabled
+	endif
 
 dcModOff:
+	if FEATURE_MODULATION
 		bclr	#cfbMod,(a5)		; disable modulation
 		rts
+	else
+		AMPS_Debug_dcModulate		; display an error if disabled
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker command for returning from tracker subroutine
@@ -2706,6 +2947,85 @@ locret_FreqOff:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Tracker command for setting modulation envelope ID
+; ---------------------------------------------------------------------------
+
+dcModEnv:
+	if FEATURE_MODENV
+		move.b	(a4)+,cModEnv(a5)	; load the modulation envelope ID
+		rts
+
+	else
+		AMPS_Debug_dcModEnv		; display an error if disabled
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Tracker command for loading a backed up track
+; ---------------------------------------------------------------------------
+
+dcBackup:
+	if FEATURE_BACKUP
+		addq.l	#4,sp			; stop the other channels from playing
+		btst	#mfbBacked,mFlags.w	; check if there is a backed up track
+		beq.w	dPlaySnd_Stop		; if not, just stop all music instead....
+		jsr	dPlaySnd_Stop(pc)	; gotta do it anyway tho but continue below
+; ---------------------------------------------------------------------------
+; The reason we do fade in right here instead of later, is so we can update
+; the FM voices with correct volume, no need to update volume later...
+; ---------------------------------------------------------------------------
+
+		lea	dFadeInDataLog(pc),a1	; prepare stock fade in program to a1
+		jsr	dLoadFade(pc)		; initiate fade in
+
+		move.l	mBackTempoMain.w,mTempoMain.w; restore tempo settings
+		move.l	mBackVctMus.w,mVctMus.w	; restore voice table address
+
+		lea	mDAC1.w,a2		; load source address to a0
+		lea	mBackDAC1.w,a1		; load destination address to a1
+		move.w	#(mSFXDAC1-mDAC1)/4-1,d0; load backup size to d0
+
+.backup
+		move.l	(a1),(a2)+		; restore data for each channel
+		clr.l	(a1)+			; clear back-up RAM
+		dbf	d0, .backup		; loop for each longword
+; ---------------------------------------------------------------------------
+; The FM instruments need to be updated! Since this process includes volume
+; updates, they do not need to be done later...
+; ---------------------------------------------------------------------------
+
+		lea	mFM1.w,a5		; start at music FM1
+		moveq	#Mus_FM-1,d7		; load FM channel count to d7
+
+.fmloop
+		tst.b	(a5)			; check if channel is running
+		bpl.s	.nofm			; if not, skip it
+
+		moveq	#0,d0
+		move.b	cVoice(a5),d0		; load FM voice ID of the channel to d0
+		move.l	mVctMus.w,a1		; load music voice table to a1
+		bsr.s	dUpdateVoiceFM		; update FM voice for each channel
+
+.nofm
+		add.w	#cSize,a5		; advance to next channel
+		dbf	d7,.fmloop		; loop for all FM channels
+; ---------------------------------------------------------------------------
+; Special logic to handle PSG4
+; ---------------------------------------------------------------------------
+
+		cmp.b	#ctPSG4,mPSG3+cType.w	; check if PSG3 channel is in PSG4 mode
+		bne.s	.nopsg4			; if not, skip
+		move.b	mPSG3+cStatPSG4.w,dPSG	; update PSG4 status to PSG port
+
+.nopsg4
+		move.b	#$FF,dPSG		; mute PSG4
+
+locret_Backup:
+		rts
+	else
+		AMPS_Debug_dcBackup
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; Tracker command for changing voice, volume envelope or sample
 ; ---------------------------------------------------------------------------
 
@@ -2715,12 +3035,12 @@ dcVoice:
 		move.b	d0,cVoice(a5)		; save to channel
 
 		tst.b	cType(a5)		; check if this is a PSG channel
-		bmi.s	locret_FreqOff		; if is, skip
+		bmi.s	locret_Backup		; if is, skip
 		btst	#ctbDAC,cType(a5)	; check if this is a DAC channel
-		bne.s	locret_FreqOff		; if is, skip
+		bne.s	locret_Backup		; if is, skip
 
 		btst	#cfbInt,(a5)		; check if channel is interrupted by SFX
-		bne.s	locret_FreqOff		; if is, skip
+		bne.s	locret_Backup		; if is, skip
 		move.l	a6,a1			; load voice table to a1
 	; continue to send FM voice
 ; ===========================================================================
@@ -2806,9 +3126,9 @@ dUpdateVoiceFM:
 		move.b	d2,(a0)+		; select YM port to access (4000 or 4002)
 		move.b	(a3)+,(a0)+		; write command values
 
-		move.b	(a3)+,d0		; load YM command
-		or.b	d3,d0			; add the channel offset to command
-		move.b	d0,(a0)+		; save to Z80 cue
+		move.b	(a3)+,d4		; load YM command
+		or.b	d3,d4			; add the channel offset to command
+		move.b	d4,(a0)+		; save to Z80 cue
 		dbf	d1,.write		; write all registers
 		st	(a0)			; mark as end of the cue
 
@@ -2822,19 +3142,7 @@ dUpdateVoiceFM:
 
 dcStop:
 		and.b	#$FF-(1<<cfbHold)-(1<<cfbRun),(a5); clear hold and running tracker flags
-		tst.b	cType(a5)		; check if this was a PSG channel
-		bmi.s	.mutePSG		; if yes, mute it
-
-		btst	#ctbDAC,cType(a5)	; check if this was a DAC channel
-		bne.s	.cont			; if we are, skip
-		jsr	dKeyOffFM(pc)		; send key-off command to YM
-		bra.s	.cont
-; ---------------------------------------------------------------------------
-
-.mutePSG
-		jsr	dMutePSGmus(pc)		; mute PSG channel
-
-.cont
+	dStopChannel	0			; stop channel operation
 		cmpa.w	#mSFXFM3,a5		; check if this is a SFX channel
 		blo.s	.exit			; if not, skip all this mess
 		clr.b	cPrio(a5)		; clear channel priority
@@ -3054,6 +3362,7 @@ SoundIndex:
 	ptrSFX	0, RingRight, RingLeft
 
 MusicIndex:
+	ptrMusic Test, $00
 	ptrMusic Pelimusa, $1A, MysticCave, $34, DIS, $1E, ZaxxRemix, $00
 	ptrMusic ColumnDive, $3C, Pray, $0B, HydroCity, $1E, GameNo, $74
 	ptrMusic TowerPuppet, $00, ChoosePath, $0E, Shop, $74, Beach, $32
@@ -3117,7 +3426,7 @@ VolEnvs:
 	volenv WOI_0C, WOI_0D, Kc02, Kc05, Kc08, MoonWalker04
 	volenv S2_02, S2_01, S2_0B
 VolEnvs_End:
-	opt ae-
+; ---------------------------------------------------------------------------
 
 ; Sonic 2 01
 vdS2_01:	dc.b $00, $00, $00, $01, $01, $01, $02, $02
@@ -3241,7 +3550,24 @@ vdCol3_03:	dc.b $02, $01, $00, $00, $01, $02, $02, $02
 vdCol3_05:	dc.b $02, $01, $00, $00, $01, $02, $02, $02
 		dc.b $02, $02, $02, $02, $02, $02, $02, $02
 		dc.b $02, $03, $03, $03, $04, $04, $04, $05, eStop
-	even
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Define volume envelopes and their data
+; ---------------------------------------------------------------------------
+
+		even
+__menv =	$01
+
+ModEnvs:
+	ModEnv Test
+ModEnvs_End:
+; ---------------------------------------------------------------------------
+
+	if FEATURE_MODENV
+; just testin'
+mdTest:		dc.b $08, eaSens, $01, eLoop, $00
+	endif
+
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Include music, sound effects and voice table
@@ -3258,7 +3584,7 @@ musend
 ; Include samples and filters
 ; ---------------------------------------------------------------------------
 
-		align	$8000		; must be aligned to bank...
+		align	$8000		; must be aligned to bank... By the way, these are also set in Z80.asm... Be sure to check it out also.
 fLog:		incbin "driver/filters/Logarithmic.dat"	; logarithmic filter (no filter)
 ;fLinear:	incbin "driver/filters/Linear.dat"	; linear filter (no filter)
 

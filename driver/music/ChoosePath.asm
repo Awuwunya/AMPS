@@ -274,17 +274,21 @@ ChoosePath_FM2:
 	ssMod68k	$27, $01, $10, $03
 	ssDetune	$00
 	sVoice		$08
+	ssPortamento	$02
 	sCall		ChoosePath_Call1
 	sVoice		$05
+	ssPortamento	$04
 	dc.b nF4, $04, nG4, nC5, nF5, nG4, nE5, $10
 	dc.b nE5, $04, nC5, nG4, nD5, nBb4, nF4, nC5
 	dc.b $10, nE4, $04, nF4, nG4, nC5, nG5
 	sVoice		$08
+	ssPortamento	$02
 	sCall		ChoosePath_Call1
 	;sPanAni		$03, $02, $01, $03, $02
 	sVoice		$05
 
 ChoosePath_Jump2:
+	ssPortamento	$04
 	dc.b nE5, $50, nF5, $08, nG5, nC6, $50, nBb5
 	dc.b $08, nA5, $0C, nD5, $04, nA5, nG5, $48
 	dc.b nRst, $04, nF5, nE5, $08, nC5, $04, nE5
@@ -328,6 +332,7 @@ ChoosePath_Loop5:
 	sLoop		$00, $04, ChoosePath_Loop5
 
 ChoosePath_Jump3:
+	ssPortamento	$08
 	dc.b nE5, $54, nE5, $04, nG4, nE5, nD5, nBb4
 	dc.b nD5, nA5, $4C, nG5, $04, nF5, nF5, nD5
 	dc.b nF5, nE5, $48, nE5, $04, nC5, nG4, nBb4
@@ -356,6 +361,7 @@ ChoosePath_Loop7:
 	sVoice		$07
 
 ChoosePath_Jump4:
+	ssPortamento	$08
 	dc.b nG4, $54, nG4, $04, nE4, nG4, nBb4, nF4
 	dc.b nBb4, nF5, $48, nF5, $04, nE5, nD5, nD5
 	dc.b nBb4, nD5, nG4, $48, nC5, $04, nG4, nE4
@@ -451,13 +457,17 @@ ChoosePath_PSG1:
 	ssMod68k	$02, $01, $02, $03
 
 ChoosePath_Jump7:
+	ssPortamento	$02
 	sCall		ChoosePath_Call2
+	ssPortamento	$05
 	dc.b nF4, $04, nG4, nC5, nF5, nG4, nE5, $10
 	dc.b nE5, $04, nC5, nG4, nD5, nBb4, nF4, nC5
 	dc.b $10, nE4, $04, nF4, nG4, nC5, nG5
+	ssPortamento	$02
 	sCall		ChoosePath_Call2
 
 ChoosePath_Jump6:
+	ssPortamento	$05
 	dc.b nC5, $50, nD5, $08, nE5, nA5, $50, nG5
 	dc.b $08, nF5, $0C, nBb4, $04, nF5, nE5, $48
 	dc.b nRst, $04, nD5, nC5, $08, nG4, $04, nC5

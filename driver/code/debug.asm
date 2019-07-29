@@ -145,10 +145,18 @@ AMPS_Debug_Console_Channel:
 	Console.WriteLine "%<.b cSample(a5)> %<.b cDuration(a5)> %<.b cLastDur(a5)> %<.w cFreq(a5)>"
 	Console.BreakLine
 
-	Console.WriteLine "%<pal1>Mod: %<pal0>%<.l cMod(a5) sym|split>%<pal2,symdisp>"
-	Console.Write	  "%<pal1>Mod Data: %<pal2>%<.b cModDelay(a5)> %<pal2>%<.w cModFreq(a5)> "
-	Console.WriteLine "%<.b cModSpeed(a5)> %<.b cModStep(a5)> %<.b cModCount(a5)>"
-	Console.BreakLine
+	if FEATURE_MODULATION
+		Console.WriteLine "%<pal1>Mod: %<pal0>%<.l cMod(a5) sym|split>%<pal2,symdisp>"
+		Console.Write	  "%<pal1>Mod Data: %<pal2>%<.b cModDelay(a5)> %<pal2>%<.w cModFreq(a5)> "
+		Console.WriteLine "%<.b cModSpeed(a5)> %<.b cModStep(a5)> %<.b cModCount(a5)>"
+		Console.BreakLine
+	endif
+
+	if FEATURE_PORTAMENTO
+		Console.WriteLine "%<pal1>Porta: %<pal2>%<.b cPortaSpeed(a5)> %<pal2> "
+		Console.WriteLine "%<.w cPortaFreq(a5)> %<.w cPortaDisp(a5)>"
+		Console.BreakLine
+	endif
 
 	Console.Write "%<pal1>Loop: %<pal2>%<.b cLoop(a5)> %<.b cLoop+1(a5)> %<.b cLoop+2(a5)> "
 	cmp.w	#mSFXDAC1,a5
@@ -280,6 +288,28 @@ AMPS_Debug_VolEnvCmd	macro
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Invalid modulation envelope handler
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_ModEnvID	macro
+	cmp.b	#(ModEnvs_End-ModEnvs)/4,d4	; check against max
+	bls.s	.ok			; if in range, branch
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+		jsr	AMPS_DebugR_ModEnvID
+	else
+		bra.w	*
+	endif
+
+.ok
+    endm
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+AMPS_DebugR_ModEnvID:
+		RaiseError2 "Modulation envelope ID out of range: %<.b d4>", AMPS_Debug_Console_Channel
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; PSG note check
 ; ---------------------------------------------------------------------------
 
@@ -365,6 +395,75 @@ AMPS_Debug_dcInvalid	macro
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Handler for disabled features - portamento
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_dcPortamento	macro
+	if def(RaiseError)	; check if Vladik's debugger is active
+		RaiseError "Portamento feature is disabled. Set FEATURE_PORTAMENTO to 1 to enable.", AMPS_Debug_Console_Channel
+	else
+		bra.w	*
+	endif
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Handler for disabled features - modulation
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_dcModulate	macro
+	if def(RaiseError)	; check if Vladik's debugger is active
+		jsr	AMPS_DebugR_dcModulate
+	else
+		bra.w	*
+	endif
+    endm
+
+	if FEATURE_MODULATION=0
+	if def(RaiseError)	; check if Vladik's debugger is active
+AMPS_DebugR_dcModulate:
+		RaiseError "Modulation feature is disabled. Set FEATURE_MODULATION to 1 to enable.", AMPS_Debug_Console_Channel
+	endif
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Handler for disabled features - modulation
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_dcModEnv	macro
+	if def(RaiseError)	; check if Vladik's debugger is active
+		jsr	AMPS_DebugR_dcModEnv
+	else
+		bra.w	*
+	endif
+    endm
+
+	if FEATURE_MODENV=0
+	if def(RaiseError)	; check if Vladik's debugger is active
+AMPS_DebugR_dcModEnv:
+		RaiseError "Modulation envelopes are disabled. Set FEATURE_MODENV to 1 to enable.", AMPS_Debug_Console_Channel
+	endif
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Handler for disabled features - modulation
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_dcBackup	macro
+	if def(RaiseError)	; check if Vladik's debugger is active
+		jsr	AMPS_DebugR_dcBackup
+	else
+		bra.w	*
+	endif
+    endm
+
+	if FEATURE_MODENV=0
+	if def(RaiseError)	; check if Vladik's debugger is active
+AMPS_DebugR_dcBackup:
+		RaiseError "Backup feature is disabled. Set FEATURE_BACKUP to 1 to enable.", AMPS_Debug_Console_Channel
+	endif
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; PSG on sPan handler
 ; ---------------------------------------------------------------------------
 
@@ -433,18 +532,18 @@ AMPS_Debug_dcCall2	macro
 ; ---------------------------------------------------------------------------
 
 AMPS_Debug_dcLoop	macro
-	cmp.b	#3,d0		; check for invalid call number
-	bhi.s	.fail		; if is, branch
-	cmp.w	#mSFXDAC1,a5	; check for SFX channel
-	blo.s	.nosfx		; if no, branch
-	cmp.b	#1,d0		; check if cPrio
-	beq.s	.fail		; if so, branch
+	cmp.b	#cSizeSFX-cLoop,d0	; check for invalid call number
+	bhi.s	.fail			; if is, branch
+	cmp.w	#mSFXDAC1,a5		; check for SFX channel
+	blo.s	.nosfx			; if no, branch
+	cmp.b	#cPrio-cLoop,d0		; check if cPrio
+	beq.s	.fail			; if so, branch
 
 .nosfx
-	cmp.b	#$C0,cType(a5)	; check if PSG3 or PSG4
-	blo.s	.ok		; if no, branch
-	cmp.b	#2,d0		; check if cStatPSG4
-	bne.s	.ok		; if no, branch
+	cmp.b	#$C0,cType(a5)		; check if PSG3 or PSG4
+	blo.s	.ok			; if no, branch
+	cmp.b	#cStatPSG4-cLoop,d0	; check if cStatPSG4
+	bne.s	.ok			; if no, branch
 
 .fail
 	if def(RaiseError)	; check if Vladik's debugger is active
