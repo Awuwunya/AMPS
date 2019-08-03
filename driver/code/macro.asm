@@ -19,6 +19,7 @@ tempo =	0
 FEATURE_MODULATION =	1	; set to 1 to enable software modulation effect
 FEATURE_PORTAMENTO =	1	; set to 1 to enable portamento flag
 FEATURE_MODENV =	1	; set to 1 to enable modulation envelopes
+FEATURE_UNDERWATER =	1	; set to 1 to enable underwater mode
 FEATURE_BACKUP =	1	; set to 1 to enable back-up channels. Used for the 1-up SFX in Sonic 1, 2 and 3K...
 FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Used for the 1-up SFX.
 ; ===========================================================================
@@ -295,6 +296,27 @@ fStop		rs.l 1		; 84 - Stop all music
 fResVol		rs.l 1		; 88 - Reset volume and update
 fReset		rs.l 1		; 8C - Stop music playing and reset volume
 fLast		rs.l 0		; safe mode equate
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Quickly clear some memory in certain block sizes
+; ---------------------------------------------------------------------------
+
+dCLEAR_MEM	macro len, block
+		move.w	#((\len)/(\block))-1,d1	; load repeat count to d7
+.c\@
+	rept (\block)/4
+		clr.l	(a1)+			; clear driver and music channel memory
+	endr
+		dbf	d1, .c\@		; loop for each longword to clear it...
+
+	rept ((\len)%(\block))/4
+		clr.l	(a1)+			; clear extra longs of memory
+	endr
+
+	if (\len)&2
+		clr.w	(a1)+			; if there is an extra word, clear it too
+	endif
+    endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Quickly read a word from odd address. 28 cycles

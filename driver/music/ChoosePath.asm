@@ -9,8 +9,8 @@ ChoosePath_Header:
 	sHeaderFM	ChoosePath_FM3, $02, $1A
 	sHeaderFM	ChoosePath_FM4, $02, $15
 	sHeaderFM	ChoosePath_FM5, $02, $1A
-	sHeaderPSG	ChoosePath_PSG1, $DE, $04, $00, v00
-	sHeaderPSG	ChoosePath_PSG2, $DE, $05, $00, v00
+	sHeaderPSG	ChoosePath_PSG1, $DE, $20, $00, v00
+	sHeaderPSG	ChoosePath_PSG2, $DE, $28, $00, v00
 	sHeaderPSG	ChoosePath_PSG3, $00, $00, $00, vRistar02
 
 	; Patch $00
@@ -452,6 +452,14 @@ ChoosePath_Jump8:
 	dc.b d89, d8A, d8A, d8B, d82
 	sJump		ChoosePath_Jump8
 
+ChoosePath_PSG2:
+	dc.b nRst, $06
+	ssMod68k	$02, $01, $02, $03
+	dc.b nRst, $01
+	ssDetune	$02
+	dc.b nRst, $0C
+	sJump		ChoosePath_Jump7
+
 ChoosePath_PSG1:
 	dc.b nRst, $06, nRst, $0C
 	ssMod68k	$02, $01, $02, $03
@@ -486,14 +494,6 @@ ChoosePath_Loop10:
 	sLoop		$00, $02, ChoosePath_Loop10
 ;	saTranspose	$0C
 	sRet
-
-ChoosePath_PSG2:
-	dc.b nRst, $06
-	ssMod68k	$02, $01, $02, $03
-	dc.b nRst, $01
-	ssDetune	$02
-	dc.b nRst, $0C
-	sJump		ChoosePath_Jump7
 
 ChoosePath_PSG3:
 	sNoisePSG	$E7

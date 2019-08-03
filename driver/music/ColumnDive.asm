@@ -9,9 +9,9 @@ ColumnDive_Header:
 	sHeaderFM	ColumnDive_FM3, $F4, $14
 	sHeaderFM	ColumnDive_FM4, $F4, $1A
 	sHeaderFM	ColumnDive_FM5, $F4, $14
-	sHeaderPSG	ColumnDive_PSG1, $E8-$0C, $04, $00, v00
-	sHeaderPSG	ColumnDive_PSG2, $E8-$0C, $04, $00, v00
-	sHeaderPSG	ColumnDive_PSG3, $00-$0D, $02, $00, v00
+	sHeaderPSG	ColumnDive_PSG1, $E8-$0C, $20, $00, v00
+	sHeaderPSG	ColumnDive_PSG2, $E8-$0C, $20, $00, v00
+	sHeaderPSG	ColumnDive_PSG3, $00-$0D, $10, $00, v00
 
 	; Patch $00
 	; $20
@@ -195,7 +195,7 @@ ColumnDive_PSG1:
 	sJump		ColumnDive_PSG1
 
 ColumnDrive_Call20:
-	saVol		$03
+	saVol		$18
 
 ColumnDive_Loop3:
 	dc.b nEb3, $10, nBb4, nEb3, $08, nBb4, nRst, nC3
@@ -207,7 +207,7 @@ ColumnDive_Loop3:
 	dc.b $10, nBb4, nEb3, $08, nBb4, nRst, nD5, sHold
 	dc.b nD5, $20, sHold, $20
 	sLoop		$00, $02, ColumnDive_Loop3
-	saVol		$FD
+	saVol		-$18
 	sRet
 
 ColumnDrive_Call21:

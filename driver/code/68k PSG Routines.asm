@@ -185,7 +185,7 @@ dEnvProgPSG:
 
 		moveq	#0,d4
 		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
-		beq.s	dUpdateVolPSG2		; if 0, update volume only
+		beq.s	dUpdateVolPSG		; if 0, update volume only
 		bra.s	dEnvProgPSG2		; continue to run code below
 
 dEnvelopePSG:
@@ -195,6 +195,8 @@ dEnvelopePSG:
 
 		move.b	cVolume(a5),d5		; load channel volume to d5
 		add.b	mMasterVolPSG.w,d5	; add PSG master volume to d5
+		bpl.s	dEnvProgPSG2		; branch if volume did not overflow
+		moveq	#$7F,d5			; set to maximum volume
 
 dEnvProgPSG2:
 	if safe=1
@@ -217,7 +219,8 @@ dEnvProgPSG3:
 		cmp.b	#eLast-2,d0		; check if this is a command
 		ble.s	dEnvCommand		; if it is handle it
 
-.value		addq.b	#1,cEnvPos(a5)		; increment envelope position
+.value
+		addq.b	#1,cEnvPos(a5)		; increment envelope position
 		add.b	d0,d5			; add envelope volume to d5
 	; continue to update PSG volume
 ; ===========================================================================
@@ -225,30 +228,31 @@ dEnvProgPSG3:
 ; Routine for updating PSG volume to hardware
 ; ---------------------------------------------------------------------------
 
-dUpdateVolPSG2:
-		cmpi.b	#$F,d5			; check if volume is out of range
-		bls.s	dUpdateVolPSG		; if not, branch
-		moveq	#$F,d5			; cap volume to silent
-
 dUpdateVolPSG:
+		cmpi.b	#$7F,d5			; check if volume is out of range
+		bls.s	.nocap			; if not, branch
+		moveq	#$7F,d5			; cap volume to silent
+
+.nocap
 		btst	#cfbRest,(a5)		; is this channel resting
 		bne.s	locret_UpdVolPSG	; if is, do not update
 		btst	#cfbInt,(a5)		; is channel interrupted by sfx?
 		bne.s	locret_UpdVolPSG	; if is, do not update
 
 		btst	#cfbHold,(a5)		; check if note is held
-		beq.s	dUpdVolPSGset		; if not, update volume
+		beq.s	.send			; if not, update volume
 		cmp.w	#mSFXDAC1,a5		; check if this is a SFX channel
-		bhs.s	dUpdVolPSGset		; if so, update volume
+		bhs.s	.send			; if so, update volume
 
 		tst.b	cNoteTimeMain(a5)	; check if note timeout is active
-		beq.s	dUpdVolPSGset		; if not, update volume
+		beq.s	.send			; if not, update volume
 		tst.b	cNoteTimeCur(a5)	; is note stopped already?
 		beq.s	locret_UpdVolPSG	; if is, do not update
 
-dUpdVolPSGset:
+.send
+		lsr.b	#3,d5			; divide volume by 8
 		or.b	cType(a5),d5		; combine channel type value with volume
-		addi.b	#$10,d5			; set volume update bit
+		or.b	#$10,d5			; set volume update bit
 		move.b	d5,dPSG			; write volume command to PSG port
 
 locret_UpdVolPSG:

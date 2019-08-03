@@ -4,27 +4,28 @@
 ; ---------------------------------------------------------------------------
 
 dFadeOutDataLog:
-	dc.b $01, $01, $00,  $02, $02, $00,  $02, $04, $01,  $03, $05, $01
-	dc.b $04, $05, $01,  $04, $06, $02,  $05, $07, $02,  $06, $08, $02
-	dc.b $07, $09, $03,  $09, $0B, $03,  $0A, $0C, $03,  $0C, $0E, $03
-	dc.b $0E, $10, $04,  $10, $11, $04,  $11, $13, $04,  $14, $15, $05
-	dc.b $16, $18, $05,  $1A, $1C, $05,  $1C, $1F, $06,  $20, $24, $06
-	dc.b $22, $28, $07,  $26, $2E, $07,  $2C, $34, $08,  $30, $39, $08
-	dc.b $34, $3E, $09,  $3C, $44, $0A,  $40, $4C, $0A,  $46, $54, $0B
-	dc.b $4C, $5A, $0C,  $54, $62, $0D,  $5C, $6B, $0D,  $60, $76, $0E
-	dc.b $6C, $7C, $0E,  $74, $7F, $0F,  $7F, $7F, $0F,  fReset
+	dc.b $01, $02, $01,  $02, $02, $02,  $02, $02, $02,  $03, $02, $03
+	dc.b $04, $05, $04,  $04, $05, $04,  $05, $05, $05,  $06, $05, $06
+	dc.b $07, $09, $07,  $09, $09, $09,  $0A, $09, $0A,  $0C, $09, $0C
+	dc.b $0E, $11, $0E,  $10, $11, $10,  $11, $11, $11,  $14, $11, $14
+	dc.b $16, $1B, $16,  $1A, $1B, $1A,  $1C, $1B, $1C,  $20, $1B, $20
+	dc.b $22, $28, $22,  $26, $28, $26,  $2C, $28, $2C,  $30, $28, $30
+	dc.b $34, $3E, $34,  $3C, $3E, $3C,  $40, $3E, $40,  $46, $3E, $46
+	dc.b $4C, $58, $4C,  $54, $58, $54,  $5C, $58, $5C,  $60, $58, $60
+	dc.b $6C, $7F, $6C,  $74, $7F, $74,  $7F, $7F, $7F,  fReset
 
 	if FEATURE_BACKUP		; this data is only needed when backup feature is enabled also.
 dFadeInDataLog:				; you may enable this regardless for personal uses
-	dc.b $7F, $7F, $0F,  $74, $7F, $0F,  $6C, $7C, $0E,  $60, $76, $0E
-	dc.b $5C, $6B, $0D,  $54, $62, $0D,  $4C, $5A, $0C,  $46, $54, $0B
-	dc.b $40, $4C, $0A,  $3C, $44, $0A,  $34, $3E, $09,  $30, $39, $08
-	dc.b $2C, $34, $08,  $26, $2E, $07,  $22, $28, $07,  $20, $24, $06
-	dc.b $1C, $1F, $06,  $1A, $1C, $05,  $16, $18, $05,  $14, $15, $05
-	dc.b $11, $13, $04,  $10, $11, $04,  $0E, $10, $04,  $0C, $0E, $03
-	dc.b $0A, $0C, $03,  $09, $0B, $03,  $07, $09, $03,  $06, $08, $02
-	dc.b $05, $07, $02,  $04, $06, $02,  $04, $05, $01,  $03, $05, $01
-	dc.b $02, $04, $01,  $02, $02, $00,  $01, $01, $00,  fEnd
+	dc.b $7F, $7F, $7F,  $74, $7F, $74,  $6C, $7F, $6C,  $60, $7F, $60
+	dc.b $5C, $50, $5C,  $54, $50, $54,  $4C, $50, $4C,  $46, $50, $46
+	dc.b $40, $38, $40,  $3C, $38, $3C,  $34, $38, $34,  $30, $38, $30
+	dc.b $2C, $24, $2C,  $26, $24, $26,  $22, $24, $22,  $20, $24, $20
+	dc.b $1C, $18, $1C,  $1A, $18, $1A,  $16, $18, $16,  $14, $18, $14
+	dc.b $11, $0F, $11,  $10, $0F, $10,  $0E, $0F, $0E,  $0C, $0F, $0C
+	dc.b $0A, $08, $0A,  $09, $08, $09,  $07, $08, $07,  $06, $08, $06
+	dc.b $05, $05, $05,  $04, $05, $04,  $04, $05, $04,  $03, $05, $03
+	dc.b $02, $02, $02,  $02, $02, $02,  $01, $02, $01,  $00, $00, $00
+	dc.b fEnd
 	endif
 
 ;dFadeOutDataLinear:
@@ -71,10 +72,10 @@ dLoadFade:
 		bpl.s	.search			; branch if this is not a command
 
 .nofade
+		move.l	a1,mFadeAddr.w		; save new fade program address to memory
 		move.b	(a1)+,mMasterVolFM.w	; save new FM master volume
 		move.b	(a1)+,mMasterVolDAC.w	; save new DAC master volume
 		move.b	(a1)+,mMasterVolPSG.w	; save new PSG master volume
-		move.l	a1,mFadeAddr.w		; save new fade program address to memory
 		rts
 
 .search
@@ -124,102 +125,6 @@ dSetFilter:
 
 locret_SetFilter:
 		rts
-
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Routine for running modulation envelope programs
-; ---------------------------------------------------------------------------
-
-dModEnvProg:
-	if FEATURE_MODENV
-		moveq	#0,d4
-		move.b	cModEnv(a5),d4		; load modulation envelope ID to d4
-		beq.s	locret_SetFilter	; if 0, return
-
-	if safe=1
-		AMPS_Debug_ModEnvID		; check if modulation envelope ID is valid
-	endif
-
-		lea	ModEnvs-4(pc),a1	; load modulation envelope data array
-		add.w	d4,d4			; quadruple modulation envelope ID
-		add.w	d4,d4			; (each entry is 4 bytes in size)
-		move.l	(a1,d4.w),a1		; get pointer to modulation envelope data
-
-		moveq	#0,d1
-		moveq	#0,d0
-
-dModEnvProg2:
-		move.b	cModEnvPos(a5),d1	; get envelope position to d1
-		move.b	(a1,d1.w),d0		; get the data in that position
-		bpl.s	.value			; if positive, its a normal value
-
-		cmp.b	#eLast-2,d0		; check if this is a command
-		ble.s	dModEnvCommand		; if it is handle it
-
-.value
-		move.b	cModEnvSens(a5),d1	; load sensitivity to d1 (unsigned value - effective range is ~ -$7000 to $8000)
-		addq.w	#1,d1			; increment sensitivity by 1 (range of 1 to $100)
-		muls	d1,d0			; signed multiply loaded value with sensitivity
-
-		addq.b	#1,cModEnvPos(a5)	; increment envelope position
-		add.w	d0,d6			; add the frequency to channel frequency
-		rts
-
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Subroutine for handling modulation envelope commands
-; ---------------------------------------------------------------------------
-
-dModEnvCommand:
-	if safe=1
-		AMPS_Debug_VolEnvCmd		; check if command is valid
-	endif
-
-		jmp	.comm-$80(pc,d0.w)	; jump to command handler
-
-.comm
-		bra.s	.reset			; 80 - Loop back to beginning
-		bra.s	.hold			; 82 - Hold the envelope at current level
-		bra.s	.loop			; 84 - Go to position defined by the next byte
-		bra.s	.stop			; 86 - Stop current note and envelope
-		bra.s	.seset			; 88 - Set the sensitivity of the modulation envelope
-		bra.s	.seadd			; 8A - Add to the sensitivity of the modulation envelope
-; ---------------------------------------------------------------------------
-
-.hold
-		subq.b	#1,cModEnvPos(a5)	; decrease envelope position
-		jmp	dModEnvProg2(pc)	; run the program again (make sure volume fades work)
-; ---------------------------------------------------------------------------
-
-.reset
-		clr.b	cModEnvPos(a5)		; set envelope position to 0
-		jmp	dModEnvProg2(pc)	; run the program again
-; ---------------------------------------------------------------------------
-
-.loop
-		move.b	1(a1,d1.w),cModEnvPos(a5); set envelope position to the next byte
-		jmp	dModEnvProg2(pc)	; run the program again
-; ---------------------------------------------------------------------------
-
-.seset
-		move.b	1(a1,d1.w),cModEnvSens(a5); set modulation envelope sensitivity
-		bra.s	.ignore
-; ---------------------------------------------------------------------------
-
-.seadd
-		move.b	1(a1,d1.w),d0		; load sensitivity to d0
-		add.b	d0,cModEnvSens(a5)	; add to modulation envelope sensitivity
-; ---------------------------------------------------------------------------
-
-.ignore		addq.b	#2,cModEnvPos(a5)	; skip the command and the next byte
-		jmp	dModEnvProg2(pc)	; run the program again
-; ---------------------------------------------------------------------------
-
-.stop
-		bset	#cfbRest,(a5)		; set channel resting bit
-	dStopChannel	1			; stop channel operation
-; ---------------------------------------------------------------------------
-	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Routine to multiply duration by tick rate

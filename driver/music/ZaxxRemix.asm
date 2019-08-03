@@ -9,8 +9,8 @@ Zaxx_Header:
 	sHeaderFM	Zaxx_FM3, $00, $10
 	sHeaderFM	Zaxx_FM4, $00, $0B
 	sHeaderFM	Zaxx_FM5, $00, $04
-	sHeaderPSG	Zaxx_PSG1, $00-$0C, $03, $00, vZaxx04
-	sHeaderPSG	Zaxx_PSG2, $00-$0C, $03, $00, vZaxx04
+	sHeaderPSG	Zaxx_PSG1, $00-$0C, $18, $00, vZaxx04
+	sHeaderPSG	Zaxx_PSG2, $00-$0C, $18, $00, vZaxx04
 	sHeaderPSG	Zaxx_PSG3, $00-$0C, $00, $00, vZaxx04
 
 	; Patch $00
@@ -683,11 +683,11 @@ Zaxx_PSG1:
 .ver2	ssMod68k	$00, $01, -$06, $FF
 
 .ver1	dc.b nE2, $08
-	saVol		$03
+	saVol		$18
 	dc.b sHold, nF2
-	saVol		$03
+	saVol		$18
 	dc.b sHold, nA2
-	saVol		-$06
+	saVol		-$30
 	saDetune	-$08
 	sLoop		$00, $06, .ver1
 
@@ -716,9 +716,9 @@ Zaxx_PSG1:
 
 .out1	dc.b nRst, $60, $60
 	dc.b nC3, $0C, nCs2
-	saVol		$04
+	saVol		$20
 	sLoop		$00, $02, .out1
-	saVol		-$08
+	saVol		-$40
 
 	dc.b nRst, $60
 	sCall		Zaxx_PSG12_DblOut1
@@ -871,9 +871,9 @@ Zaxx_PSG3:
 	ssMod68k	$00, $01, $01, $04
 
 .out2	dc.b sHold, $06
-	saVol		$01
+	saVol		$08
 	sLoop		$00, $08, .out2
-	saVol		-$08
+	saVol		-$40
 
 	dc.b nRst, $60, $60, $30
 	ssMod68k	$08, $04, $01, $04

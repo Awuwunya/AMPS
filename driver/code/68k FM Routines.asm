@@ -54,12 +54,18 @@ dUpdateVolFM:
 		move.b	(a1),d0			; load algorithm and feedback to d0
 		moveq	#0,d6			; reset the modulator offset
 
+	if FEATURE_UNDERWATER
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
 		beq.s	.uwdone			; if not, skip
 		move.b	d0,d6			; copy algorithm and feedback to d6
 		and.w	#7,d6			; mask out everything but the algorithm
 		add.b	d6,d3			; add algorithm to Total Level carrier offset
+		bpl.s	.noover2		; if volume did not overflow, skip
+		moveq	#$7F,d3			; force FM volume to silence
+
+.noover2
 		move.b	d0,d6			; set algorithm and feedback to modulator offset
+	endif
 
 .uwdone
 		moveq	#4-1,d5			; prepare 4 operators to d5
@@ -73,7 +79,7 @@ dUpdateVolFM:
 
 		add.b	d3,d1			; add carrier offset to loaded value
 		bmi.s	.slot			; if we did not overflow, branch
-		moveq	#$7F,d1			; cap to silent volume
+		moveq	#-1,d1			; cap to silent volume
 		bra.s	.slot
 
 .noslot

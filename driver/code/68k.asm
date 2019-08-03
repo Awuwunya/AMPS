@@ -9,6 +9,7 @@
 	include "driver/code/68k DAC Routines.asm"	; most DAC-related code
 	include "driver/code/68k FM Routines.asm"	; most FM-related code
 	include "driver/code/68k PSG Routines.asm"	; most PSG-related code
+	include "driver/code/68k Envelopes.asm"		; code for processing various envelopes
 	include "driver/code/68k PlaySnd.asm"		; routine for playing sounds
 	include "driver/code/68k Commands.asm"		; routine for proecessing commands
 	include "driver/code/Data.asm"			; all the data related to the driver

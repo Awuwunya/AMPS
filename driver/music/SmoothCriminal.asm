@@ -9,9 +9,9 @@ SmoothCriminal_Header:
 	sHeaderFM	SmoothCriminal_FM3, $00, $16
 	sHeaderFM	SmoothCriminal_FM4, $00, $16
 	sHeaderFM	SmoothCriminal_FM5, $00, $16
-	sHeaderPSG	SmoothCriminal_PSG1, $DC, $07, $00, v00
-	sHeaderPSG	SmoothCriminal_PSG2, $DC, $07, $00, v00
-	sHeaderPSG	SmoothCriminal_PSG3, $00, $03, $00, vMoonWalker04
+	sHeaderPSG	SmoothCriminal_PSG1, $DC, $38, $00, v00
+	sHeaderPSG	SmoothCriminal_PSG2, $DC, $38, $00, v00
+	sHeaderPSG	SmoothCriminal_PSG3, $00, $18, $00, vMoonWalker04
 
 	; Patch $00
 	; $3D
@@ -648,12 +648,12 @@ SmoothCriminal_Loop17:
 	sLoop		$00, $03, SmoothCriminal_Loop17
 	dc.b sHold, $30, nA3
 	ssMod68k	$08, $01, $03, $04
-	saVol		$FE
+	saVol		-$10
 	dc.b nCs4, $18, nC4, nBb3, nC4, $12, nCs4, $1E
 	dc.b nC4, $18, nBb3, nA3, $12, nCs4, $1E, nC4
 	dc.b $18, nBb3, nC4, $12, nCs4, $1E, nC4, $18
 	dc.b nBb3, nA3, $12
-	saVol		$02
+	saVol		$10
 	dc.b nBb3, $06
 
 SmoothCriminal_Loop18:
@@ -695,29 +695,29 @@ SmoothCriminal_PSG3:
 	sNoisePSG	$E7
 	sNoteTimeOut	$02
 	dc.b nRst, $06, nA5
-	saVol		$FE
+	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$02
+	saVol		$10
 	sNoteTimeOut	$02
 	dc.b $06
 
 SmoothCriminal_Loop22:
 	dc.b nA5, $06, $06
-	saVol		$FE
+	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$02
+	saVol		$10
 	sNoteTimeOut	$02
 	dc.b $06
 	sLoop		$00, $02, SmoothCriminal_Loop22
 	dc.b nA5, $06, $06
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$FE
+	saVol		-$10
 	sNoteTimeOut	$00
 	dc.b $06
-	saVol		$02
+	saVol		$10
 
 SmoothCriminal_Loop24:
 	sCall		SmoothCriminal_Call10
@@ -732,28 +732,28 @@ SmoothCriminal_Loop27:
 	sCall		SmoothCriminal_Call10
 	sLoop		$01, $02, SmoothCriminal_Loop27
 	sCall		SmoothCriminal_Call11
-	saVol		$02
+	saVol		$10
 	sNoteTimeOut	$02
 	dc.b $06, $06
-	saVol		$FD
+	saVol		-$18
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$03
+	saVol		$18
 	sNoteTimeOut	$02
 	dc.b $06
-	saVol		$FD
+	saVol		-$18
 	sNoteTimeOut	$0A
 	dc.b $06, $06, $06
-	saVol		$03
+	saVol		$18
 	sNoteTimeOut	$02
 	dc.b $06, $06, $06
-	saVol		$FD
+	saVol		-$18
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$03
+	saVol		$18
 	sNoteTimeOut	$02
 	dc.b $06, $06, $06
-	saVol		$FE
+	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06, $06
 	sCall		SmoothCriminal_Call10
@@ -764,20 +764,20 @@ SmoothCriminal_Call10:
 
 SmoothCriminal_Loop23:
 	dc.b nA5, $06, $06
-	saVol		$FE
+	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$02
+	saVol		$10
 	sNoteTimeOut	$02
 	dc.b $06
 	sLoop		$00, $03, SmoothCriminal_Loop23
 	dc.b nA5, $06, $06
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$FE
+	saVol		-$10
 	sNoteTimeOut	$00
 	dc.b $06
-	saVol		$02
+	saVol		$10
 	sRet
 
 SmoothCriminal_Call11:
@@ -785,10 +785,10 @@ SmoothCriminal_Call11:
 
 SmoothCriminal_Loop25:
 	dc.b nA5, $06, $06
-	saVol		$FE
+	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06
-	saVol		$02
+	saVol		$10
 	sNoteTimeOut	$02
 	dc.b $06
 	sLoop		$00, $04, SmoothCriminal_Loop25

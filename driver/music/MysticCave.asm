@@ -9,9 +9,9 @@ MysticCave_Header:
 	sHeaderFM	MysticCave_FM3, $00, $0C
 	sHeaderFM	MysticCave_FM4, $00, $10
 	sHeaderFM	MysticCave_FM5, $00, $10
-	sHeaderPSG	MysticCave_PSG1, $DC, $04, $00, vS2_0B
-	sHeaderPSG	MysticCave_PSG2, $DC, $02, $00, vS2_01
-	sHeaderPSG	MysticCave_PSG3, $00, $03, $00, vS2_02
+	sHeaderPSG	MysticCave_PSG1, $DC, $20, $00, vS2_0B
+	sHeaderPSG	MysticCave_PSG2, $DC, $10, $00, vS2_01
+	sHeaderPSG	MysticCave_PSG3, $00, $18, $00, vS2_02
 
 	; Patch $00
 	; $04

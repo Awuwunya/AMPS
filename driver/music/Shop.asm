@@ -2,16 +2,16 @@ Shop_Header:
 	sHeaderInit						; Z80 offset is $8921
 	sHeaderTempo	$01, $80
 	sHeaderCh	$05, $03
-	sHeaderDAC	Shop_DAC1, $16
-	sHeaderDAC	Shop_DAC2, $16
+	sHeaderDAC	Shop_DAC1, $12
+	sHeaderDAC	Shop_DAC2, $12
 	sHeaderFM	Shop_FM1, $0C, $0C
 	sHeaderFM	Shop_FM2, $00, $0B
 	sHeaderFM	Shop_FM3, $0C, $10
 	sHeaderFM	Shop_FM4, $0C, $0F
 	sHeaderFM	Shop_FM5, $0C, $0F
-	sHeaderPSG	Shop_PSG1, $F4, $03, $00, vPhan3_05
-	sHeaderPSG	Shop_PSG2, $00, $06, $00, vPhan3_0A
-	sHeaderPSG	Shop_PSG2, $F4, $04, $00, vPhan3_05
+	sHeaderPSG	Shop_PSG1, $F4, $18, $00, vPhan3_05
+	sHeaderPSG	Shop_PSG2, $00, $30, $00, vPhan3_0A
+	sHeaderPSG	Shop_PSG2, $F4, $20, $00, vPhan3_05
 
 	; Patch $00
 	; $24

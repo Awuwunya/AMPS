@@ -14,9 +14,9 @@ Pelimusa_Header:
 	sHeaderFM	Pelimusa_FM3, $00, $16
 	sHeaderFM	Pelimusa_FM4, $00, $17
 	sHeaderFM	Pelimusa_FM5, $00, $18
-	sHeaderPSG	Pelimusa_PSG1, $00, $0A, $30, vRistar10
-	sHeaderPSG	Pelimusa_PSG2, $00, $08, $00, vCol3_02
-	sHeaderPSG	Pelimusa_PSG3, $00, $08, $00, v00
+	sHeaderPSG	Pelimusa_PSG1, $00, $50, $30, vRistar10
+	sHeaderPSG	Pelimusa_PSG2, $00, $40, $00, vCol3_02
+	sHeaderPSG	Pelimusa_PSG3, $00, $40, $00, v00
 
 	; Patch $00 - Syntikkabasso 1 and 2 (From Columns III)
 	spAlgorithm	$02, Basso
@@ -744,7 +744,7 @@ Pelimusa_PSG3_State = 0
 Pelimusa_PSG3_Bell	macro	len
 	if Pelimusa_PSG3_State<>1
 		sNoisePSG	$00
-		ssVol		$06
+		ssVol		$30
 
 Pelimusa_PSG3_State = 1
 	endif

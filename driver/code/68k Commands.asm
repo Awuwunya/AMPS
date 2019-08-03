@@ -106,8 +106,10 @@ dCommands:
 	rts			; E3 - Set channel pitch to xx (TRANSPOSE - TRNSP_SET)
 	addq.w	#1,a4
 	rts			; E4 - Add xx to channel pitch (TRANSPOSE - TRNSP_ADD)
-	bra.w	dcsTmulCh	; E5 - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
-	bra.w	dcsTmul		; E6 - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
+	addq.w	#1,a4
+	rts			; E5 - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
+	addq.w	#1,a4
+	rts			; E6 - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
 	bra.w	dcHold		; E7 - Do not allow note on/off for next note (HOLD)
 	addq.w	#1,a4
 	rts			; E8 - Add xx to music tempo (TEMPO - TEMPO_ADD)
@@ -648,6 +650,28 @@ dcBackup:
 		clr.l	(a1)+			; clear back-up RAM
 		dbf	d0, .backup		; loop for each longword
 ; ---------------------------------------------------------------------------
+; We clear the PCM 1 & 2 volume tables to 0 to prevent any sound being
+; accidentally generated. This costs a bit of CPU time but ensures that
+; the volume is forced to minimum and there is no chance any wrong noise
+; plays before fade in starts
+; ---------------------------------------------------------------------------
+
+		lea	dZ80+PCM_Volume1,a1	; get Z80 volume table to a1
+		moveq	#$7F,d2			; prepare max volume to d1
+		move.w	#($200/16)-1,d0		; get repeat count to d1 (clear both tables!)
+		moveq	#0,d1			; prepare 0
+	stopZ80
+
+.volloop
+	rept 16					; clear 1 byte at a time
+		move.b	d1,(a1)+		; but! Clear 16 bytes per loop!
+	endr					; this actually saves some cycles
+		dbf	d0,.volloop		; loop for all bytes
+
+		move.b	d2,dZ80+PCM1_VolumeCur+1; set PCM1 volume as mute
+		move.b	d2,dZ80+PCM2_VolumeCur+1; set PCM2 volume as mute
+	startZ80
+; ---------------------------------------------------------------------------
 ; The FM instruments need to be updated! Since this process includes volume
 ; updates, they do not need to be done later...
 ; ---------------------------------------------------------------------------
@@ -671,12 +695,10 @@ dcBackup:
 ; Special logic to handle PSG4
 ; ---------------------------------------------------------------------------
 
-		cmp.b	#ctPSG4,mPSG3+cType.w	; check if PSG3 channel is in PSG4 mode
-		bne.s	.nopsg4			; if not, skip
-		move.b	mPSG3+cStatPSG4.w,dPSG	; update PSG4 status to PSG port
-
-.nopsg4
 		move.b	#$FF,dPSG		; mute PSG4
+		cmp.b	#ctPSG4,mPSG3+cType.w	; check if PSG3 channel is in PSG4 mode
+		bne.s	locret_Backup		; if not, skip
+		move.b	mPSG3+cStatPSG4.w,dPSG	; update PSG4 status to PSG port
 
 locret_Backup:
 		rts
@@ -725,22 +747,27 @@ dUpdateVoiceFM:
 		move.b	(a2)+,(a3)+		; copy each command
 	endr
 
+		moveq	#4-1,d5			; prepare 4 operators to d5
 		moveq	#0,d6			; reset the modulator offset
+
 		move.b	cVolume(a5),d3		; load FM channel volume to d3
 		add.b	mMasterVolFM.w,d3	; add master FM volume to d3
-		bpl.s	.noover			; if volume did not overflow, skio
+		bpl.s	.noover			; if volume did not overflow, skip
 		moveq	#$7F,d3			; force FM volume to silence
 
 .noover
+	if FEATURE_UNDERWATER
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
-		beq.s	.uwdone			; if not, skip
+		beq.s	.tlloop			; if not, skip
 		move.b	d4,d6			; copy algorithm and feedback to d6
 		and.w	#7,d6			; mask out everything but the algorithm
 		add.b	d6,d3			; add algorithm to Total Level carrier offset
-		move.b	d4,d6			; set algorithm and feedback to modulator offset
+		bpl.s	.noover2		; if volume did not overflow, skip
+		moveq	#$7F,d3			; force FM volume to silence
 
-.uwdone
-		moveq	#4-1,d5			; prepare 4 operators to d5
+.noover2
+		move.b	d4,d6			; set algorithm and feedback to modulator offset
+	endif
 
 .tlloop
 		move.b	(a1)+,d1		; get Total Level value from voice to d1
@@ -748,7 +775,7 @@ dUpdateVoiceFM:
 
 		add.b	d3,d1			; add carrier offset to loaded value
 		bmi.s	.slot			; if we did not overflow, branch
-		moveq	#$7F,d1			; cap to silent volume
+		moveq	#-1,d1			; cap to silent volume
 		bra.s	.slot
 
 .noslot

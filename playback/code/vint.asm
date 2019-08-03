@@ -24,7 +24,6 @@ VInt:
 
 .copyvol	move.b	mMasterVolDAC.w,d0	; get vol to d0
 		move.b	d0,mMasterVolFM.w	; copy to FM
-		lsr.b	#3,d0			; divide by 8
 		move.b	d0,mMasterVolPSG.w	; copy to PSG
 		jsr	dUpdateVolumeAll	; update all volume
 

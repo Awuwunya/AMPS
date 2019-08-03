@@ -717,14 +717,7 @@ dPlaySnd_Stop:
 		jsr	WriteYM_Pt1(pc)		; write to YM global register
 
 		lea	mSFXDAC1.w,a1		; prepare SFX DAC 1 to start clearing from
-		move.w	#(mChannelEnd-mSFXDAC1)/4-1,d1; load repeat count to d7
-.clear
-		clr.l	(a1)+			; clear entire SFX RAM (others done below)
-		dbf	d1,.clear		; loop for each longword to clear it...
-
-	if (mChannelEnd-mSFXDAC1)&2
-		clr.w	(a1)+			; if there is an extra word, clear it too
-	endif
+	dCLEAR_MEM	mChannelEnd-mSFXDAC1, 16; clear this block of memory with 16 byts per loop
 
 	; continue straight to stopping music
 ; ===========================================================================
@@ -735,15 +728,7 @@ dPlaySnd_Stop:
 dStopMusic:
 		lea	mVctMus.w,a1		; load driver RAM start to a1
 		move.b	mMasterVolDAC.w,d0	; load DAC master volume to d4
-
-		move.w	#(mSFXDAC1-mVctMus)/4-1,d1; load repeat count to d7
-.clear
-		clr.l	(a1)+			; clear driver and music channel memory
-		dbf	d1,.clear		; loop for each longword to clear it...
-
-	if (mSFXDAC1-mVctMus)&2
-		clr.w	(a1)+			; if there is an extra word, clear it too
-	endif
+	dCLEAR_MEM	mSFXDAC1-mVctMus, 32	; clear this block of memory with 32 byts per loop
 
 	if safe=1
 		clr.b	msChktracker.w		; if in safe mode, also clear the check tracker variable!
@@ -824,7 +809,9 @@ dPlaySnd_Reset:
 		bclr	#mfbBacked,mFlags.w	; reset backed up song bit
 	endif
 
+	if FEATURE_UNDERWATER
 		bsr.s	dPlaySnd_OutWater	; gp reset underwater flag and request volume update
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Disable speed shoes mode
@@ -846,21 +833,27 @@ dPlaySnd_ShoesOff:
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_ToWater:
+	if FEATURE_UNDERWATER
 		bset	#mfbWater,mFlags.w	; enable underwater mode
 		bra.s	dReqVolUpFM		; request FM volume update
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Disable Underwater mode
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_OutWater:
+	if FEATURE_UNDERWATER
 		bclr	#mfbWater,mFlags.w	; disable underwater mode
+	else
+		rts
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; force volume update on all FM channels
 ; ---------------------------------------------------------------------------
 
-dReqVolUpFM;
+dReqVolUpFM:
 		moveq	#1<<cfbVol,d0		; prepare volume update flag to d0
 .ch =	mFM1					; start at FM1
 	rept Mus_FM				; loop through all music FM channels

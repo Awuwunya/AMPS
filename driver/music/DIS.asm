@@ -10,8 +10,8 @@ Dis_Header:
 	sHeaderFM	Dis_FM4, $00, $10
 	sHeaderFM	Dis_FM5, $00, $10
 	sHeaderPSG	Dis_PSG1, $F4-$0C, $00, $00, vKc08
-	sHeaderPSG	Dis_PSG2, $F4-$0C, $03, $00, vKc08
-	sHeaderPSG	Dis_PSG3, $21-$0C, $01, $00, vKc02
+	sHeaderPSG	Dis_PSG2, $F4-$0C, $18, $00, vKc08
+	sHeaderPSG	Dis_PSG3, $21-$0C, $08, $00, vKc02
 
 	; Patch $00
 	; $3A
@@ -1216,7 +1216,7 @@ Dis_Loop15:
 	sVoice		vKc05
 	dc.b nC4, $0C, nRst, $06, nC4, $0C, nC4, nRst
 	dc.b $2A, nRst, $60
-	saVol		$01
+	saVol		$08
 
 Dis_Loop16:
 	dc.b nB3, $0C, $0C, $0C, $0C, $0C, $0C, $0C
@@ -1228,7 +1228,7 @@ Dis_Loop17:
 	dc.b $0C
 	sLoop		$00, $03, Dis_Loop17
 	dc.b nB3, $0C, $0C, $0C, $0C, nRst, $30
-	saVol		$FF
+	saVol		-$08
 	sJump		Dis_Loop15
 
 Dis_Call14:

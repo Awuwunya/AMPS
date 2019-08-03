@@ -2,17 +2,17 @@ Beach_Header:
 	sHeaderInit						; Z80 offset is $94E3
 	sHeaderTempo	$01, $40
 	sHeaderCh	$05, $03
-	sHeaderDAC	Beach_DAC1, $1C
-	sHeaderDAC	Beach_DAC2, $1C, dSnare
+	sHeaderDAC	Beach_DAC1, $18
+	sHeaderDAC	Beach_DAC2, $18, dSnare
 	sHeaderFM	Beach_FM1, $F4, $06
 	sHeaderFM	Beach_FM2, $00, $00
 	sHeaderFM	Beach_FM3, $00, $00
 	sHeaderFM	Beach_FM4, $00, $00
 	sHeaderFM	Beach_FM5, $00, $05
 ;	sHeaderFM	Beach_FM6, $00, $18
-	sHeaderPSG	Beach_PSG1, $E8-$0C, $02, $00, v00
-	sHeaderPSG	Beach_PSG2, $F4-$0C, $02, $00, v00
-	sHeaderPSG	Beach_PSG3, $F4-$0C, $02, $00, v00
+	sHeaderPSG	Beach_PSG1, $E8-$0C, $10, $00, v00
+	sHeaderPSG	Beach_PSG2, $F4-$0C, $10, $00, v00
+	sHeaderPSG	Beach_PSG3, $F4-$0C, $10, $00, v00
 
 	; Patch $00
 	; $3E
@@ -366,28 +366,28 @@ Beach_PSG1:
 
 	ssDetune	$FF
 ;	ssVolQuick	$05
-	ssVol		$05+$00
+	ssVol		$28
 	sCall		Beach_FM1_00
 
 .loop;	ssVolQuick	$03
-	ssVol		$03+$00
+	ssVol		$18
 	sCall		Beach_FM1_01
 ;	ssVolQuick	$03
 	sCall		Beach_FM1_02
 
 ;	ssVolQuick	$04
-	ssVol		$04+$00
+	ssVol		$20
 	sCall		Beach_FM1_03
 ;	ssVolQuick	$04
 	sCall		Beach_FM1_04
 	sCall		Beach_FM1_05
 
 ;	ssVolQuick	$03
-	ssVol		$03+$00
+	ssVol		$18
 	sCall		Beach_FM1_06
 
 ;	ssVolQuick	$04
-	ssVol		$04+$00
+	ssVol		$20
 	sCall		Beach_FM1_07
 	sJump		.loop
 
@@ -633,7 +633,7 @@ Beach_PSG3:
 .loop	sCall		Beach_FM4_00
 
 ;	ssVolQuick	$0A
-	ssVol		$0A+$00
+	ssVol		$50
 	sCall		Beach_FM4_01
 
 ;	ssVolQuick	$04

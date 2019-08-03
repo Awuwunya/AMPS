@@ -9,9 +9,9 @@ Pray_Header:
 	sHeaderFM	Pray_FM3, $00, $0D
 	sHeaderFM	Pray_FM2, $00, $0D
 	sHeaderFM	Pray_FM5, $00, $15
-	sHeaderPSG	Pray_PSG1, $E8, $05, $00, v00
-	sHeaderPSG	Pray_PSG2, $E8, $05, $00, v00
-	sHeaderPSG	Pray_PSG3, $1B, $01, $00, v00
+	sHeaderPSG	Pray_PSG1, $E8, $28, $00, v00
+	sHeaderPSG	Pray_PSG2, $E8, $28, $00, v00
+	sHeaderPSG	Pray_PSG3, $1B, $08, $00, v00
 
 	; Patch $00
 	; $3B
@@ -514,7 +514,7 @@ Pray_PSG1:
 Pray_Cond3:
 	ssMod68k	$0D, $01, $03, $02
 	saTranspose	$F4
-	saVol		$FF
+	saVol		-$08
 	sVoice		vRistar1D
 
 Pray_Jump3:
@@ -535,10 +535,10 @@ Pray_PSG2:
 	dc.b $08, nG4, $0C, nG3, $04, nBb4, $08, nBb3
 	dc.b $04, nRst, $30, nRst, $30
 	saTranspose	$F4
-	saVol		$02
+	saVol		$10
 
 Pray_Cond2:
-	saVol		$FF
+	saVol		-$08
 	ssMod68k	$0E, $01, $02, $02
 	saTranspose	$F4
 	sVoice		vRistar1D

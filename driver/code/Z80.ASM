@@ -1590,8 +1590,13 @@ SVF_StartVolume:
 		dec	e				; 04	; check volume table counter
 		inc	e				; 04	; ''
 		jp	nz,SVF_LoadVolume		; 10	; if not finished, branch
-		ld	a,004h				; 07	; set timer for PCM volume changing
+		ld	a,000h				; 07	; set timer for PCM volume changing
 		ret					; 10	; return
+
+; NAT: Changed the above line from 4 to 0 thanks to advice from Markey
+; This should make the buffer loop when volume is changed too often, instead of
+; stopping playback and distorting. It may or may not sound better, but I think
+; it sounds better, so I changed it to be so.
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

@@ -10,9 +10,9 @@ GameNo_Header:
 	sHeaderFM	GameNo_FM4, $0C, $14
 ;	sHeaderFM	GameNo_FM5, $00, $08
 	sHeaderFM	GameNo_FM6, $00, $12
-	sHeaderPSG	GameNo_PSG1, $E8-$0C, $06, $00, v00
-	sHeaderPSG	GameNo_PSG2, $E8-$0C, $06, $00, v00
-	sHeaderPSG	GameNo_PSG3, $00, $05, $00, v00
+	sHeaderPSG	GameNo_PSG1, $E8-$0C, $30, $00, v00
+	sHeaderPSG	GameNo_PSG2, $E8-$0C, $30, $00, v00
+	sHeaderPSG	GameNo_PSG3, $00, $28, $00, v00
 
 	; Patch $00
 	; $3D
@@ -378,10 +378,10 @@ GameNo_Call18:
 	dc.b nEb5, nAb4, nRst, $09, nB4, nB4, nB4, $06
 	dc.b nFs4, $03, nA4, nCs5, nE5, nA4, nRst, $09
 	dc.b nCs5, nCs5, nCs5, $06
-	saVol		$02
+	saVol		$10
 	dc.b nRst, $08, nB5, $03, nA5, nFs5, nB5, nA5
 	dc.b nFs5, $01
-	saVol		$FE
+	saVol		-$10
 	dc.b nA4, $0C, nB4
 	sLoop		$02, $02, GameNo_Call18
 	sRet

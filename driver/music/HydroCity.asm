@@ -9,9 +9,9 @@ HCZ2_Header:
 	sHeaderFM	HCZ2_FM3, $18, $13
 	sHeaderFM	HCZ2_FM4, $0C, $0F
 	sHeaderFM	HCZ2_FM5, $0C, $0C
-	sHeaderPSG	HCZ2_PSG1, $F4-$0C, $04, $00, v00
-	sHeaderPSG	HCZ2_PSG2, $F4-$0C, $04, $00, v00
-	sHeaderPSG	HCZ2_PSG3, $00, $03, $00, v00
+	sHeaderPSG	HCZ2_PSG1, $F4-$0C, $20, $00, v00
+	sHeaderPSG	HCZ2_PSG2, $F4-$0C, $20, $00, v00
+	sHeaderPSG	HCZ2_PSG3, $00, $18, $00, v00
 
 	; Universal sound bank from S3K
 	; Patch $00
@@ -1208,6 +1208,12 @@ HCZ2_Jump3:
 	dc.b nRst, $2C
 	sJump		HCZ2_Jump3
 
+HCZ2_PSG2:
+	sVoice		vS3K_08
+	dc.b nRst, $01
+	ssDetune	$01
+	sJump		HCZ2_Jump2
+
 HCZ2_PSG1:
 	sVoice		vS3K_0A
 
@@ -1285,13 +1291,6 @@ HCZ2_Jump2:
 	dc.b nEb5, $04, nRst, $08, nEb5, $04, nRst, $02
 	dc.b nEb5, $0A, nRst, $02, nD5, $04, nRst, $2C
 	sJump		HCZ2_Jump2
-
-HCZ2_PSG2:
-	sVoice		vS3K_08
-	dc.b nRst, $01
-	ssDetune	$01
-	sJump		HCZ2_Jump2
-
 
 HCZ2_PSG3:
 	sVoice		vS3K_02
