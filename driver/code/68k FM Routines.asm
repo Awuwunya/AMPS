@@ -30,6 +30,8 @@ dMuteFM:
 
 		sub.b	d5,d0			; go to next FM channel
 		dbf	d4,.chloop		; repeat for each channel
+
+locret_MuteFM:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -37,15 +39,37 @@ dMuteFM:
 ; ---------------------------------------------------------------------------
 
 dUpdateVolFM:
+	if FEATURE_DACFMVOLENV
+		btst	#cfbRest,(a5)		; check if channel is resting
+		bne.s	locret_MuteFM		; if is, do not update anything
+	endif
+
+		move.b	cVolume(a5),d5		; load FM channel volume to d3
+		add.b	mMasterVolFM.w,d5	; add master FM volume to d3
+		bpl.s	.nocap			; if volume did not overflow, skio
+		moveq	#$7F,d5			; force FM volume to silence
+
+.nocap
+	if FEATURE_DACFMVOLENV
+		moveq	#0,d4
+		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
+		beq.s	.ckflag			; if 0, check if volume update was needed
+
+		jsr	dVolEnvProg(pc)		; run the envelope program
+		bne.s	dUpdateVolFM2		; if it was necessary to update volume, do so
+
+.ckflag
+		btst	#cfbVol,(a5)		; test volume update flag
+		beq.s	locret_MuteFM		; branch if no volume update was requested
+	endif
+
+dUpdateVolFM2:
+	if FEATURE_DACFMVOLENV
+		bclr	#cfbVol,(a5)		; clear volume update flag
+	endif
 		btst	#cfbInt,(a5)		; is the channel interrupted by SFX?
-		bne.s	locret_VolFM		; if yes, do not update
+		bne.s	locret_MuteFM		; if yes, do not update
 
-		move.b	cVolume(a5),d3		; load FM channel volume to d3
-		add.b	mMasterVolFM.w,d3	; add master FM volume to d3
-		bpl.s	.noover			; if volume did not overflow, skio
-		moveq	#$7F,d3			; force FM volume to silence
-
-.noover
 		moveq	#0,d0
 		move.b	cVoice(a5),d0		; load FM voice ID of the channel to d0
 		move.l	a6,a1			; copy music voice table address to a1
@@ -59,16 +83,16 @@ dUpdateVolFM:
 		beq.s	.uwdone			; if not, skip
 		move.b	d0,d6			; copy algorithm and feedback to d6
 		and.w	#7,d6			; mask out everything but the algorithm
-		add.b	d6,d3			; add algorithm to Total Level carrier offset
+		add.b	d6,d5			; add algorithm to Total Level carrier offset
 		bpl.s	.noover2		; if volume did not overflow, skip
-		moveq	#$7F,d3			; force FM volume to silence
+		moveq	#$7F,d5			; force FM volume to silence
 
 .noover2
 		move.b	d0,d6			; set algorithm and feedback to modulator offset
 	endif
 
 .uwdone
-		moveq	#4-1,d5			; prepare 4 operators to d5
+		moveq	#4-1,d3			; prepare 4 operators to d3
 		add.w	#VoiceTL,a1		; go to the Total Level offset of the voice
 		lea	dOpTLFM(pc),a2		; load Total Level address table to a3
 
@@ -77,7 +101,7 @@ dUpdateVolFM:
 		move.b	(a1)+,d1		; get Total Level value from voice to d1
 		bpl.s	.noslot			; if slot operator bit was not set, branch
 
-		add.b	d3,d1			; add carrier offset to loaded value
+		add.b	d5,d1			; add carrier offset to loaded value
 		bmi.s	.slot			; if we did not overflow, branch
 		moveq	#-1,d1			; cap to silent volume
 		bra.s	.slot
@@ -87,7 +111,7 @@ dUpdateVolFM:
 .slot
 		jsr	WriteChYM(pc)		; write Total Level to YM according to channel
 .ignore
-		dbf	d5,.tlloop		; repeat for each Total Level operator
+		dbf	d3,.tlloop		; repeat for each Total Level operator
 
 	if safe=1
 		AMPS_Debug_UpdVolFM		; check if the voice was valid
@@ -127,8 +151,10 @@ dAMPSnextFMSFX:
 	dModPorta dAMPSdoPSGSFX, dAMPSnextFMSFX, 1; run modulation + portamento code
 		bsr.w	dUpdateFreqFM3		; send FM frequency to hardware
 
+	if FEATURE_DACFMVOLENV=0
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.next			; if not, skip
+	endif
 		jsr	dUpdateVolFM(pc)	; update FM volume
 
 .next
@@ -155,8 +181,10 @@ dAMPSnextFMSFX:
 		bsr.w	dUpdateFreqFM		; send FM frequency to hardware
 	dKeyOnFM 1				; send key-on command to YM
 
+	if FEATURE_DACFMVOLENV=0
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.noupdate		; if not, branch
+	endif
 		jsr	dUpdateVolFM(pc)	; update FM volume
 
 .noupdate	dbf	d7,dAMPSnextFMSFX	; make sure to run all the channels
@@ -182,8 +210,10 @@ dAMPSnextFM:
 	dModPorta dAMPSdoPSG, dAMPSnextFM, 0	; run modulation + portamento code
 		bsr.w	dUpdateFreqFM2		; send FM frequency to hardware
 
+	if FEATURE_DACFMVOLENV=0
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.next			; if not, skip
+	endif
 		jsr	dUpdateVolFM(pc)	; update FM volume
 
 .next
@@ -210,8 +240,10 @@ dAMPSnextFM:
 		bsr.s	dUpdateFreqFM		; send FM frequency to hardware
 	dKeyOnFM				; send key-on command to YM
 
+	if FEATURE_DACFMVOLENV=0
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.noupdate		; if not, branch
+	endif
 		jsr	dUpdateVolFM(pc)	; update FM volume
 
 .noupdate

@@ -158,6 +158,18 @@ AMPS_Debug_Console_Channel:
 		Console.BreakLine
 	endif
 
+	if FEATURE_DACFMVOLENV
+		Console.WriteLine "%<pal1>VolEnv: %<pal2>%<.b cVolEnv(a5)> %<pal2>%<.b cEnvPos(a5)>"
+		if FEATURE_MODENV=0
+			Console.BreakLine
+		endif
+	endif
+
+	if FEATURE_MODENV
+		Console.WriteLine "%<pal1>ModEnv: %<pal2>%<.b cModEnv(a5)> %<pal2>%<.b cModEnvPos(a5)>%<.b cModEnvSens(a5)>"
+		Console.BreakLine
+	endif
+
 	Console.Write "%<pal1>Loop: %<pal2>%<.b cLoop(a5)> %<.b cLoop+1(a5)> %<.b cLoop+2(a5)> "
 	cmp.w	#mSFXDAC1,a5
 	bhs.w	.rts
@@ -421,23 +433,57 @@ AMPS_DebugR_dcModulate:
 	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Handler for disabled features - modulation
+; Handler for special case of FEATURE_DACFMVOLENV in dcVoice
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_dcVoiceEnv	macro
+	tst.b	cType(a5)	; check if this is a PSG channel
+	bpl.s	.ok		; if not, skip
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+		jsr	AMPS_DebugR_dcVoiceEnv
+	else
+		bra.w	*
+	endif
+
+.ok
+    endm
+
+	if FEATURE_DACFMVOLENV
+	if def(RaiseError)	; check if Vladik's debugger is active
+AMPS_DebugR_dcVoiceEnv:
+		RaiseError "You can not use sVoice for PSG channelwhen FEATURE_MODULATION is set to 1.  Please use sVolEnv instead.", AMPS_Debug_Console_Channel
+	endif
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Handler for disabled features - volume envelopes
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_dcVolEnv	macro
+	tst.b	cType(a5)	; check if this is a PSG channel
+	bmi.s	.ok		; if is, skip
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+		RaiseError "Volume envelopes are disabled for DAC and FM channels. Set FEATURE_DACFMVOLENV to 1 to enable.", AMPS_Debug_Console_Channel
+	else
+		bra.w	*
+	endif
+
+.ok
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Handler for disabled features - modulation envelopes
 ; ---------------------------------------------------------------------------
 
 AMPS_Debug_dcModEnv	macro
 	if def(RaiseError)	; check if Vladik's debugger is active
-		jsr	AMPS_DebugR_dcModEnv
+		RaiseError "Modulation envelopes are disabled. Set FEATURE_MODENV to 1 to enable.", AMPS_Debug_Console_Channel
 	else
 		bra.w	*
 	endif
     endm
-
-	if FEATURE_MODENV=0
-	if def(RaiseError)	; check if Vladik's debugger is active
-AMPS_DebugR_dcModEnv:
-		RaiseError "Modulation envelopes are disabled. Set FEATURE_MODENV to 1 to enable.", AMPS_Debug_Console_Channel
-	endif
-	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Handler for disabled features - modulation

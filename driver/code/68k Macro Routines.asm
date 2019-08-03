@@ -39,7 +39,7 @@ dNoteToutFM	macro
 
 dNoteToutPSG	macro
 	dNoteToutHandler			; include timeout handler
-		bset	#cfbRest,(a5)		; set track to resting
+		or.b	#(1<<cfbRest)|(1<<cfbVol),(a5); set channel to resting and request a volume update (update on next note-on)
 		bsr.w	dMutePSGmus		; mute PSG channel
 		bra.w	.next			; jump to next track
 .endt
@@ -189,8 +189,10 @@ dModulate	macro jump,loop,type
 
 dGenLoops macro	mode,jump,loop,type
 	if \type>=0
-		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
-		beq.s	.noupdatevol		; if not, skip
+		if FEATURE_DACFMVOLENV=0
+			bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
+			beq.s	.noupdatevol		; if not, skip
+		endif
 
 		if \type<2
 			jsr	dUpdateVolFM(pc)	; update FM volume
@@ -312,7 +314,7 @@ dProcNote	macro sfx, chan
 .noporta
 	endif
 
-	if (FEATURE_MODULATION=1)|(\sfx=0)|(\chan=1)
+	if FEATURE_MODULATION|(\sfx=0)|(\chan=1)
 		btst	#cfbHold,(a5)		; check if we are holding
 		bne.s	.endpn			; if we are, branch
 	endif
@@ -321,7 +323,7 @@ dProcNote	macro sfx, chan
 		move.b	cNoteTimeMain(a5),cNoteTimeCur(a5); copy note timeout value
 	endif
 
-	if \chan=1
+	if FEATURE_DACFMVOLENV|(\chan=1)
 		clr.b	cEnvPos(a5)		; clear envelope position if PSG channel
 	endif
 
@@ -402,7 +404,7 @@ dKeyOnFM	macro
 dGetFreqPSG	macro
 		subi.b	#$81,d5			; sub $81 from the note (notes start at $80)
 		bhs.s	.norest			; branch if note wasnt $80 (rest)
-		bset	#cfbRest,(a5)		; set channel to resting
+		or.b	#(1<<cfbRest)|(1<<cfbVol),(a5); set channel to resting and request a volume update (update on next note-on)
 		move.w	#-1,cFreq(a5)		; set invalid PSG frequency
 		jsr	dMutePSGmus(pc)		; mute this PSG channel
 		bra.s	.freqgot

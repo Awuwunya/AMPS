@@ -360,7 +360,7 @@ Beach_PSG2:
 	dc.b nRst, $01
 
 Beach_PSG1:
-	sVoice		vWOI_0D
+	sVolEnv		vWOI_0D
 ;	ssVolBase	$00
 	dc.b nRst, $01
 
@@ -626,7 +626,7 @@ Beach_FM3_00:
 	sRet
 
 Beach_PSG3:
-	sVoice		vWOI_0C
+	sVolEnv		vWOI_0C
 ;	ssVolBase	$00
 	dc.b nRst, $02
 	sCall		Beach_FM4_00

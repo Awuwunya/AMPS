@@ -40,9 +40,8 @@ dAMPSnextPSGSFX:
 		jsr	dCalcDuration(pc)	; calculate duration
 .pcnote
 	dProcNote 1, 1				; reset necessary channel memory
-
 		bsr.w	dUpdateFreqPSG		; update hardware frequency
-		bsr.w	dEnvProgPSG		; run envelope program
+		bsr.w	dEnvelopePSG		; run envelope program
 		dbf	d7,dAMPSnextPSGSFX	; make sure to run all the channels
 	; continue to check tracker and end loop
 ; ===========================================================================
@@ -104,7 +103,7 @@ dAMPSnextPSG:
 	dProcNote 0, 1				; reset necessary channel memory
 
 		bsr.s	dUpdateFreqPSG		; update hardware frequency
-		bsr.w	dEnvProgPSG		; run envelope program
+		bsr.w	dEnvelopePSG		; run envelope program
 		dbf	d7,dAMPSnextPSG		; make sure to run all the channels
 		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
 ; ===========================================================================
@@ -139,11 +138,11 @@ dUpdateFreqPSG:
 
 dUpdateFreqPSG2:
 		btst	#cfbInt,(a5)		; is channel interrupted by sfx?
-		bne.s	locret_dUpdateFreqPSG	; if so, skip
+		bne.s	locret_UpdateFreqPSG	; if so, skip
 
 dUpdateFreqPSG3:
 		btst	#cfbRest,(a5)		; is this channel resting
-		bne.s	locret_dUpdateFreqPSG	; if so, skip
+		bne.s	locret_UpdateFreqPSG	; if so, skip
 
 		move.b	cType(a5),d0		; load channel type value to d0
 		cmpi.b	#ctPSG4,d0		; check if this channel is in PSG4 mode
@@ -172,56 +171,33 @@ dUpdateFreqPSG3:
 		move.b	d0,dPSG			; write frequency low nibble and latch channel
 		move.b	d6,dPSG			; write frequency high nibbles to PSG
 
-locret_dUpdateFreqPSG:
+locret_UpdateFreqPSG:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Routine for running envelope programs
 ; ---------------------------------------------------------------------------
 
-dEnvProgPSG:
-		move.b	cVolume(a5),d5		; load channel volume to d5
-		add.b	mMasterVolPSG.w,d5	; add PSG master volume to d5
-
-		moveq	#0,d4
-		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
-		beq.s	dUpdateVolPSG		; if 0, update volume only
-		bra.s	dEnvProgPSG2		; continue to run code below
-
 dEnvelopePSG:
-		moveq	#0,d4
-		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
-		beq.s	locret_UpdVolPSG	; if 0, return
+		btst	#cfbRest,(a5)		; check if channel is resting
+		bne.s	locret_UpdateFreqPSG	; if is, do not update anything
 
-		move.b	cVolume(a5),d5		; load channel volume to d5
-		add.b	mMasterVolPSG.w,d5	; add PSG master volume to d5
-		bpl.s	dEnvProgPSG2		; branch if volume did not overflow
+		move.b	mMasterVolPSG.w,d5	; load PSG master volume to d5
+		add.b	cVolume(a5),d5		; add channel volume to d5
+		bpl.s	.nocap			; branch if volume did not overflow
 		moveq	#$7F,d5			; set to maximum volume
 
-dEnvProgPSG2:
-	if safe=1
-		AMPS_Debug_VolEnvID		; check if volume envelope ID is valid
-	endif
+.nocap
+		moveq	#0,d4
+		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
+		beq.s	.ckflag			; if 0, check if volume update was needed
 
-		lea	VolEnvs-4(pc),a1	; load volume envelope data array
-		add.w	d4,d4			; quadruple volume envelope ID
-		add.w	d4,d4			; (each entry is 4 bytes in size)
-		move.l	(a1,d4.w),a1		; get pointer to volume envelope data
+		jsr	dVolEnvProg(pc)		; run the envelope program
+		bne.s	dUpdateVolPSG		; if it was necessary to update volume, do so
 
-		moveq	#0,d1
-		moveq	#0,d0
-
-dEnvProgPSG3:
-		move.b	cEnvPos(a5),d1		; get envelope position to d1
-		move.b	(a1,d1.w),d0		; get the data in that position
-		bpl.s	.value			; if positive, its a normal value
-
-		cmp.b	#eLast-2,d0		; check if this is a command
-		ble.s	dEnvCommand		; if it is handle it
-
-.value
-		addq.b	#1,cEnvPos(a5)		; increment envelope position
-		add.b	d0,d5			; add envelope volume to d5
+.ckflag
+		btst	#cfbVol,(a5)		; test volume update flag
+		beq.s	locret_UpdVolPSG	; branch if no volume update was requested
 	; continue to update PSG volume
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -229,11 +205,7 @@ dEnvProgPSG3:
 ; ---------------------------------------------------------------------------
 
 dUpdateVolPSG:
-		cmpi.b	#$7F,d5			; check if volume is out of range
-		bls.s	.nocap			; if not, branch
-		moveq	#$7F,d5			; cap volume to silent
-
-.nocap
+		bclr	#cfbVol,(a5)		; clear volume update flag
 		btst	#cfbRest,(a5)		; is this channel resting
 		bne.s	locret_UpdVolPSG	; if is, do not update
 		btst	#cfbInt,(a5)		; is channel interrupted by sfx?
@@ -250,6 +222,11 @@ dUpdateVolPSG:
 		beq.s	locret_UpdVolPSG	; if is, do not update
 
 .send
+		cmpi.b	#$7F,d5			; check if volume is out of range
+		bls.s	.nocap			; if not, branch
+		moveq	#$7F,d5			; cap volume to silent
+
+.nocap
 		lsr.b	#3,d5			; divide volume by 8
 		or.b	cType(a5),d5		; combine channel type value with volume
 		or.b	#$10,d5			; set volume update bit
@@ -257,50 +234,6 @@ dUpdateVolPSG:
 
 locret_UpdVolPSG:
 		rts
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Subroutine for handling volume envelope commands
-; ---------------------------------------------------------------------------
-
-dEnvCommand:
-	if safe=1
-		AMPS_Debug_VolEnvCmd		; check if command is valid
-	endif
-
-		jmp	.comm-$80(pc,d0.w)	; jump to command handler
-
-.comm
-		bra.s	.reset			; 80 - Loop back to beginning
-		bra.s	.hold			; 82 - Hold the envelope at current level
-		bra.s	.loop			; 84 - Go to position defined by the next byte
-		bra.s	.stop			; 86 - Stop current note and envelope
-		bra.s	.ignore			; 88 - ignore
-		bra.s	.ignore			; 8A - ignore
-; ---------------------------------------------------------------------------
-
-.stop
-		bset	#cfbRest,(a5)		; set channel resting bit
-		bra.s	dMutePSGmus		; nute the channel
-; ---------------------------------------------------------------------------
-
-.hold
-		subq.b	#1,cEnvPos(a5)		; decrease envelope position
-		jmp	dEnvProgPSG3(pc)	; run the program again (make sure volume fades work)
-; ---------------------------------------------------------------------------
-
-.reset
-		clr.b	cEnvPos(a5)		; set envelope position to 0
-		jmp	dEnvProgPSG3(pc)	; run the program again
-; ---------------------------------------------------------------------------
-
-.loop
-		move.b	1(a1,d1.w),cEnvPos(a5)	; set envelope position to the next byte
-		jmp	dEnvProgPSG3(pc)	; run the program again
-; ---------------------------------------------------------------------------
-
-.ignore
-		addq.b	#2,cEnvPos(a5)		; skip the command and the next byte
-		jmp	dEnvProgPSG3(pc)	; run the program again
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Routine for hardware muting a PSG channel

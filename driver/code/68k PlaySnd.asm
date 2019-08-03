@@ -331,6 +331,7 @@ dPlaySnd_Music:
 ; this fix.
 ; ---------------------------------------------------------------------------
 
+		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbVol)|(1<<cfbRest),d2; prepare running tracker, resting and volume flags into d2
 		moveq	#2,d5			; prepare duration of 1 frames to d5
 		lea	dPSGtypeVals(pc),a2	; prepare PSG type value list into a2
 		lea	mPSG1.w,a1		; start from PSG1 channel

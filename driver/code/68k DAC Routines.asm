@@ -20,8 +20,10 @@ dAMPSnextDAC:
 	dModPorta dAMPSdoFM, dAMPSnextDAC, 4	; run modulation + portamento code
 		bsr.w	dUpdateFreqDAC		; if frequency needs changing, do it
 
+	if FEATURE_DACFMVOLENV=0
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.next			; if not, skip
+	endif
 		bsr.w	dUpdateVolDAC		; update DAC volume
 
 .next
@@ -45,12 +47,19 @@ dAMPSnextDAC:
 		jsr	dCalcDuration(pc)	; calculate duration
 .pcnote
 	dProcNote 0, -1				; reset necessary channel memory
-
 		tst.b	d6			; check if channel was resting
 		bmi.s	.noplay			; if yes, we do not want to note on anymore
 		bsr.s	dNoteOnDAC		; do hardware note-on behavior
 
-.noplay		dbf	d7,dAMPSnextDAC		; make sure to run all the channels
+.noplay
+	if FEATURE_DACFMVOLENV=0
+		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
+		beq.s	.next2			; if not, skip
+	endif
+		bsr.w	dUpdateVolDAC		; update DAC volume
+
+.next2
+		dbf	d7,dAMPSnextDAC		; make sure to run all the channels
 		jmp	dAMPSdoFM(pc)		; after that, process FM channels
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -196,9 +205,11 @@ dAMPSdoDACSFX:
 	dModPorta dAMPSdoFMSFX, dAMPSdoFMSFX, 5	; run modulation + portamento code
 		bsr.w	dUpdateFreqDAC2		; if frequency needs changing, do it
 
+	if FEATURE_DACFMVOLENV=0
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.next			; if not, skip
-		bsr.w	dUpdateVolDAC2		; update DAC volume
+	endif
+		bsr.w	dUpdateVolDAC		; update DAC volume
 
 .next
 		jmp	dAMPSdoFMSFX(pc)	; after that, process SFX FM channels
@@ -225,6 +236,13 @@ dAMPSdoDACSFX:
 		bsr.w	dNoteOnDAC		; do hardware note-on behavior
 
 .noplay
+	if FEATURE_DACFMVOLENV=0
+		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
+		beq.s	.next2			; if not, skip
+	endif
+		bsr.w	dUpdateVolDAC		; update DAC volume
+
+.next2
 		jmp	dAMPSdoFMSFX(pc)	; after that, process SFX FM channels
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -232,27 +250,43 @@ dAMPSdoDACSFX:
 ; ---------------------------------------------------------------------------
 
 dUpdateVolDAC:
+		move.b	cVolume(a5),d5		; get channel volume to d3
+		add.b	mMasterVolDAC.w,d5	; add master volume to it
+		bpl.s	.gotvol			; if positive (in range), branch
+		moveq	#$FFFFFF80,d5		; force volume to mute ($80 is the last valid volume)
+
+.gotvol
+	if FEATURE_DACFMVOLENV
+		moveq	#0,d4
+		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
+		beq.s	.ckflag			; if 0, check if volume update was needed
+
+		jsr	dVolEnvProg(pc)		; run the envelope program
+		bne.s	dUpdateVolDAC2		; if it was necessary to update volume, do so
+
+.ckflag
+		btst	#cfbVol,(a5)		; test volume update flag
+		beq.s	locret_VolDAC		; branch if no volume update was requested
+	endif
+
+dUpdateVolDAC2:
+	if FEATURE_DACFMVOLENV
+		bclr	#cfbVol,(a5)		; clear volume update flag
+	endif
 		btst	#cfbInt,(a5)		; is the channel interrupted by SFX?
 		bne.s	locret_VolDAC		; if yes, do not update
 
-dUpdateVolDAC2:
-		move.b	cVolume(a5),d3		; get channel volume to d3
-		add.b	mMasterVolDAC.w,d3	; add master volume to it
-		bpl.s	.gotvol			; if positive (in range), branch
-		moveq	#$FFFFFF80,d3		; force volume to mute ($80 is the last valid volume)
-
-.gotvol
 	StopZ80					; wait for Z80 to stop
 		move.b	#$D2,dZ80+PCM_ChangeVolume; set volume change flag
 
 		btst	#ctbPt2,cType(a5)	; check if this channel is DAC1
 		beq.s	.dac1			; if is, branch
-		move.b	d3,dZ80+PCM2_Volume+1	; save volume for PCM 1
+		move.b	d5,dZ80+PCM2_Volume+1	; save volume for PCM 1
 	StartZ80				; enable Z80 execution
 		rts
 
 .dac1
-		move.b	d3,dZ80+PCM1_Volume+1	; save volume for PCM 2
+		move.b	d5,dZ80+PCM1_Volume+1	; save volume for PCM 2
 	StartZ80				; enable Z80 execution
 
 locret_VolDAC:

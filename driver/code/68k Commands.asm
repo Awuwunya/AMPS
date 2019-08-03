@@ -29,7 +29,7 @@ dCommands:
 	bra.w	dcsTmulCh	; E5 - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
 	bra.w	dcsTmul		; E6 - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
 	bra.w	dcHold		; E7 - Do not allow note on/off for next note (HOLD)
-	bra.w	dcVoice		; E8 - Set Voice/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
+	bra.w	dcVoice		; E8 - Set Voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_DAC)
 	bra.w	dcsTempoShoes	; E9 - Set music speed shoes tempo to xx (TEMPO - TEMPO_SET_SPEED)
 	bra.w	dcsTempo	; EA - Set music tempo to xx (TEMPO - TEMPO_SET)
 	bra.w	dcSampDAC	; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
@@ -39,8 +39,8 @@ dCommands:
 	bra.w	dcsLFO		; EF - Set LFO (SET_LFO - LFO_AMSEN)
 	bra.w	dcMod68K	; F0 - Modulation (MOD_SETUP)
 	bra.w	dcPortamento	; F1 - Portamento enable/disable flag (PORTAMENTO)
-	bra.w	dcModEnv	; F2 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
-	bra.w	dcNoisePSG	; F3 - PSG4 mode to xx (PSG_NOISE - PNOIS_AMPS)
+	bra.w	dcVolEnv	; F2 - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
+	bra.w	dcModEnv	; F3 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
 	bra.w	dcCont		; F4 - Do a continuous SFX loop (CONT_SFX)
 	bra.w	dcStop		; F5 - End of channel (TRK_END - TEND_STD)
 	bra.w	dcJump		; F6 - Jump to xxxx (GOTO)
@@ -85,6 +85,7 @@ dCommands:
 	bra.w	dcSpecFM3	; FF 30 - Enable FM3 special mode (SPC_FM3)
 	bra.w	dcFilter	; FF 34 - Set DAC filter bank. (DAC_FILTER)
 	bra.w	dcBackup	; FF 38 - Load the last song from back-up (FADE_IN_SONG)
+	bra.w	dcNoisePSG	; FF 3C - PSG4 mode to xx (PSG_NOISE - PNOIS_AMPS)
 
 	if safe=1
 		bra.w	dcFreeze	; FF 40 - Freeze CPU. Debug flag (DEBUG_STOP_CPU)
@@ -132,9 +133,9 @@ dCommands:
 	addq.w	#1,a4
 	rts			; F1 - Portamento enable/disable flag (PORTAMENTO)
 	addq.w	#1,a4
-	rts			; F2 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
+	rts			; F2 - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
 	addq.w	#1,a4
-	rts			; F3 - PSG4 mode to xx (PSG_NOISE - PNOIS_SET)
+	rts			; F3 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
 	addq.w	#2,a4
 	rts			; F4 - Do a continuous SFX loop (CONT_SFX)
 	rts
@@ -608,6 +609,18 @@ locret_FreqOff:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Tracker command for setting volume envelope ID
+; ---------------------------------------------------------------------------
+
+dcVolEnv:
+	if FEATURE_DACFMVOLENV=0
+		AMPS_Debug_dcVolEnv		; display an error if an invalid channel attempts to load a volume envelope
+	endif
+
+		move.b	(a4)+,cVolEnv(a5)	; load the volume envelope ID
+		rts
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; Tracker command for setting modulation envelope ID
 ; ---------------------------------------------------------------------------
 
@@ -699,12 +712,12 @@ dcBackup:
 		cmp.b	#ctPSG4,mPSG3+cType.w	; check if PSG3 channel is in PSG4 mode
 		bne.s	locret_Backup		; if not, skip
 		move.b	mPSG3+cStatPSG4.w,dPSG	; update PSG4 status to PSG port
-
-locret_Backup:
-		rts
 	else
 		AMPS_Debug_dcBackup
 	endif
+
+locret_Backup:
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker command for changing voice, volume envelope or sample
@@ -715,8 +728,13 @@ dcVoice:
 		move.b	(a4)+,d0		; load voice/sample/volume envelope from tracker to d0
 		move.b	d0,cVoice(a5)		; save to channel
 
+	if FEATURE_DACFMVOLENV
+		AMPS_Debug_dcVoiceEnv		; warn user if DAC & FM volume envelopes are enabled. This behaviour can be removed
+	else					; for better integration of FM/DAC tracker code with PSG channels.
 		tst.b	cType(a5)		; check if this is a PSG channel
 		bmi.s	locret_Backup		; if is, skip
+	endif
+
 		btst	#ctbDAC,cType(a5)	; check if this is a DAC channel
 		bne.s	locret_Backup		; if is, skip
 

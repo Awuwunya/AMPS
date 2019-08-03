@@ -25,6 +25,7 @@
 
 Test_FM1:
 	sVoice		pJousi
+	sVolEnv		vS2_0B
 	sModEnv		mTest
 
 .loop

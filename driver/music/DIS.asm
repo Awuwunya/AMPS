@@ -1183,37 +1183,37 @@ Dis_Loop15:
 	sCall		Dis_Call14
 	sLoop		$00, $03, Dis_Loop15
 	sCall		Dis_Call15
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, $0C, nRst, nRst, $06
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b nC4, $0C, $06, sHold, $06, nRst
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, $06, $06, nRst, nC4, $06, $0C, nRst
 	dc.b $06, nC4, nC4, nRst, nRst, $0C, nC4, $06
 	dc.b $06, nRst
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b nC4, $06
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b $06, nRst, nC4, $0C, $06, $06, nRst, $0C
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b nC4, nRst, $06, nC4, $0C, $0C, nRst, $06
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, $06, $06, nRst, nC4, nC4, $0C, nRst
 	dc.b $06, nC4, nC4, nRst, nRst, nC4, nC4
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b nC4
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, nC4, $0C, $06, nRst, $18, nRst, $0C
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b nC4, nRst, $06, nC4, $0C, $0C, nRst, $06
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, $06, $06, nRst, nC4, nC4, nC4, nRst
 	dc.b nC4, nC4, nRst, nRst, nC4, nC4, nRst, nC4
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b nC4
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, nRst, nC4, $0C, $06, $06, nRst, $0C
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b nC4, $0C, nRst, $06, nC4, $0C, nC4, nRst
 	dc.b $2A, nRst, $60
 	saVol		$08
@@ -1232,26 +1232,26 @@ Dis_Loop17:
 	sJump		Dis_Loop15
 
 Dis_Call14:
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, $0C, $0C, $0C, $0C, $0C
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b $0C
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b $0C, $0C, $0C, $0C, $0C, $06, $06, $0C
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b $0C
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b $0C
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b $0C
 	sRet
 
 Dis_Call15:
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b nC4, $0C, $0C, $0C, $0C, $0C
-	sVoice		vKc05
+	sVolEnv		vKc05
 	dc.b $0C
-	sVoice		vKc02
+	sVolEnv		vKc02
 	dc.b $0C, $0C, $0C, $0C, $0C, $06, $06, nRst
 	dc.b $30
 	sRet

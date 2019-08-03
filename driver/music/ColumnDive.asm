@@ -186,11 +186,11 @@ ColumnDive_FM3:
 	sJump		ColumnDive_FM3
 
 ColumnDive_PSG1:
-	sVoice		vCol3_03
+	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call20
-	sVoice		v00
+	sVolEnv		v00
 	sCall		ColumnDrive_Call21
-	sVoice		vCol3_03
+	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call22
 	sJump		ColumnDive_PSG1
 
@@ -240,11 +240,11 @@ ColumnDive_FM5:
 	sJump		ColumnDive_FM5
 
 ColumnDive_PSG2:
-	sVoice		vCol3_03
+	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call24
-	sVoice		v00
+	sVolEnv		v00
 	sCall		ColumnDrive_Call25
-	sVoice		vCol3_03
+	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call26
 	sJump		ColumnDive_PSG2
 
@@ -348,23 +348,23 @@ ColumnDive_PSG3:
 	sNoisePSG	$E7
 
 ColumnDive_Jump3:
-	sVoice		vCol3_02
+	sVolEnv		vCol3_02
 
 ColumnDive_Loop5:
 	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
 	dc.b nBb6
 	sLoop		$00, $0E, ColumnDive_Loop5
 	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
-	sVoice		vCol3_05
+	sVolEnv		vCol3_05
 	dc.b nA6, $20, nRst, $20, nRst, $08
-	sVoice		vCol3_02
+	sVolEnv		vCol3_02
 
 ColumnDive_Loop6:
 	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
 	dc.b nBb6
 	sLoop		$00, $0E, ColumnDive_Loop6
 	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
-	sVoice		vCol3_05
+	sVolEnv		vCol3_05
 	dc.b nA6, $20, nRst, $20, nRst, $08, nRst, $20
 	dc.b nRst, nRst, nRst, $18, nA6, $20, nRst, $20
 	dc.b nRst, $08

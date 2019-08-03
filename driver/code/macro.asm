@@ -19,6 +19,7 @@ tempo =	0
 FEATURE_MODULATION =	1	; set to 1 to enable software modulation effect
 FEATURE_PORTAMENTO =	1	; set to 1 to enable portamento flag
 FEATURE_MODENV =	1	; set to 1 to enable modulation envelopes
+FEATURE_DACFMVOLENV =	1	; set to 1 to enable volume envelopes for FM & DAC channels.
 FEATURE_UNDERWATER =	1	; set to 1 to enable underwater mode
 FEATURE_BACKUP =	1	; set to 1 to enable back-up channels. Used for the 1-up SFX in Sonic 1, 2 and 3K...
 FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Used for the 1-up SFX.
@@ -31,14 +32,18 @@ FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Use
 cFlags		rs.b 1		; various channel flags, see below
 cType		rs.b 1		; hardware type for the channel
 cData		rs.l 1		; 68k tracker address for the channel
-cPanning	rs.b 0		; channel panning and LFO. FM and DAC only
-cEnvPos		rs.b 1		; volume envelope position. PSG only
+	if FEATURE_DACFMVOLENV=0
+cEnvPos		rs.b 0		; volume envelope position. PSG only
+	endif
+cPanning	rs.b 1		; channel panning and LFO. FM and DAC only
 cDetune		rs.b 1		; frequency detune (offset)
 cPitch		rs.b 1		; pitch (transposition) offset
 cVolume		rs.b 1		; channel volume
 cTick		rs.b 1		; channel tick multiplier
-cSample		rs.b 0		; channel sample ID, DAC only
+	if FEATURE_DACFMVOLENV=0
 cVolEnv		rs.b 0		; volume envelope ID. PSG only
+	endif
+cSample		rs.b 0		; channel sample ID, DAC only
 cVoice		rs.b 1		; YM2612 voice ID. FM only
 cDuration	rs.b 1		; current note duration
 cLastDur	rs.b 1		; last note duration
@@ -57,6 +62,11 @@ cModCount	rs.b 1		; number of modulation steps until reversal
 cPortaSpeed	rs.b 1		; number of frames for each portamento to complete. 0 means it is disabled.
 cPortaFreq	rs.w 1		; frequency offset for portamento.
 cPortaDisp	rs.w 1		; frequency displacement per frame for portamento.
+	endif
+
+	if FEATURE_DACFMVOLENV
+cVolEnv		rs.b 1		; volume envelope ID
+cEnvPos		rs.b 1		; volume envelope position
 	endif
 
 	if FEATURE_MODENV

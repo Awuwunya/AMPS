@@ -314,14 +314,14 @@ sVoice		macro val
 	dc.b $E8, \val
     endm
 
-; E8xx - Set volume envelope to xx (INSTRUMENT - INS_C_PSG)
+; F2xx - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
 sVolEnv		macro val
-	dc.b $E8, \val
+	dc.b $F2, \val
     endm
 
-; F2xx - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
+; F3xx - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
 sModEnv		macro val
-	dc.b $F2, \val
+	dc.b $F3, \val
     endm
 
 ; E9xx - Set music speed shoes tempo to xx (TEMPO - TEMPO_SET_SPEED)
@@ -380,11 +380,6 @@ sModOn		macro
 ; FF04 - Turn off Modulation (MOD_SET - MODS_OFF)
 sModOff		macro
 	dc.b $FF, $04
-    endm
-
-; F3xx - PSG4 noise mode xx (PSG_NOISE - PNOIS_AMPS)
-sNoisePSG	macro val
-	dc.b $F3, \val
     endm
 
 ; F4xxxx - Keep looping back to xxxx each time the SFX is being played (CONT_SFX)
@@ -514,6 +509,11 @@ ssFilter	macro bank
 ; FF38 - Load the last song from back-up (FADE_IN_SONG)
 sBackup		macro
 	dc.b $FF,$38
+    endm
+
+; FF3Cxx - PSG4 noise mode xx (PSG_NOISE - PNOIS_AMPS)
+sNoisePSG	macro val
+	dc.b $FF, $3C, \val
     endm
 
 ; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)

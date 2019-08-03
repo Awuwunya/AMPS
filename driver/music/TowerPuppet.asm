@@ -1614,7 +1614,7 @@ TowerPuppet_FM5:
 
 TowerPuppet_PSG1:
 	dc.b nRst, $30, nRst, nRst
-	sVoice		vDyHe0A
+	sVolEnv		vDyHe0A
 	saVol		$08
 	dc.b nC6, $04, nRst, $02, nCs6, $04, nRst, $02
 	dc.b nC6, $04, nRst, $02, nD6, $04, nRst, $02
@@ -1622,7 +1622,7 @@ TowerPuppet_PSG1:
 	dc.b nC6, $04, nRst, $02, nE6, $04, nRst, $02
 	saVol		-$08
 	dc.b nRst, $30, nRst, nRst, nRst, nRst, $18
-	sVoice		v00
+	sVolEnv		v00
 	saVol		$08
 	saTranspose	$F4
 	ssMod68k	$13, $02, $02, $02
@@ -1664,7 +1664,7 @@ TowerPuppet_Loop17:
 	dc.b $04, nBb5, $02, nRst, $04, nF5, $06, sHold
 	dc.b nF5, $04, nRst, $02, nG5, $04, nRst, $02
 	dc.b nRst, $0C
-	sVoice		v00
+	sVolEnv		v00
 	ssMod68k	$14, $02, $02, $02
 	dc.b nD5, $18, sHold, nD5, $1E, nCs5, $06, nD5
 	dc.b nG5, sHold, nG5, nFs5, $0C, nE5, $16, nRst
@@ -1766,53 +1766,53 @@ TowerPuppet_PSG3:
 
 TowerPuppet_Loop20:
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5, $03, nA5
 	sNoteTimeOut	$03
-	sVoice		vDyHe05
+	sVolEnv		vDyHe05
 	dc.b nA5
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5, nA5, nA5
 	sNoteTimeOut	$03
-	sVoice		vDyHe05
+	sVolEnv		vDyHe05
 	dc.b nA5
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5, nA5, nA5
 	sNoteTimeOut	$03
-	sVoice		vDyHe05
+	sVolEnv		vDyHe05
 	dc.b nA5
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5, nA5
 	sNoteTimeOut	$03
-	sVoice		vDyHe05
+	sVolEnv		vDyHe05
 	dc.b nA5
 	sNoteTimeOut	$04
-	sVoice		vDyHe05
+	sVolEnv		vDyHe05
 	dc.b nA5
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5
 	sNoteTimeOut	$05
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5, $0C, nA5, nA5, nA5
 	sLoop		$00, $12, TowerPuppet_Loop20
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5, $03, nA5
 	sNoteTimeOut	$03
-	sVoice		vDyHe05
+	sVolEnv		vDyHe05
 	dc.b nA5
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5, nA5, nA5
 	sNoteTimeOut	$03
-	sVoice		vDyHe05
+	sVolEnv		vDyHe05
 	dc.b nA5
 	sNoteTimeOut	$01
-	sVoice		vDyHe03
+	sVolEnv		vDyHe03
 	dc.b nA5
 	sJump		TowerPuppet_PSG3
 

@@ -505,7 +505,7 @@ Pray_PSG1:
 	dc.b nRst, $7F, $7F, $69
 	ssMod68k	$0B, $01, $03, $02
 	saTranspose	$F4
-	sVoice		vRistar07
+	sVolEnv		vRistar07
 	sCall		Pray_Call2
 	saTranspose	$0C
 	dc.b nC5, $30, sHold, $30, sHold, $30, sHold, $30
@@ -515,7 +515,7 @@ Pray_Cond3:
 	ssMod68k	$0D, $01, $03, $02
 	saTranspose	$F4
 	saVol		-$08
-	sVoice		vRistar1D
+	sVolEnv		vRistar1D
 
 Pray_Jump3:
 	dc.b nC4, $30, sHold, $30, nBb3, nF4, nE4, $24
@@ -529,7 +529,7 @@ Pray_Jump3:
 Pray_PSG2:
 	saTranspose	$0C
 	dc.b nRst, $7F, $7F, $7F, $02
-	sVoice		vRistar02
+	sVolEnv		vRistar02
 	sCall		Pray_Call1
 	dc.b nC3, $0C, nC4, nG3, nE3, nEb4, $0C, nEb3
 	dc.b $08, nG4, $0C, nG3, $04, nBb4, $08, nBb3
@@ -541,7 +541,7 @@ Pray_Cond2:
 	saVol		-$08
 	ssMod68k	$0E, $01, $02, $02
 	saTranspose	$F4
-	sVoice		vRistar1D
+	sVolEnv		vRistar1D
 
 Pray_Jump2:
 	dc.b nG3, $30, sHold, $30, nF3, $30, nD4, nC4
@@ -558,16 +558,16 @@ Pray_PSG3:
 	dc.b nRst, $7F, $7F, $7F, $02
 
 Pray_Loop4:
-	sVoice		vRistar18
+	sVolEnv		vRistar18
 	dc.b nFs3, $08, $04
-	sVoice		vRistar10
+	sVolEnv		vRistar10
 	dc.b nFs3, $08
-	sVoice		vRistar18
+	sVolEnv		vRistar18
 	dc.b nFs3, $04
 	sLoop		$00, $03, Pray_Loop4
-	sVoice		vRistar18
+	sVolEnv		vRistar18
 	dc.b nFs3, $08, $04
-	sVoice		vRistar10
+	sVolEnv		vRistar10
 	dc.b nFs3, $08, $04
 	sLoop		$01, $03, Pray_Loop4
 	dc.b nRst, $30, nRst
@@ -575,22 +575,22 @@ Pray_Loop4:
 Pray_Cond1:
 Pray_Loop1:
 Pray_Jump1:
-	sVoice		vRistar18
+	sVolEnv		vRistar18
 	dc.b nFs3, $08, $04
-	sVoice		vRistar10
+	sVolEnv		vRistar10
 	dc.b nFs3, $08
-	sVoice		vRistar18
+	sVolEnv		vRistar18
 	dc.b nFs3, $04
 	sLoop		$00, $16, Pray_Loop1
-	sVoice		vRistar10
+	sVolEnv		vRistar10
 	dc.b nFs3, $14, $10, $0C
-	sVoice		vRistar18
+	sVolEnv		vRistar18
 
 Pray_Loop2:
 	dc.b nFs3, $08, $04
-	sVoice		vRistar10
+	sVolEnv		vRistar10
 	dc.b nFs3, $08
-	sVoice		vRistar18
+	sVolEnv		vRistar18
 	dc.b nFs3, $04
 	sLoop		$00, $08, Pray_Loop2
 	sJump		Pray_Jump1

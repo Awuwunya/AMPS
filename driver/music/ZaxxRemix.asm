@@ -865,7 +865,7 @@ Zaxx_PSG3:
 	sLoop		$00, $04, .out1
 
 	ssMod68k	$08, $04, $01, $04
-	sVoice		vZaxx04
+	sVolEnv		vZaxx04
 	dc.b nRst, $30
 	dc.b nAb6, $60
 	ssMod68k	$00, $01, $01, $04
@@ -885,36 +885,36 @@ Zaxx_PSG3:
 ; subroutines
 
 Zaxx_PSG3_DblDark1:
-	sVoice		vS3K_01
+	sVolEnv		vS3K_01
 	dc.b nA6, $06, $06
-	sVoice		vS3K_08
+	sVolEnv		vS3K_08
 	dc.b $06
-	sVoice		vS3K_01
+	sVolEnv		vS3K_01
 	dc.b $06, $06
-	sVoice		vS3K_08
+	sVolEnv		vS3K_08
 	dc.b $06
-	sVoice		vS3K_01
+	sVolEnv		vS3K_01
 	dc.b $06, $06, $06, $06, $06, $06, $06, $06
 	dc.b $06, $06
 	sLoop		$00, $08, Zaxx_PSG3_DblDark1
 	sRet
 
 Zaxx_PSG3_LiteOut1:
-	sVoice		vS3K_01
+	sVolEnv		vS3K_01
 	dc.b nA6, $0C
-	sVoice		vS3K_08
+	sVolEnv		vS3K_08
 	dc.b $0C
-	sVoice		vS3K_01
+	sVolEnv		vS3K_01
 	dc.b $0C
-	sVoice		vS3K_08
+	sVolEnv		vS3K_08
 	dc.b $0C
-	sVoice		vS3K_01
+	sVolEnv		vS3K_01
 	dc.b $0C
-	sVoice		vS3K_08
+	sVolEnv		vS3K_08
 	dc.b $0C
-	sVoice		vS3K_01
+	sVolEnv		vS3K_01
 	dc.b $0C
-	sVoice		vS3K_08
+	sVolEnv		vS3K_08
 	dc.b $0C
 	sRet
 ; ===========================================================================

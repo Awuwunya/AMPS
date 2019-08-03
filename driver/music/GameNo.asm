@@ -302,7 +302,7 @@ GameNo_PSG1:
 	;sRawFreq	$00
 	;sPitchSlide	$00
 	ssMod68k	$0C, $01, $01, $04
-	sVoice		vGameNo01
+	sVolEnv		vGameNo01
 
 GameNo_Jump6:
 	sCall		GameNo_Call17
@@ -344,7 +344,7 @@ GameNo_PSG2:
 	;sRawFreq	$00
 	;sPitchSlide	$00
 	ssMod68k	$0C, $01, $01, $04
-	sVoice		vGameNo01
+	sVolEnv		vGameNo01
 
 GameNo_Jump7:
 	sCall		GameNo_Call18

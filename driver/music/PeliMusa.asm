@@ -758,7 +758,7 @@ Pelimusa_PSG3_State = 1
 ; ---------------------------------------------------------------------------
 
 Pelimusa_PSG3:
-	sVoice		vCol3_02
+	sVolEnv		vCol3_02
 	; pattern 5 and 6
 	Pelimusa_PSG3_Hat	$0C
 	Pelimusa_PSG3_Bell
