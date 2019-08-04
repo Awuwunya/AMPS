@@ -452,41 +452,6 @@ Z80_Init:
 			ld	a,02Ah				; 07	; set YM2612 address to DAC port
 			ld	(04000h),a			; 13	; ''
 
-	; --- Setting up channels to be mute ---
-
-			ld	hl,(MuteSample)			; 16	; load sample address to current address
-			ld	a,(MuteSample+002h)		; 13	; load bank address to current address
-			ld	(PCM1_SampCur+001h),hl		; 16	; Setting current address
-			ld	(PCM2_SampCur+001h),hl		; 16	; ''
-			ld	(PCM1_BankCur),a		; 13	; Setting current bank
-			ld	(PCM2_BankCur),a		; 13	; ''
-
-			ld	de,PCM1_Sample			; 10	; load request list
-			ld	bc,00006h			; 10	; set size to copy
-			ld	hl,MuteSample			; 10	; load mute sample address
-			ldir					; 21 16	; copy mute sample data over...
-			ld	c,006h				; 07	; set size to copy
-			ld	hl,MuteSample			; 10	; load mute sample address
-			ldir					; 21 16	; copy mute sample data over...
-			ld	c,006h				; 07	; set size to copy
-			ld	hl,MuteSample			; 10	; load mute sample address
-			ldir					; 21 16	; copy mute sample data over...
-			ld	c,006h				; 07	; set size to copy
-			ld	hl,MuteSample			; 10	; load mute sample address
-			ldir					; 21 16	; copy mute sample data over...
-
-	; --- Setting up PCM 1 switch ---
-
-			ld	a,(PCM1_BankCur)		; 13	; load bank ID
-			ld	de,PCM1_Switch			; 10	; load PCM switch list to edit
-			call	SetBank				; 17	; set bank address
-
-	; --- Setting up PCM 2 switch ---
-
-			ld	a,(PCM2_BankCur)		; 13	; load bank ID
-			ld	de,PCM2_Switch			; 10	; load PCM switch list to edit
-			call	SetBank				; 17	; set bank address
-
 	; --- Final register setup ---
 
 			ld	bc,04001h			; 10	; prepare YM2612 port address
@@ -521,14 +486,14 @@ PCM1_MuteRet:
 		ld	hl,06001h			; 10	; load bank switch register port
 		dec	iyl				; 08	; set bank interrupt
 Int1_nop:	znop					; 04	; CANNOT CHANGE "ld  (hl),h" since it's altered by Z80 elsewhere
-PCM1_Switch:	ld	(hl),h				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
-		ld	(hl),h				; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
-		ld	(hl),h				; 07	; 0000 0010 0 128KB - 256KB ( 20000 -   40000)
-		ld	(hl),h				; 07	; 0000 0100 0 256KB - 512KB ( 40000 -   80000)
-		ld	(hl),h				; 07	; 0000 1000 0 512KB -   1MB ( 80000 -  100000)
-		ld	(hl),h				; 07	; 0001 0000 0   1MB -   2MB (100000 -  200000)
-		ld	(hl),h				; 07	; 0010 0000 0   2MB -   4MB (200000 -  400000)
-		ld	(hl),h				; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
+PCM1_Switch:	db	$74|((SWF_Stop>>$0F)&1)		; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
+		db	$74|((SWF_Stop>>$10)&1)		; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
+		db	$74|((SWF_Stop>>$11)&1)		; 07	; 0000 0010 0 128KB - 256KB ( 20000 -   40000)
+		db	$74|((SWF_Stop>>$12)&1)		; 07	; 0000 0100 0 256KB - 512KB ( 40000 -   80000)
+		db	$74|((SWF_Stop>>$13)&1)		; 07	; 0000 1000 0 512KB -   1MB ( 80000 -  100000)
+		db	$74|((SWF_Stop>>$14)&1)		; 07	; 0001 0000 0   1MB -   2MB (100000 -  200000)
+		db	$74|((SWF_Stop>>$15)&1)		; 07	; 0010 0000 0   2MB -   4MB (200000 -  400000)
+		db	$74|((SWF_Stop>>$16)&1)		; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
 		ld	(hl),h				; 07	; 1000 0000 0   8MB -  16MB (800000 - 1000000)
 		inc	iyl				; 08	; set non-read interrupt
 PCM1_OverflwCur:ld	bc,Z80E_Read			; 10	; prepare amount to get to end of window
@@ -547,7 +512,7 @@ Int1_lda:	ld	a,(hl)				; 07	; load PCM byte at the next ending address
 
 PCM1_PrepRet:
 
-PCM1_SampCur:	ld	hl,08000h			; 10	; load PCM sample address
+PCM1_SampCur:	ld	hl,08000h|(SWF_Stop&$7FFF)	; 10	; load PCM sample address
 PCM1_Buffer:	ld	de,PCM_Buffer1			; 10	; load IN buffer address
 PCM1_PitchQuo:	ld	sp,00000h			; 10	; load pitch quotient
 PCM1_PitchDiv:	ld	bc,000FFh			; 10	; load pitch dividend (and counter for ldi)
@@ -627,14 +592,14 @@ PCM2_MuteRet:
 		ld	hl,06001h			; 10	; load bank switch register port
 		dec	iyl				; 08	; set bank interrupt
 Int2_nop:	znop					; 04	; CANNOT CHANGE "ld  (hl),h" since it's altered by Z80 elsewhere
-PCM2_Switch:	ld	(hl),h				; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
-		ld	(hl),h				; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
-		ld	(hl),h				; 07	; 0000 0010 0 128KB - 256KB ( 20000 -   40000)
-		ld	(hl),h				; 07	; 0000 0100 0 256KB - 512KB ( 40000 -   80000)
-		ld	(hl),h				; 07	; 0000 1000 0 512KB -   1MB ( 80000 -  100000)
-		ld	(hl),h				; 07	; 0001 0000 0   1MB -   2MB (100000 -  200000)
-		ld	(hl),h				; 07	; 0010 0000 0   2MB -   4MB (200000 -  400000)
-		ld	(hl),h				; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
+PCM2_Switch:	db	$74|((SWF_Stop>>$0F)&1)		; 07	; 0000 0000 1  32KB -  64KB (  8000 -   10000)
+		db	$74|((SWF_Stop>>$10)&1)		; 07	; 0000 0001 0  64KB - 128KB ( 10000 -   20000)
+		db	$74|((SWF_Stop>>$11)&1)		; 07	; 0000 0010 0 128KB - 256KB ( 20000 -   40000)
+		db	$74|((SWF_Stop>>$12)&1)		; 07	; 0000 0100 0 256KB - 512KB ( 40000 -   80000)
+		db	$74|((SWF_Stop>>$13)&1)		; 07	; 0000 1000 0 512KB -   1MB ( 80000 -  100000)
+		db	$74|((SWF_Stop>>$14)&1)		; 07	; 0001 0000 0   1MB -   2MB (100000 -  200000)
+		db	$74|((SWF_Stop>>$15)&1)		; 07	; 0010 0000 0   2MB -   4MB (200000 -  400000)
+		db	$74|((SWF_Stop>>$16)&1)		; 07	; 0100 0000 0   4MB -   8MB (400000 -  800000)
 		ld	(hl),h				; 07	; 1000 0000 0   8MB -  16MB (800000 - 1000000)
 		inc	iyl				; 08	; set non-read interrupt
 PCM2_OverflwCur:ld	bc,Z80E_Read			; 10	; prepare amount to get to end of window
@@ -653,7 +618,7 @@ Int2_lda:	ld	a,(hl)				; 07	; load PCM byte at the next ending address
 
 PCM2_PrepRet:
 
-PCM2_SampCur:	ld	hl,08000h			; 10	; load PCM sample address
+PCM2_SampCur:	ld	hl,08000h|(SWF_Stop&$7FFF)	; 10	; load PCM sample address
 PCM2_Buffer:	ld	de,PCM_Buffer2			; 10	; load IN buffer address
 PCM2_PitchQuo:	ld	sp,00000h			; 10	; load pitch quotient
 PCM2_PitchDiv:	ld	bc,000FFh			; 10	; load pitch dividend (and counter for ldi)
@@ -1362,15 +1327,8 @@ PCM2_PrepTable:	dw	PCM2_PreInst01
 
 	; --- Current bank address for PCM channels ---
 
-PCM1_BankCur:	db	000h					; The current bank address of PCM 1
-PCM2_BankCur:	db	000h					; The current bank address of PCM 2
-
-	; --- "Mute Sample" pointer into 68k memory ---
-
-MuteSample:	dw	00000h					; sample window address
-MuteBank:	db	000h					; sample bank address
-MuteSample_Rev:	dw	00000h					; sample window address
-MuteBank_Rev:	db	000h					; sample bank address
+PCM1_BankCur:	db	(SWF_Stop>>$0F)&$FF			; The current bank address of PCM 1
+PCM2_BankCur:	db	(SWF_Stop>>$0F)&$FF			; The current bank address of PCM 2
 
 	; --- YM2612 Pointers ---
 
@@ -1383,31 +1341,31 @@ YM_Buffer:	db	000h					; 00 = Z80 Buffer 1 | 68k Buffer 2 ... FF = Z80 Buffer 2 
 
 	; --- PCM 1 start sample ---
 
-PCM1_Sample:		dw	00000h					; PCM 1 requested sample
-PCM1_Bank:		db	000h					; PCM 1 requested bank
-PCM1_Sample_Rev:	dw	00000h					; PCM 1 requested sample (reverse position)
-PCM1_Bank_Rev:		db	000h					; PCM 1 requested bank (reverse position)
+PCM1_Sample:		dw	08000h|(SWF_Stop&$7FFF)		; PCM 1 requested sample
+PCM1_Bank:		db	(SWF_Stop>>$0F)&$FF		; PCM 1 requested bank
+PCM1_Sample_Rev:	dw	08000h|(SWFR_Stop&$7FFF)	; PCM 1 requested sample (reverse position)
+PCM1_Bank_Rev:		db	(SWFR_Stop>>$0F)&$FF		; PCM 1 requested bank (reverse position)
 
 	; --- PCM 1 next sample ---
 
-PCM1_SampleNext:	dw	00000h					; PCM 1 requested sample
-PCM1_BankNext:		db	000h					; PCM 1 requested bank
-PCM1_SampleNext_Rev:	dw	00000h					; PCM 1 requested sample (reverse position)
-PCM1_BankNext_Rev:	db	000h					; PCM 1 requested bank (reverse position)
+PCM1_SampleNext:	dw	08000h|(SWF_Stop&$7FFF)		; PCM 1 requested sample
+PCM1_BankNext:		db	(SWF_Stop>>$0F)&$FF		; PCM 1 requested bank
+PCM1_SampleNext_Rev:	dw	08000h|(SWFR_Stop&$7FFF)	; PCM 1 requested sample (reverse position)
+PCM1_BankNext_Rev:	db	(SWFR_Stop>>$0F)&$FF		; PCM 1 requested bank (reverse position)
 
 	; --- PCM 2 start sample ---
 
-PCM2_Sample:		dw	00000h					; PCM 2 requested sample
-PCM2_Bank:		db	000h					; PCM 2 requested bank
-PCM2_Sample_Rev:	dw	00000h					; PCM 2 requested sample (reverse position)
-PCM2_Bank_Rev:		db	000h					; PCM 2 requested bank (reverse position)
+PCM2_Sample:		dw	08000h|(SWF_Stop&$7FFF)		; PCM 2 requested sample
+PCM2_Bank:		db	(SWF_Stop>>$0F)&$FF		; PCM 2 requested bank
+PCM2_Sample_Rev:	dw	08000h|(SWFR_Stop&$7FFF)	; PCM 2 requested sample (reverse position)
+PCM2_Bank_Rev:		db	(SWFR_Stop>>$0F)&$FF		; PCM 2 requested bank (reverse position)
 
 	; --- PCM 2 next sample ---
 
-PCM2_SampleNext:	dw	00000h					; PCM 2 requested sample
-PCM2_BankNext:		db	000h					; PCM 2 requested bank
-PCM2_SampleNext_Rev:	dw	00000h					; PCM 2 requested sample (reverse position)
-PCM2_BankNext_Rev:	db	000h					; PCM 2 requested bank (reverse position)
+PCM2_SampleNext:	dw	08000h|(SWF_Stop&$7FFF)		; PCM 2 requested sample
+PCM2_BankNext:		db	(SWF_Stop>>$0F)&$FF		; PCM 2 requested bank
+PCM2_SampleNext_Rev:	dw	08000h|(SWFR_Stop&$7FFF)	; PCM 2 requested sample (reverse position)
+PCM2_BankNext_Rev:	db	(SWFR_Stop>>$0F)&$FF		; PCM 2 requested bank (reverse position)
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -1553,15 +1511,15 @@ SwitchVolume:
 ; ---------------------------------------------------------------------------
 
 		ld	hl,06001h			; 10	; load bank switch register address
-SV_VolumeBank:	ld	(hl),h				; 07	; set 68k address where PCM volume tables are
-		ld	(hl),h				; 07	; '' (this is set by the 68k)
-		ld	(hl),h				; 07	; ''
-		ld	(hl),h				; 07	; ''
-		ld	(hl),h				; 07	; ''
-		ld	(hl),h				; 07	; ''
-		ld	(hl),h				; 07	; ''
-		ld	(hl),h				; 07	; ''
-		ld	(hl),h				; 07	; ''
+SV_VolumeBank:	db	$74|((fLog>>$0F)&1)		; 07	; "ld (hl),h" Volume table address in 68k ROM
+		db	$74|((fLog>>$10)&1)		; 07	; "ld (hl),h"
+		db	$74|((fLog>>$11)&1)		; 07	; "ld (hl),h"
+		db	$74|((fLog>>$12)&1)		; 07	; "ld (hl),h"
+		db	$74|((fLog>>$13)&1)		; 07	; "ld (hl),h"
+		db	$74|((fLog>>$14)&1)		; 07	; "ld (hl),h"
+		db	$74|((fLog>>$15)&1)		; 07	; "ld (hl),h"
+		db	$74|((fLog>>$16)&1)		; 07	; "ld (hl),h"
+		db	$74|((fLog>>$17)&1)		; 07	; "ld (hl),h"
 		dec	b				; 04	; check the volume timer
 		inc	b				; 04	; ''
 		jp	z,SV_Flush			; 10	; if the channel can flush while volume changing, branch
@@ -1632,8 +1590,13 @@ SVF_StartVolume:
 		dec	e				; 04	; check volume table counter
 		inc	e				; 04	; ''
 		jp	nz,SVF_LoadVolume		; 10	; if not finished, branch
-		ld	a,004h				; 07	; set timer for PCM volume changing
+		ld	a,000h				; 07	; set timer for PCM volume changing
 		ret					; 10	; return
+
+; NAT: Changed the above line from 4 to 0 thanks to advice from Markey
+; This should make the buffer loop when volume is changed too often, instead of
+; stopping playback and distorting. It may or may not sound better, but I think
+; it sounds better, so I changed it to be so.
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

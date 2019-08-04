@@ -1,38 +1,42 @@
-; ===============================================
+; ---------------------------------------------------------------------------------------------
+; AMPS - SMPS2ASM macro & equate file.
+;
 ; Based on Flamewing's SMPS2ASM, and S1SMPS2ASM by Marc (AKA Cinossu)
 ; Reworked and improved by Natsumi
-; ===============================================
-; this macro is created to emulate enum in AS
-enum	macro	num, lable
-; copy initial number for referencing later
-.num	= num
+; ---------------------------------------------------------------------------------------------
 
-	rept narg-1
-\lable		set .num
-.num =	.num+1
+; this macro is created to emulate enum in AS
+enum	macro	lable
+	rept narg
+\lable =	_num
+_num =		_num+1
 	shift
 	endr
     endm
-
 ; ---------------------------------------------------------------------------------------------
 ; Note Equates
-	enum $80+0, nRst
-	enum nRst+1,nC0,nCs0,nD0,nEb0,nE0,nF0,nFs0,nG0,nAb0,nA0,nBb0,nB0
-	enum nB0+1, nC1,nCs1,nD1,nEb1,nE1,nF1,nFs1,nG1,nAb1,nA1,nBb1,nB1
-	enum nB1+1, nC2,nCs2,nD2,nEb2,nE2,nF2,nFs2,nG2,nAb2,nA2,nBb2,nB2
-	enum nB2+1, nC3,nCs3,nD3,nEb3,nE3,nF3,nFs3,nG3,nAb3,nA3,nBb3,nB3
-	enum nB3+1, nC4,nCs4,nD4,nEb4,nE4,nF4,nFs4,nG4,nAb4,nA4,nBb4,nB4
-	enum nB4+1, nC5,nCs5,nD5,nEb5,nE5,nF5,nFs5,nG5,nAb5,nA5,nBb5,nB5
-	enum nB5+1, nC6,nCs6,nD6,nEb6,nE6,nF6,nFs6,nG6,nAb6,nA6,nBb6,nB6
-	enum nB6+1, nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
+; ---------------------------------------------------------------------------------------------
 
+_num =	$80
+	enum nRst
+	enum nC0,nCs0,nD0,nEb0,nE0,nF0,nFs0,nG0,nAb0,nA0,nBb0,nB0
+	enum nC1,nCs1,nD1,nEb1,nE1,nF1,nFs1,nG1,nAb1,nA1,nBb1,nB1
+	enum nC2,nCs2,nD2,nEb2,nE2,nF2,nFs2,nG2,nAb2,nA2,nBb2,nB2
+	enum nC3,nCs3,nD3,nEb3,nE3,nF3,nFs3,nG3,nAb3,nA3,nBb3,nB3
+	enum nC4,nCs4,nD4,nEb4,nE4,nF4,nFs4,nG4,nAb4,nA4,nBb4,nB4
+	enum nC5,nCs5,nD5,nEb5,nE5,nF5,nFs5,nG5,nAb5,nA5,nBb5,nB5
+	enum nC6,nCs6,nD6,nEb6,nE6,nF6,nFs6,nG6,nAb6,nA6,nBb6,nB6
+	enum nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
 ; ---------------------------------------------------------------------------------------------
 ; Other Equates
+; ---------------------------------------------------------------------------------------------
+
 v00 =	$00
 m00 =	$00
-
 ; ---------------------------------------------------------------------------------------------
 ; Header Macros
+; ---------------------------------------------------------------------------------------------
+
 sHeaderInit	macro
 sPointZero =	*
 sPatNum =	0
@@ -98,18 +102,19 @@ sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.w \loc-sPointZero
 	dc.b \pitch,\vol
     endm
-
 ; ---------------------------------------------------------------------------------------------
 ; Command Flag Macros and Equates. Based on the original s1smps2asm, and Flamewing's smps2asm
+; ---------------------------------------------------------------------------------------------
+
 spNone set $00
 spRight set $40
 spLeft set $80
 spCentre set $C0
 spCenter set $C0
-
 ; ---------------------------------------------------------------------------------------------
 ; Macros for FM instruments
 ; Patches - Feedback
+; ---------------------------------------------------------------------------------------------
 
 ; Patches - Algorithm
 spAlgorithm macro val, name
@@ -262,7 +267,8 @@ spTL4	= op4
 	endif
     endm
 ; ---------------------------------------------------------------------------------------------
-; SMPS commands
+; tracker commands
+; ---------------------------------------------------------------------------------------------
 
 ; E0xx - Panning, AMS, FMS (PANAFMS - PAFMS_PAN)
 sPan		macro pan, ams, fms
@@ -332,6 +338,16 @@ ssTempoShoes	macro val
 ; EAxx - Set music tempo to xx (TEMPO - TEMPO_SET)
 ssTempo		macro val
 	dc.b $EA, \val
+    endm
+
+; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
+sModeSampDAC	macro
+	dc.b $EB
+    endm
+
+; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+sModePitchDAC	macro
+	dc.b $EC
     endm
 
 ; EDxx - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
@@ -514,16 +530,6 @@ sBackup		macro
 ; FF3Cxx - PSG4 noise mode xx (PSG_NOISE - PNOIS_AMPS)
 sNoisePSG	macro val
 	dc.b $FF, $3C, \val
-    endm
-
-; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
-sModeSampDAC	macro
-	dc.b $EB
-    endm
-
-; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
-sModePitchDAC	macro
-	dc.b $EC
     endm
 
 ; FF40 - Freeze 68k. Debug flag (DEBUG_STOP_CPU)

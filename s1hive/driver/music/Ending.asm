@@ -9,9 +9,9 @@ Ending_Header:
 	sHeaderFM	Ending_FM3, $F4, $0D
 	sHeaderFM	Ending_FM4, $F4, $0D
 	sHeaderFM	Ending_FM5, $F4, $17
-	sHeaderPSG	Ending_PSG1, $D0, $05, $00, v05
-	sHeaderPSG	Ending_PSG2, $DC, $05, $00, v05
-	sHeaderPSG	Ending_PSG3, $00, $03, $00, v04
+	sHeaderPSG	Ending_PSG1, $D0, $28, $00, v05
+	sHeaderPSG	Ending_PSG2, $DC, $28, $00, v05
+	sHeaderPSG	Ending_PSG3, $00, $18, $00, v04
 
 	; Patch $00
 	; $3D

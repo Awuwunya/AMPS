@@ -1,8 +1,8 @@
 	sHeaderInit
 	sHeaderPrio	$82
 	sHeaderCh	$02
-	sHeaderSFX	$80, $04, .FM4, $0C, $00
-	sHeaderSFX	$80, $05, .FM5, $00, $13
+	sHeaderSFX	$80, ctFM4, .FM4, $0C, $00
+	sHeaderSFX	$80, ctFM5, .FM5, $00, $13
 
 .FM4	sVoice		$1B
 	dc.b nRst, $01, nA2, $08

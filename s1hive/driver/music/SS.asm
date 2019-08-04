@@ -10,9 +10,9 @@ SpecialStage_Header:
 	sHeaderFM	SpecialStage_FM3, $E8, $18
 	sHeaderFM	SpecialStage_FM4, $E8, $18
 ;	sHeaderFM	SpecialStage_FM5, $E8, $18
-	sHeaderPSG	SpecialStage_PSG1, $DC, $03, $00, v04
-	sHeaderPSG	SpecialStage_PSG2, $FD, $01, $00, v08
-	sHeaderPSG	SpecialStage_DAC1, $DC, $04, $00, v04
+	sHeaderPSG	SpecialStage_PSG1, $DC, $18, $00, v04
+	sHeaderPSG	SpecialStage_PSG2, $FD, $08, $00, v08
+	sHeaderPSG	SpecialStage_DAC1, $DC, $20, $00, v04
 
 	; Patch $00
 	; $2C

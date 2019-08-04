@@ -9,9 +9,9 @@ SpringYard_Header:
 	sHeaderFM	SpringYard_FM3, $F4, $14
 	sHeaderFM	SpringYard_FM4, $F4, $18
 	sHeaderFM	SpringYard_FM5, $F4, $18
-	sHeaderPSG	SpringYard_PSG1, $D0, $06, $00, v06
-	sHeaderPSG	SpringYard_PSG2, $E8, $07, $00, v00
-	sHeaderPSG	SpringYard_PSG3, $00, $05, $00, v04
+	sHeaderPSG	SpringYard_PSG1, $D0, $30, $00, v06
+	sHeaderPSG	SpringYard_PSG2, $E8, $38, $00, v00
+	sHeaderPSG	SpringYard_PSG3, $00, $28, $00, v04
 
 	; Patch $00
 	; $3C
@@ -329,7 +329,7 @@ SpringYard_FM5:
 
 SpringYard_PSG1:
 	ssTickMulCh	$01
-	sCall		Credits_Call18x	; fuck.it (oh btw this will break if you remove credits fuck you)
+	sCall		Credits_Call18x	; fuck it (oh btw this will break if you remove credits fuck you)
 	dc.b $04			; needs moar delay
 	ssTickMulCh	$02
 
@@ -339,18 +339,15 @@ SpringYard_Jump4:
 	sCall		SpringYard_Call12
 	sJump		SpringYard_Jump4
 
-SpringYard_PSG2:
-	sStop
-
 SpringYard_PSG3:
 	sNoisePSG	$E7
 	sNoteTimeOut	$01
-	saVol		$01
+	saVol		$08
 
 SpringYard_Loop2:
 	dc.b nRst, $04, nA5, $02
 	sLoop		$00, $08, SpringYard_Loop2
-	saVol		$FF
+	saVol		-$08
 
 SpringYard_Jump5:
 	dc.b $02, nRst, nA5
@@ -391,5 +388,6 @@ SpringYard_Call14:
 	dc.b $0C, dSnare, $0A, dKick, $02
 	sRet
 
+SpringYard_PSG2:
 SpringYard_DAC2:
 	sStop

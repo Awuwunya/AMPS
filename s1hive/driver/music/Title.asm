@@ -9,9 +9,9 @@ TitleScreen_Header:
 	sHeaderFM	TitleScreen_FM3, $F4, $0D
 	sHeaderFM	TitleScreen_FM4, $F4, $0C
 	sHeaderFM	TitleScreen_FM5, $F4, $0E
-	sHeaderPSG	TitleScreen_PSG1, $D0, $03, $00, v05
-	sHeaderPSG	TitleScreen_PSG1, $DC, $06, $00, v05
-	sHeaderPSG	TitleScreen_PSG3, $00, $04, $00, v04
+	sHeaderPSG	TitleScreen_PSG1, $D0, $18, $00, v05
+	sHeaderPSG	TitleScreen_PSG1, $DC, $30, $00, v05
+	sHeaderPSG	TitleScreen_PSG3, $00, $20, $00, v04
 
 	; Patch $00
 	; $3A

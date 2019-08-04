@@ -1,10 +1,10 @@
 	sHeaderInit
 	sHeaderPrio	$70
 	sHeaderCh	$04
-	sHeaderSFX	$80, $02, .FM3, $10, $00
-	sHeaderSFX	$80, $04, .FM4, $00, $00
-	sHeaderSFX	$80, $05, .FM5, $10, $00
-	sHeaderSFX	$80, $C0, .PSG3, $00, $00
+	sHeaderSFX	$80, ctFM3, .FM3, $10, $00
+	sHeaderSFX	$80, ctFM4, .FM4, $00, $00
+	sHeaderSFX	$80, ctFM5, .FM5, $10, $00
+	sHeaderSFX	$A1, ctPSG3, .PSG3, $00, $00
 
 .FM3	sPan		spRight, $00
 	dc.b nRst, $02
@@ -25,6 +25,6 @@
 	sNoisePSG	$E7
 
 .Loop1	dc.b nB3, $18, sHold
-	saVol		$03
+	saVol		$18
 	sLoop		$00, $05, .Loop1
 	sStop

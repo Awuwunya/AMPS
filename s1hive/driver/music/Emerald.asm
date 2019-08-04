@@ -10,8 +10,8 @@ Emerald_Header:
 	sHeaderFM	Emerald_FM4, $F4, $16
 ;	sHeaderFM	Emerald_FM5, $F4, $16
 	sHeaderFM	Emerald_FM6, $F4, $16
-	sHeaderPSG	Emerald_PSG1, $F4, $02, $00, v04
-	sHeaderPSG	Emerald_PSG2, $F4, $02, $00, v05
+	sHeaderPSG	Emerald_PSG1, $F4, $10, $00, v04
+	sHeaderPSG	Emerald_PSG2, $F4, $10, $00, v05
 	sHeaderPSG	Emerald_DAC1, $F4, $00, $00, v04
 
 	; Patch $00
@@ -90,7 +90,7 @@ Emerald_PSG2:
 
 Emerald_Loop2:
 	dc.b nG5, $06, nF5, nE5, nD5
-	saVol		$03
+	saVol		$18
 	sLoop		$00, $04, Emerald_Loop2
 	sStop
 
@@ -99,7 +99,7 @@ Emerald_PSG1:
 
 Emerald_Loop1:
 	dc.b nG5, $06, nF5, nE5, nD5
-	saVol		$03
+	saVol		$18
 	sLoop		$00, $04, Emerald_Loop1
 
 Emerald_DAC2:

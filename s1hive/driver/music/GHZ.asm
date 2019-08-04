@@ -9,9 +9,9 @@ GreenHill_Header:
 	sHeaderFM	GreenHill_FM3, $F4, $14
 	sHeaderFM	GreenHill_FM4, $F4, $08
 	sHeaderFM	GreenHill_FM5, $F4, $20
-	sHeaderPSG	GreenHill_PSG1, $D0, $01, $00, v03
-	sHeaderPSG	GreenHill_PSG2, $D0, $03, $00, v06
-	sHeaderPSG	GreenHill_PSG3, $00, $03, $00, v04
+	sHeaderPSG	GreenHill_PSG1, $D0, $08, $00, v03
+	sHeaderPSG	GreenHill_PSG2, $D0, $08, $00, v06
+	sHeaderPSG	GreenHill_PSG3, $00, $18, $00, v04
 
 	; Patch $00
 	; $08
@@ -614,7 +614,7 @@ GreenHill_Call8:
 	sRet
 
 GreenHill_PSG1:
-	sVoice		v05
+	sVolEnv		v05
 	ssMod68k	$0E, $01, $01, $03
 	dc.b nRst, $40
 	sNoteTimeout	$10
@@ -631,7 +631,7 @@ GreenHill_PSG1:
 
 GreenHill_Loop17:
 GreenHill_Jump7:
-	sVoice		v01
+	sVolEnv		v01
 
 GreenHill_Loop16:
 	dc.b nRst, $10, nC6, $04, nRst, $14, nC6, $08
@@ -642,21 +642,20 @@ GreenHill_Loop16:
 	dc.b nRst, $20, nG5, $04, nRst, $14, nG5, $08
 	dc.b nRst, $10
 	sLoop		$00, $02, GreenHill_Loop17
-	sVoice		v05
+	sVolEnv		v05
 	dc.b nBb6, $18, nA6, nG6, nF6, nE6, $08, nRst
 	dc.b nD6, nRst, nA5, $18, nB5, nC6, nD6, nE6
 	dc.b $08, nRst, nA6, nRst, nAb6, $18, nG6, nF6
 	dc.b nEb6, nD6, $10, nC6, $08, nRst, nRst, $08
 	dc.b nG6, nA6, nG6, $10, $08, nA6, nRst, $10
-	saVol		$01
+	saVol		$08
 	dc.b nA5, $18, $08, nRst, nA5, nRst
-	saVol		$FF
-	sVoice		v03
+	saVol		-$08
+	sVolEnv		v03
 	sJump		GreenHill_Jump7
 
 GreenHill_PSG2:
 	dc.b nRst, $40
-	saVol		$FE
 
 GreenHill_Loop18:
 	sNoteTimeout	$06
@@ -667,7 +666,7 @@ GreenHill_Loop18:
 
 GreenHill_Loop20:
 GreenHill_Jump8:
-	sVoice		v01
+	sVolEnv		v01
 
 GreenHill_Loop19:
 	dc.b nRst, $10, nE6, $04, nRst, $14, nE6, $08
@@ -681,10 +680,10 @@ GreenHill_Loop19:
 	dc.b nD6, $34, sHold, $34, nC6, $08, nD6, nE6
 	dc.b $38, sHold, $38, nC6, $08, nC6, nE6, nEb6
 	dc.b $34, sHold, $34, nC6, $08, nEb6, nD6
-	sVoice		v05
+	sVolEnv		v05
 	dc.b nC5, $18, $18, $18, $18, $08, nRst, nC5
 	dc.b nRst
-	sVoice		v03
+	sVolEnv		v03
 	sJump		GreenHill_Jump8
 
 GreenHill_PSG3:

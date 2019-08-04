@@ -159,7 +159,7 @@ GameProgram:
 	; init RAM
 		move.b	HW_Version,d0		; get System version bits
 		andi.b	#$C0,d0
-		move.b	d0,Region.w		; save into RAM
+		move.b	d0,ConsoleRegion.w	; save into RAM
 
 		move.w	#2,DMAlen.w		; reset len
 		move.b	#MusOff,MusSel.w	; set selected music

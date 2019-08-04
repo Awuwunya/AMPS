@@ -9,9 +9,9 @@ Marble_Header:
 	sHeaderFM	Marble_FM3, $E8, $15
 	sHeaderFM	Marble_FM4, $E8, $17
 	sHeaderFM	Marble_FM5, $E8, $17
-	sHeaderPSG	Marble_PSG1, $D0, $03, $00, v08
-	sHeaderPSG	Marble_PSG2, $D0, $05, $00, v08
-	sHeaderPSG	Marble_PSG3, $00, $03, $00, v09
+	sHeaderPSG	Marble_PSG1, $D0, $18, $00, v08
+	sHeaderPSG	Marble_PSG2, $D0, $28, $00, v08
+	sHeaderPSG	Marble_PSG3, $00, $18, $00, v09
 
 	; Patch $00
 	; $22
@@ -258,6 +258,10 @@ Marble_Loop1:
 	sLoop		$00, $02, Marble_Loop1
 	sRet
 
+Marble_PSG2:
+	dc.b nRst, $02
+	ssDetune	$01
+
 Marble_PSG1:
 	dc.b nRst, $3C
 
@@ -282,17 +286,12 @@ Marble_Call6:
 	dc.b nD6, nA5, nF5, $27, nRst, $3C
 	sRet
 
-Marble_PSG2:
-	dc.b nRst, $02
-	ssDetune	$01
-	sJump		Marble_PSG1
-
 Marble_PSG3:
 	sNoisePSG	$E7
-	saVol		$FF
+	saVol		-$08
 	dc.b nRst, $06, nA5, $03, $03, $06, nRst, nEb5
 	dc.b $24
-	saVol		$01
+	saVol		$08
 
 Marble_Jump6:
 	sCall		Marble_Call7
@@ -305,13 +304,13 @@ Marble_Jump6:
 	dc.b nEb5, nEb5, nB4, nB4, nAb4, nAb4, nB4, nB4
 	dc.b nAb4, nAb4, nEb5, nEb5, nB4, nB4, nEb5, nEb5
 	dc.b nAb4, nAb4, nEb5, nEb5, nCs5, nCs5, nEb5, nEb5
-	saVol		$FF
+	saVol		-$08
 
 Marble_Loop6:
 	dc.b nAb5, $12, nAb5, $06, nFs5, $12, nFs5, $06
 	dc.b nE5, $12, nE5, $06, nFs5, $12, nFs5, $06
 	sLoop		$00, $02, Marble_Loop6
-	saVol		$01
+	saVol		$08
 	sJump		Marble_Jump6
 
 Marble_Call7:

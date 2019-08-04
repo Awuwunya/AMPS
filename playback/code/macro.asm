@@ -249,5 +249,5 @@ Ctrl2Hold	rs.b 1		; controller 2 held buttons
 Ctrl2Press	rs.b 1		; controller 2 pressed buttons
 MusSel		rs.b 1		; selected music
 MusPlay		rs.b 1		; music currently playing
-Region		rs.b 1		; system region
+ConsoleRegion	rs.b 1		; system region
 ; ===========================================================================

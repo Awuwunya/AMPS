@@ -1,37 +1,42 @@
-; ===============================================
+; ---------------------------------------------------------------------------------------------
+; AMPS - SMPS2ASM macro & equate file.
+;
 ; Based on Flamewing's SMPS2ASM, and S1SMPS2ASM by Marc (AKA Cinossu)
 ; Reworked and improved by Natsumi
-; ===============================================
-; this macro is created to emulate enum in AS
-enum	macro	num, lable
-; copy initial number for referencing later
-.num	= num
+; ---------------------------------------------------------------------------------------------
 
-	rept narg-1
-\lable		set .num
-.num =	.num+1
+; this macro is created to emulate enum in AS
+enum	macro	lable
+	rept narg
+\lable =	_num
+_num =		_num+1
 	shift
 	endr
     endm
-
 ; ---------------------------------------------------------------------------------------------
 ; Note Equates
-	enum $80+0, nRst
-	enum nRst+1,nC0,nCs0,nD0,nEb0,nE0,nF0,nFs0,nG0,nAb0,nA0,nBb0,nB0
-	enum nB0+1, nC1,nCs1,nD1,nEb1,nE1,nF1,nFs1,nG1,nAb1,nA1,nBb1,nB1
-	enum nB1+1, nC2,nCs2,nD2,nEb2,nE2,nF2,nFs2,nG2,nAb2,nA2,nBb2,nB2
-	enum nB2+1, nC3,nCs3,nD3,nEb3,nE3,nF3,nFs3,nG3,nAb3,nA3,nBb3,nB3
-	enum nB3+1, nC4,nCs4,nD4,nEb4,nE4,nF4,nFs4,nG4,nAb4,nA4,nBb4,nB4
-	enum nB4+1, nC5,nCs5,nD5,nEb5,nE5,nF5,nFs5,nG5,nAb5,nA5,nBb5,nB5
-	enum nB5+1, nC6,nCs6,nD6,nEb6,nE6,nF6,nFs6,nG6,nAb6,nA6,nBb6,nB6
-	enum nB6+1, nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
-
 ; ---------------------------------------------------------------------------------------------
-; PSG volume envelope equates
-v00 =	$00
 
+_num =	$80
+	enum nRst
+	enum nC0,nCs0,nD0,nEb0,nE0,nF0,nFs0,nG0,nAb0,nA0,nBb0,nB0
+	enum nC1,nCs1,nD1,nEb1,nE1,nF1,nFs1,nG1,nAb1,nA1,nBb1,nB1
+	enum nC2,nCs2,nD2,nEb2,nE2,nF2,nFs2,nG2,nAb2,nA2,nBb2,nB2
+	enum nC3,nCs3,nD3,nEb3,nE3,nF3,nFs3,nG3,nAb3,nA3,nBb3,nB3
+	enum nC4,nCs4,nD4,nEb4,nE4,nF4,nFs4,nG4,nAb4,nA4,nBb4,nB4
+	enum nC5,nCs5,nD5,nEb5,nE5,nF5,nFs5,nG5,nAb5,nA5,nBb5,nB5
+	enum nC6,nCs6,nD6,nEb6,nE6,nF6,nFs6,nG6,nAb6,nA6,nBb6,nB6
+	enum nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
+; ---------------------------------------------------------------------------------------------
+; Other Equates
+; ---------------------------------------------------------------------------------------------
+
+v00 =	$00
+m00 =	$00
 ; ---------------------------------------------------------------------------------------------
 ; Header Macros
+; ---------------------------------------------------------------------------------------------
+
 sHeaderInit	macro
 sPointZero =	*
 sPatNum =	0
@@ -97,18 +102,19 @@ sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.w \loc-sPointZero
 	dc.b \pitch,\vol
     endm
-
 ; ---------------------------------------------------------------------------------------------
 ; Command Flag Macros and Equates. Based on the original s1smps2asm, and Flamewing's smps2asm
+; ---------------------------------------------------------------------------------------------
+
 spNone set $00
 spRight set $40
 spLeft set $80
 spCentre set $C0
 spCenter set $C0
-
 ; ---------------------------------------------------------------------------------------------
 ; Macros for FM instruments
 ; Patches - Feedback
+; ---------------------------------------------------------------------------------------------
 
 ; Patches - Algorithm
 spAlgorithm macro val, name
@@ -261,7 +267,8 @@ spTL4	= op4
 	endif
     endm
 ; ---------------------------------------------------------------------------------------------
-; SMPS commands
+; tracker commands
+; ---------------------------------------------------------------------------------------------
 
 ; E0xx - Panning, AMS, FMS (PANAFMS - PAFMS_PAN)
 sPan		macro pan, ams, fms
@@ -313,6 +320,16 @@ sVoice		macro val
 	dc.b $E8, \val
     endm
 
+; F2xx - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
+sVolEnv		macro val
+	dc.b $F2, \val
+    endm
+
+; F3xx - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
+sModEnv		macro val
+	dc.b $F3, \val
+    endm
+
 ; E9xx - Set music speed shoes tempo to xx (TEMPO - TEMPO_SET_SPEED)
 ssTempoShoes	macro val
 	dc.b $E9, \val
@@ -323,13 +340,13 @@ ssTempo		macro val
 	dc.b $EA, \val
     endm
 
-; EB - Turn on Modulation (MOD_SET - MODS_ON)
-sModOn		macro
+; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
+sModeSampDAC	macro
 	dc.b $EB
     endm
 
-; EC - Turn off Modulation (MOD_SET - MODS_OFF)
-sModOff		macro
+; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+sModePitchDAC	macro
 	dc.b $EC
     endm
 
@@ -366,19 +383,19 @@ ssMod68k	macro wait, speed, step, count
 	dc.b $F0, \wait,\speed,\step,\count
     endm
 
-; F1 - Use sample DAC mode (DAC_MODE - DACM_SAMP)
-sModeSampDAC	macro
-	dc.b $F1
+; F1xx - Set portamento speed to xx frames. 0 means portamento is disabled (PORTAMENTO)
+ssPortamento	macro vol
+	dc.b $F1, \vol
     endm
 
-; F2 - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
-sModePitchDAC	macro
-	dc.b $F2
+; FF00 - Turn on Modulation (MOD_SET - MODS_ON)
+sModOn		macro
+	dc.b $FF, $00
     endm
 
-; F3xx - PSG4 noise mode xx (PSG_NOISE - PNOIS_AMPS)
-sNoisePSG	macro val
-	dc.b $F3, \val
+; FF04 - Turn off Modulation (MOD_SET - MODS_OFF)
+sModOff		macro
+	dc.b $FF, $04
     endm
 
 ; F4xxxx - Keep looping back to xxxx each time the SFX is being played (CONT_SFX)
@@ -441,90 +458,90 @@ sCmdYM		macro reg, val
 	dc.b $FE, \reg,\val
     endm
 
-; FF00xx - Play sample xx on DAC1 (PLAY_DAC - PLAY_DAC1)
-sPlaySamp1	macro id
-	dc.b $FF,$00, \id
-    endm
-
-; FF01xx - Play sample xx on DAC1 (PLAY_DAC - PLAY_DAC2)
-sPlaySamp2	macro id
-	dc.b $FF,$01, \id
-    endm
-
-; FF02xxxx - Set channel frequency to xxxx (CHFREQ_SET)
+; FF08xxxx - Set channel frequency to xxxx (CHFREQ_SET)
 ssFreq		macro freq
-	dc.b $FF,$02
+	dc.b $FF,$08
 	dc.w \freq
     endm
 
-; FF03xx - Set channel frequency to note xx (CHFREQ_SET - CHFREQ_NOTE)
+; FF0Cxx - Set channel frequency to note xx (CHFREQ_SET - CHFREQ_NOTE)
 ssFreqNote	macro note
-	dc.b $FF,$03, \note^$80
+	dc.b $FF,$0C, \note^$80
     endm
 
-; FF04 - Increment spindash rev counter (SPINDASH_REV - SDREV_INC)
+; FF10 - Increment spindash rev counter (SPINDASH_REV - SDREV_INC)
 sSpinRev	macro
-	dc.b $FF,$04
+	dc.b $FF,$10
     endm
 
-; FF05 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
+; FF14 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
 sSpinReset	macro
-	dc.b $FF,$05
+	dc.b $FF,$14
     endm
 
-; FF06xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
+; FF18xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
 saTempoSpeed	macro tempo
-	dc.b $FF,$06, \tempo
+	dc.b $FF,$18, \tempo
     endm
 
-; FF07xx - Add xx to music tempo (TEMPO - TEMPO_ADD)
+; FF1Cxx - Add xx to music tempo (TEMPO - TEMPO_ADD)
 saTempo		macro tempo
-	dc.b $FF,$07, \tempo
+	dc.b $FF,$1C, \tempo
     endm
 
-; FF08xyzz - Get RAM address pointer offset by y, compare zz with it using condition x (COMM_CONDITION - COMM_SPEC)
+; FF20xyzz - Get RAM address pointer offset by y, compare zz with it using condition x (COMM_CONDITION - COMM_SPEC)
 sCondReg	macro off, cond, val
-	dc.b $FF,$08, \off|(\cond<<4),\val
+	dc.b $FF,$20, \off|(\cond<<4),\val
     endm
 
-; FF09xx - Play another music/sfx (SND_CMD)
+; FF24xx - Play another music/sfx (SND_CMD)
 sPlayMus	macro id
-	dc.b $FF,$09, \id
+	dc.b $FF,$24, \id
     endm
 
-; FF0A - Enable raw frequency mode (RAW_FREQ)
+; FF28 - Enable raw frequency mode (RAW_FREQ)
 sFreqOn		macro freq
-	dc.b $FF,$0A
+	dc.b $FF,$28
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
-; FF0B - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
+; FF2C - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
 sFreqOff	macro freq
-	dc.b $FF,$0B
+	dc.b $FF,$2C
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
-; FF0C - Enable FM3 special mode (SPC_FM3)
+; FF30 - Enable FM3 special mode (SPC_FM3)
 sSpecFM3	macro freq
-	dc.b $FF,$0C
+	dc.b $FF,$30
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
-; FF0Dxx - Set DAC filter bank address (DAC_FILTER)
+; FF34xx - Set DAC filter bank address (DAC_FILTER)
 ssFilter	macro bank
-	dc.b $FF,$0D, \bank
+	dc.b $FF,$34, \bank
     endm
 
-; FF0E - Freeze 68k. Debug flag (DEBUG_STOP_CPU)
+; FF38 - Load the last song from back-up (FADE_IN_SONG)
+sBackup		macro
+	dc.b $FF,$38
+    endm
+
+; FF3Cxx - PSG4 noise mode xx (PSG_NOISE - PNOIS_AMPS)
+sNoisePSG	macro val
+	dc.b $FF, $3C, \val
+    endm
+
+; FF40 - Freeze 68k. Debug flag (DEBUG_STOP_CPU)
 sFreeze		macro
 	if safe=1
-		dc.b $FF,$0E
+		dc.b $FF,$40
 	endif
     endm
 
-; FF0F - Bring up tracker debugger at end of frame. Debug flag (DEBUG_PRINT_TRACKER)
+; FF44 - Bring up tracker debugger at end of frame. Debug flag (DEBUG_PRINT_TRACKER)
 sCheck		macro
 	if safe=1
-		dc.b $FF,$0F
+		dc.b $FF,$44
 	endif
     endm

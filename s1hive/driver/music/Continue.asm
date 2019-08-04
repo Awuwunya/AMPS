@@ -1,17 +1,13 @@
 Continue_Header:
 	sHeaderInit
 	sHeaderTempo	$01, $25
-	sHeaderCh	$05, $03
+	sHeaderCh	$04, $00
 	sHeaderDAC	Continue_DAC1
 	sHeaderDAC	Continue_DAC2
 	sHeaderFM	Continue_FM1, $E5, $08
 	sHeaderFM	Continue_FM2, $E8, $08
 	sHeaderFM	Continue_FM3, $F4, $0F
 	sHeaderFM	Continue_FM4, $F4, $0F
-	sHeaderFM	Continue_FM5, $F4, $0A
-	sHeaderPSG	Continue_FM5, $D0, $03, $00, v05
-	sHeaderPSG	Continue_FM5, $DC, $06, $00, v05
-	sHeaderPSG	Continue_FM5, $DC, $00, $00, v04
 
 	; Patch $00
 	; $3A
@@ -146,10 +142,7 @@ Continue_Loop4:
 	dc.b nCs6, $06, nRst, nCs6, nRst, nA5, nRst, nA5
 	dc.b nRst, nD6, $0C, nRst, $06, nD6, $4E
 
-Continue_FM5:
 Continue_DAC2:
-	sVoice		$00
-	dc.b nRst, $30
 	sStop
 
 Continue_DAC1:

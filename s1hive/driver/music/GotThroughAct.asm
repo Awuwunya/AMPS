@@ -9,8 +9,8 @@ GotThrough_Header:
 	sHeaderFM	GotThrough_FM3, $F4, $15
 	sHeaderFM	GotThrough_FM4, $F4, $15
 	sHeaderFM	GotThrough_FM5, $F4, $14
-	sHeaderPSG	GotThrough_PSG1, $D0, $05, $00, v05
-	sHeaderPSG	GotThrough_PSG2, $DC, $07, $00, v05
+	sHeaderPSG	GotThrough_PSG1, $D0, $28, $00, v05
+	sHeaderPSG	GotThrough_PSG2, $DC, $38, $00, v05
 	sHeaderPSG	GotThrough_PSG3, $DC, $00, $00, v04
 
 	; Patch $00

@@ -9,9 +9,6 @@ Final_Header:
 	sHeaderFM	Final_FM3, $F4, $0A
 	sHeaderFM	Final_FM4, $F4, $0F
 	sHeaderFM	Final_FM5, $00, $12
-;	sHeaderPSG	Final_PSG1, $D0, $03, $00, v05
-;	sHeaderPSG	Final_PSG1, $DC, $06, $00, v05
-;	sHeaderPSG	Final_PSG1, $DC, $00, $00, v04
 
 	; Patch $00
 	; $3D
@@ -180,7 +177,6 @@ Final_Loop3:
 	sLoop		$00, $04, Final_Loop3
 	sJump		Final_Loop1
 
-Final_PSG1:
 Final_DAC2:
 	sStop
 

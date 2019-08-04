@@ -1,7 +1,7 @@
 GameOver_Header:
 	sHeaderInit
 	sHeaderTempo	$02, $0D
-	sHeaderCh	$05, $03
+	sHeaderCh	$05, $00
 	sHeaderDAC	GameOver_DAC1
 	sHeaderDAC	GameOver_DAC2
 	sHeaderFM	GameOver_FM1, $E8, $0A
@@ -9,9 +9,6 @@ GameOver_Header:
 	sHeaderFM	GameOver_FM3, $F4, $0F
 	sHeaderFM	GameOver_FM4, $F4, $0D
 	sHeaderFM	GameOver_FM5, $DC, $16
-	sHeaderPSG	GameOver_PSG1, $D0, $03, $00, v05
-	sHeaderPSG	GameOver_PSG1, $DC, $06, $00, v05
-	sHeaderPSG	GameOver_PSG1, $DC, $00, $00, v04
 
 	; Patch $00
 	; $3A
@@ -131,7 +128,6 @@ GameOver_FM5:
 	dc.b nRst, $30, nD7, $12, nRst, $03, nD7, $1B
 	dc.b nRst, $30, nG7, $12, nRst, $03, nG7, $1B
 
-GameOver_PSG1:
 GameOver_DAC2:
 	sStop
 

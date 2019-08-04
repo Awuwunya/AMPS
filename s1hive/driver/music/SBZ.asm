@@ -9,9 +9,9 @@ ScrabBrain_Header:
 	sHeaderFM	ScrabBrain_FM3, $F4, $13
 	sHeaderFM	ScrabBrain_FM4, $F4, $17
 	sHeaderFM	ScrabBrain_FM5, $F4, $17
-	sHeaderPSG	ScrabBrain_PSG1, $D0, $03, $00, v00
-	sHeaderPSG	ScrabBrain_PSG2, $D0, $03, $00, v00
-	sHeaderPSG	ScrabBrain_PSG3, $00, $03, $00, v04
+	sHeaderPSG	ScrabBrain_PSG1, $D0, $18, $00, v00
+	sHeaderPSG	ScrabBrain_PSG2, $D0, $18, $00, v00
+	sHeaderPSG	ScrabBrain_PSG3, $00, $18, $00, v04
 
 	; Patch $00
 	; $08
@@ -373,15 +373,15 @@ ScrabBrain_Call9:
 	sRet
 
 ScrabBrain_PSG1:
-	saVol		$01
-	sVoice		v00
+	saVol		$08
+	sVolEnv		v00
 	sCall		ScrabBrain_Call6
-	sVoice		v06
-	saVol		$FF
+	sVolEnv		v06
+	saVol		-$08
 	sCall		ScrabBrain_Loop11
 	dc.b nRst, $60
-	sVoice		v00
-	saVol		$FF
+	sVolEnv		v00
+	saVol		-$08
 
 ScrabBrain_Loop15:
 	sCall		ScrabBrain_Call10
@@ -390,7 +390,7 @@ ScrabBrain_Loop15:
 	sCall		ScrabBrain_Call10
 	dc.b nF5, $0C, nRst, $06, nF5, $1E
 	sLoop		$00, $02, ScrabBrain_Loop15
-	saVol		$01
+	saVol		$08
 	sJump		ScrabBrain_PSG1
 
 ScrabBrain_Call10:
@@ -401,15 +401,15 @@ ScrabBrain_Call10:
 	sRet
 
 ScrabBrain_PSG2:
-	sVoice		v00
-	saVol		$01
+	sVolEnv		v00
+	saVol		$08
 	dc.b nC5, $03, nC5, nRst, nC5, nRst, nC5, nC5
 	sNoteTimeOut	$00
 	dc.b nB4, $4B
-	saVol		$FF
+	saVol		-$08
 
 ScrabBrain_Loop18:
-	sVoice		v05
+	sVolEnv		v05
 	sNoteTimeOut	$03
 	sCall		ScrabBrain_Call11
 
@@ -423,7 +423,7 @@ ScrabBrain_Loop17:
 	sCall		ScrabBrain_Call11
 	sLoop		$01, $02, ScrabBrain_Loop18
 	dc.b nRst, $60
-	saVol		$01
+	saVol		$08
 
 ScrabBrain_Loop19:
 	dc.b nC7, $03, nC7, nG7, nC7, nF7, nC7, nE7
@@ -438,7 +438,7 @@ ScrabBrain_Loop21:
 	dc.b nA6, nA6, nE7, nA6, nD7, nA6, nC7, nA6
 	sLoop		$00, $04, ScrabBrain_Loop21
 	sLoop		$01, $04, ScrabBrain_Loop19
-	saVol		$FF
+	saVol		-$08
 	sJump		ScrabBrain_PSG2
 
 ScrabBrain_Call11:
@@ -455,13 +455,13 @@ ScrabBrain_PSG3:
 
 ScrabBrain_Loop22:
 	dc.b nA5, $03, $03
-	saVol		$02
-	sVoice		v08
+	saVol		$10
+	sVolEnv		v08
 	sNoteTimeOut	$08
 	dc.b $06
-	sVoice		v04
+	sVolEnv		v04
 	sNoteTimeOut	$03
-	saVol		$FE
+	saVol		-$10
 	sLoop		$00, $88, ScrabBrain_Loop22
 	sJump		ScrabBrain_PSG3
 

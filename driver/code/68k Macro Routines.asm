@@ -68,7 +68,6 @@ dModPorta	macro jump,loop,type
 	dPortamento	\jump,\loop,\type
 	dModulate	\jump,\loop,\type
     endm
-
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Macro for generating portamento code

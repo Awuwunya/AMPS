@@ -452,7 +452,7 @@ AMPS_Debug_dcVoiceEnv	macro
 	if FEATURE_DACFMVOLENV
 	if def(RaiseError)	; check if Vladik's debugger is active
 AMPS_DebugR_dcVoiceEnv:
-		RaiseError "You can not use sVoice for PSG channelwhen FEATURE_MODULATION is set to 1.  Please use sVolEnv instead.", AMPS_Debug_Console_Channel
+		RaiseError "You can not use sVoice for PSG channelwhen FEATURE_DACFMVOLENV is set to 1. Please use sVolEnv instead.", AMPS_Debug_Console_Channel
 	endif
 	endif
 ; ===========================================================================
@@ -581,10 +581,14 @@ AMPS_Debug_dcLoop	macro
 	beq.s	.fail			; if so, branch
 
 .nosfx
-	cmp.b	#$C0,cType(a5)		; check if PSG3 or PSG4
-	blo.s	.ok			; if no, branch
-	cmp.b	#cStatPSG4-cLoop,d0	; check if cStatPSG4
-	bne.s	.ok			; if no, branch
+	if FEATURE_DACFMVOLENV
+		bra.s	.ok		; no need to check others
+	else
+		cmp.b	#$C0,cType(a5)	; check if PSG3 or PSG4
+		blo.s	.ok		; if no, branch
+		cmp.b	#cStatPSG4-cLoop,d0; check if cStatPSG4
+		bne.s	.ok		; if no, branch
+	endif
 
 .fail
 	if def(RaiseError)	; check if Vladik's debugger is active
@@ -699,7 +703,7 @@ AMPS_Debug_CuePtr2:
 AMPS_Debug_CuePtr0:
 		RaiseError2 "CUE invalid at dUpdateVoiceFM: %<.l a0>", AMPS_Debug_Console_Channel
 AMPS_Debug_CuePtr3:
-		RaiseError2 "CUE invalid at dAMPSend: %<.l a0>", AMPS_Debug_Console_Channel
+		RaiseError2 "CUE invalid at UpdateAMPS: %<.l a0>", AMPS_Debug_Console_Channel
 	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

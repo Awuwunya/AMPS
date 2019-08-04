@@ -2,7 +2,7 @@ soundCC_Header:
 	sHeaderInit
 	sHeaderPrio	$70
 	sHeaderCh	$01
-	sHeaderSFX	$80, $04, .FM4, $00, $02
+	sHeaderSFX	$80, ctFM4, .FM4, $00, $02
 
 .FM4	sVoice		$22
 	dc.b nRst, $01

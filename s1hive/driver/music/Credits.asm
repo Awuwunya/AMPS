@@ -9,9 +9,9 @@ Credits_Header:
 	sHeaderFM	Credits_FM3, $F4, $14
 	sHeaderFM	Credits_FM4, $F4, $08
 	sHeaderFM	Credits_FM5, $F4, $20
-	sHeaderPSG	Credits_PSG1, $D0, $01, $00, v00
-	sHeaderPSG	Credits_PSG2, $D0, $03, $00, v00
-	sHeaderPSG	Credits_PSG3, $00, $03, $00, v04
+	sHeaderPSG	Credits_PSG1, $D0, $08, $00, v00
+	sHeaderPSG	Credits_PSG2, $D0, $18, $00, v00
+	sHeaderPSG	Credits_PSG3, $00, $18, $00, v04
 
 	; Patch $00
 	; $20
@@ -1287,13 +1287,13 @@ Credits_Call19:
 
 Credits_PSG1:
 	dc.b nRst, $60
-	sVoice		v08
-	saVol		$03
+	sVolEnv		v08
+	saVol		$18
 	sNoteTimeOut	$06
 	sCall		Credits_Call1
-	sVoice		v01
+	sVolEnv		v01
 	sNoteTimeOut	$00
-	saVol		$FD
+	saVol		-$18
 
 Credits_Loop20:
 	dc.b nRst, $18, nC6, $06, nRst, $1E, nC6, $0C
@@ -1303,7 +1303,7 @@ Credits_Loop20:
 	dc.b nRst, $18, nA5, $06, nRst, $1E, nA5, $0C
 	dc.b nRst, $18, nRst, $18, nG5, $06, nRst, $1E
 	dc.b nG5, $0C, nRst, $18
-	sVoice		v05
+	sVolEnv		v05
 	ssMod68k	$0E, $01, $01, $03
 	sNoteTimeOut	$10
 	dc.b nE5, $24, nD5, nE5, nD5, nE5, $0C, nRst
@@ -1311,8 +1311,8 @@ Credits_Loop20:
 	sNoteTimeOut	$00
 	dc.b nE5, $60, sHold, $3C
 	sModOff
-	sVoice		v09
-	saVol		$01
+	sVolEnv		v09
+	saVol		$08
 
 Credits_Loop21:
 	dc.b nRst, $06, nE6, $0C, nE6, nE6, nE6, $06
@@ -1322,24 +1322,24 @@ Credits_Loop21:
 	saTranspose	$F6
 	dc.b nRst, $06, nE6, $0C, nE6, nE6, nE6, $06
 	dc.b nRst, $30
-	sVoice		v08
-	saVol		$01
+	sVolEnv		v08
+	saVol		$08
 	sCall		Credits_Call23
 	dc.b nRst, $02, nRst, $30
-	saVol		$03
+	saVol		$18
 	saTranspose	$F4
-	sVoice		v05
+	sVolEnv		v05
 	sCall		Credits_Call15
 	saTranspose	$0C
-	saVol		$FC
-	sVoice		v00
+	saVol		-$20
+	sVolEnv		v00
 	sCall		Credits_Call24
 	dc.b nRst, $0C, nF5, nRst, $03, nF5, nRst, nRst
 	dc.b nF5, nRst, $09
 	sCall		Credits_Call24
 	dc.b nF5, $0C, nRst, $06, nF5, $1E
-	sVoice		v06
-	saVol		$04
+	sVolEnv		v06
+	saVol		$20
 	dc.b nRst, $30, nRst, $30
 	ssTickMulCh	$01
 	sCall		Credits_Call18x
@@ -1350,7 +1350,7 @@ Credits_Loop21:
 	dc.b nBb5, $03, nRst, nBb5, nRst, nA5, $03, nRst
 	dc.b $13, nA5, $0E, nCs6, $0C, nE6, nCs7, $0A
 	dc.b nD7, $02, nRst, $60, nRst, nRst, nRst, nRst
-	saVol		$FF
+	saVol		-$08
 	dc.b nRst, $0C, nB5, $12, nRst, $06, nB5, nRst
 	dc.b nA5, $12, nB5, nA5, $0C, nE5, $18, nAb5
 	dc.b nB5, nD6, nRst, $0C, nCs6, nRst, nCs6, $12
@@ -1369,8 +1369,8 @@ Credits_PSG2:
 	sLoop		$00, $08, Credits_PSG2
 	dc.b nRst, $02
 	sCall		Credits_Call25
-	saVol		$FE
-	sVoice		v01
+	saVol		-$10
+	sVolEnv		v01
 	dc.b nRst, $16, nE6, $06, nRst, $1E, nE6, $0C
 	dc.b nRst, $18, nRst, $18, nD6, $06, nRst, $1E
 	dc.b nD6, $0C, nRst, $18
@@ -1384,14 +1384,14 @@ Credits_Loop22:
 	dc.b nRst, $18, nRst, $18, nB5, $06, nRst, $1E
 	dc.b nB5, $0C, nRst, $18
 	sNoteTimeOut	$06
-	sVoice		v06
+	sVolEnv		v06
 
 Credits_Loop23:
 	dc.b nC7, $0C, nB6, nA6, nG6
 	sLoop		$00, $08, Credits_Loop23
 	sNoteTimeOut	$00
-	sVoice		v09
-	saVol		$01
+	sVolEnv		v09
+	saVol		$09
 
 Credits_Loop24:
 	dc.b nRst, $06, nG6, $0C, nG6, nG6, nG6, $06
@@ -1402,16 +1402,16 @@ Credits_Loop24:
 	dc.b nRst, $06, nG6, $0C, nG6, nG6, nG6, $06
 	dc.b nRst, $30, nRst, $02
 	ssDetune	$01
-	saVol		$03
+	saVol		$18
 	sCall		Credits_Call23
 	ssDetune	$00
 	dc.b nRst, $30
-	saVol		$01
+	saVol		$08
 	saTranspose	$F4
-	sVoice		v05
+	sVolEnv		v05
 	sCall		Credits_Call20
 	saTranspose	$0C
-	saVol		$FD
+	saVol		-$18
 	sNoteTimeOut	$03
 
 Credits_Loop25:
@@ -1429,9 +1429,9 @@ Credits_Loop27:
 	sLoop		$01, $02, Credits_Loop25
 	dc.b nRst, $60, nRst, nRst, nRst, nRst, nRst, nRst
 	dc.b nRst, nRst
-	saVol		$0C
+	saVol		$60
 	ssDetune	$02
-	saVol		$02
+	saVol		$10
 	dc.b nRst, $0C, nE6, $06, nRst, nB6, nE6, $06
 	dc.b nRst, $0C, nE6, $06, nRst, nB6, nE6
 	sStop
@@ -1448,7 +1448,7 @@ Credits_Loop28:
 Credits_Loop29:
 	dc.b $0C
 	sLoop		$00, $60, Credits_Loop29
-	saVol		$FF
+	saVol		-$08
 	sCall		Credits_Call26
 	sNoteTimeOut	$0E
 	dc.b $0C
@@ -1458,8 +1458,8 @@ Credits_Loop29:
 Credits_Loop30:
 	sCall		Credits_Call26
 	sLoop		$00, $04, Credits_Loop30
-	sVoice		v09
-	saVol		$01
+	sVolEnv		v09
+	saVol		$08
 	saTranspose	$0B
 
 Credits_Loop31:
@@ -1478,31 +1478,31 @@ Credits_Loop32:
 	saTranspose	$F5
 
 Credits_Loop33:
-	sVoice		v04
+	sVolEnv		v04
 	dc.b nA5, $03, $03
-	saVol		$02
-	sVoice		v08
+	saVol		$10
+	sVolEnv		v08
 	sNoteTimeOut	$08
 	dc.b $06
 	sNoteTimeOut	$03
-	saVol		$FE
+	saVol		-$10
 	sLoop		$00, $1E, Credits_Loop33
 	dc.b nRst, $24
 
 Credits_Loop34:
-	sVoice		v04
+	sVolEnv		v04
 	dc.b $03, $03
-	saVol		$02
-	sVoice		v08
+	saVol		$10
+	sVolEnv		v08
 	sNoteTimeOut	$08
 	dc.b $06
 	sNoteTimeOut	$03
-	saVol		$FE
+	saVol		-$10
 	sLoop		$00, $20, Credits_Loop34
 	dc.b nRst, $30
 	sNoteTimeOut	$01
-	sVoice		v04
-	saVol		$03
+	sVolEnv		v04
+	saVol		$18
 
 Credits_Loop35:
 	dc.b nA5, $02, nRst, nA5
@@ -1511,12 +1511,12 @@ Credits_Loop35:
 Credits_Loop36:
 	dc.b nRst, $04, nA5, $02
 	sLoop		$00, $08, Credits_Loop36
-	saVol		$FF
+	saVol		-$08
 
 Credits_Loop37:
 	dc.b nA5, $02, nRst, nA5
 	sLoop		$00, $18, Credits_Loop37
-	saVol		$FE
+	saVol		-$10
 
 Credits_Loop38:
 	dc.b nA5, $04, nRst, nA5

@@ -4,10 +4,18 @@
 ; make it easier to debug built ROMS! If you would like easier
 ; assistance from Natsumi, please keep this section intact!
 ; ---------------------------------------------------------------------------
-	dc.b "AMPS-1.1  "		; ident str
+	dc.b "AMPS-v1.1 "		; ident str
+
+	if FEATURE_UNDERWATER
+		dc.b "UW"		; underwater mode enabled
+	endif
 
 	if FEATURE_MODULATION
 		dc.b "MO"		; modulation enabled
+	endif
+
+	if FEATURE_DACFMVOLENV
+		dc.b "VE"		; FM & DAC volume envelope enabled
 	endif
 
 	if FEATURE_MODENV
@@ -235,7 +243,7 @@ vdCol3_05:	dc.b $10, $08, $00, $00, $08, $10, $10, $10
 __menv =	$01
 
 ModEnvs:
-	ModEnv Test
+	modenv Test
 ModEnvs_End:
 ; ---------------------------------------------------------------------------
 
@@ -260,7 +268,7 @@ musend
 ; Include samples and filters
 ; ---------------------------------------------------------------------------
 
-		align	$8000		; must be aligned to bank... By the way, these are also set in Z80.asm... Be sure to check it out also.
+		align	$8000		; must be aligned to bank... By the way, these are also set in Z80.asm. Be sure to check it out also.
 fLog:		incbin "driver/filters/Logarithmic.dat"	; logarithmic filter (no filter)
 ;fLinear:	incbin "driver/filters/Linear.dat"	; linear filter (no filter)
 

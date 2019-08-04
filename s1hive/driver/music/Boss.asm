@@ -9,9 +9,9 @@ Boss_Header:
 	sHeaderFM	Boss_FM3, $F4, $0F
 	sHeaderFM	Boss_FM4, $F4, $12
 	sHeaderFM	Boss_FM5, $E8, $0F
-	sHeaderPSG	Boss_PSG1, $D0, $03, $00, v05
-	sHeaderPSG	Boss_PSG2, $D0, $03, $00, v05
-	sHeaderPSG	Boss_PSG3, $DC, $01, $00, v08
+	sHeaderPSG	Boss_PSG1, $D0, $18, $00, v05
+	sHeaderPSG	Boss_PSG2, $D0, $18, $00, v05
+	sHeaderPSG	Boss_PSG3, $DC, $08, $00, v08
 
 	; Patch $00
 	; $08

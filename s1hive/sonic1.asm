@@ -1,7 +1,7 @@
 z80_ram:	equ $A00000
 z80_bus_request	equ $A11100
 z80_reset:	equ $A11200
-Region		equ $FFFFFFF8
+ConsoleRegion	equ $FFFFFFF8
 		include "driver/lang.asm"
 		include "driver/code/macro.asm"
 		include "error/debugger.asm"
@@ -11921,7 +11921,7 @@ CollectRing:				; XREF: Obj25_Collect
 loc_9CA4:
 		addq.b	#1,($FFFFFE12).w ; add 1 to the	number of lives	you have
 		addq.b	#1,($FFFFFE1C).w ; add 1 to the	lives counter
-		moveq	#sfx_Register,d0		; play extra life music
+		moveq	#mus_ExtraLife,d0		; play extra life music
 
 Obj25_PlaySnd:
 		jmp	(PlaySound_Special).l
@@ -12444,7 +12444,7 @@ Obj2E_ChkSonic:
 ExtraLife:
 		addq.b	#1,($FFFFFE12).w ; add 1 to the	number of lives	you have
 		addq.b	#1,($FFFFFE1C).w ; add 1 to the	lives counter
-		moveq	#sfx_Register,d0
+		moveq	#mus_ExtraLife,d0
 		jmp	(PlaySound).l	; play extra life music
 ; ===========================================================================
 
@@ -35728,7 +35728,7 @@ Obj09_Chk1Up:
 Obj09_Get1Up:
 		addq.b	#1,($FFFFFE12).w ; add 1 to number of lives
 		addq.b	#1,($FFFFFE1C).w ; add 1 to lives counter
-		moveq	#sfx_Register,d0
+		moveq	#mus_ExtraLife,d0
 		jsr	(PlaySound).l	; play extra life music
 		moveq	#0,d4
 		rts

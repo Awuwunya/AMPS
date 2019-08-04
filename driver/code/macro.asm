@@ -4,6 +4,14 @@
 ; ---------------------------------------------------------------------------
 	opt ae+
 
+FEATURE_MODULATION =	1	; set to 1 to enable software modulation effect
+FEATURE_PORTAMENTO =	1	; set to 1 to enable portamento flag
+FEATURE_MODENV =	1	; set to 1 to enable modulation envelopes
+FEATURE_DACFMVOLENV =	1	; set to 1 to enable volume envelopes for FM & DAC channels.
+FEATURE_UNDERWATER =	1	; set to 1 to enable underwater mode
+FEATURE_BACKUP =	1	; set to 1 to enable back-up channels. Used for the 1-up SFX in Sonic 1, 2 and 3K...
+FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Used for the 1-up SFX.
+
 ; if safe mode is enabled (1), then the driver will attempt to find any issues.
 ; if Vladik's error debugger is installed, then the error will be displayed.
 ; else, the CPU is trapped.
@@ -15,14 +23,6 @@ safe =	1
 ; 1 = Counter method.
 
 tempo =	0
-
-FEATURE_MODULATION =	1	; set to 1 to enable software modulation effect
-FEATURE_PORTAMENTO =	1	; set to 1 to enable portamento flag
-FEATURE_MODENV =	1	; set to 1 to enable modulation envelopes
-FEATURE_DACFMVOLENV =	1	; set to 1 to enable volume envelopes for FM & DAC channels.
-FEATURE_UNDERWATER =	1	; set to 1 to enable underwater mode
-FEATURE_BACKUP =	1	; set to 1 to enable back-up channels. Used for the 1-up SFX in Sonic 1, 2 and 3K...
-FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Used for the 1-up SFX.
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Channel configuration
@@ -77,8 +77,13 @@ cModEnvSens	rs.b 1		; sensitivity of modulation envelope
 
 cLoop		rs.b 3		; loop counter values
 cSizeSFX	rs.w 0		; size of each SFX track (this also sneakily makes sure the memory is aligned to word always. Additional loop counter may be added if last byte is odd byte)
-cStatPSG4 =	__rs-1		; PSG4 type value. PSG3 only
 cPrio =		__rs-2		; sound effect channel priority. SFX only
+
+	if FEATURE_DACFMVOLENV
+cStatPSG4 =	cVoice		; PSG4 type value. PSG3 only
+	else
+cStatPSG4 =	__rs-1		; PSG4 type value. PSG3 only
+	endif
 
 cNoteTimeCur	rs.b 1		; frame counter to note off. Music only
 cNoteTimeMain	rs.b 1		; copy of frame counter to note off. Music only
@@ -97,7 +102,7 @@ cfbRest		rs.b 1		; set if channel is resting. FM and PSG only
 cfbInt		rs.b 1		; set if interrupted by SFX. Music only
 cfbHold		rs.b 1		; set if playing notes does not trigger note-on's
 cfbMod		rs.b 1		; set if modulation is enabled
-cfbCond		rs.b 1		; set if ignoring many tracker commands
+cfbCond		rs.b 1		; set if ignoring most tracker commands
 cfbVol		rs.b 1		; set if channel should update volume
 cfbRun =	$07		; set if channel is running a tracker
 ; ===========================================================================
@@ -282,7 +287,7 @@ dcoGT		rs.b 1		; condition GT	; GreaTer (signed)
 dcoLE		rs.b 1		; condition LE	; Less or Equal (signed)
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Emvelope commands equates
+; Envelope commands equates
 ; ---------------------------------------------------------------------------
 
 	rsset $80
@@ -421,7 +426,7 @@ __menv =	__menv+1		; increase ID
 ; ---------------------------------------------------------------------------
 
 ptrSFX		macro type, file
-.type =		\type<<24		; create equate for the type mask
+.type =		(\type)<<24		; create equate for the type mask
 
 	rept narg-1			; repeat for all arguments
 sfx_\file =	__sfx			; create sfx_ equate for the sfx

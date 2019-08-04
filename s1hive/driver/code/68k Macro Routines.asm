@@ -39,9 +39,9 @@ dNoteToutFM	macro
 
 dNoteToutPSG	macro
 	dNoteToutHandler			; include timeout handler
-		bset	#cfbRest,(a5)		; set track to resting
+		or.b	#(1<<cfbRest)|(1<<cfbVol),(a5); set channel to resting and request a volume update (update on next note-on)
 		bsr.w	dMutePSGmus		; mute PSG channel
-		bra.s	.next			; jump to next track
+		bra.w	.next			; jump to next track
 .endt
     endm
 ; ===========================================================================
@@ -57,10 +57,89 @@ dCalcFreq	macro
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Macro for generating portamento + modulation code
+; ---------------------------------------------------------------------------
+
+dModPorta	macro jump,loop,type
+	if FEATURE_MODENV
+		jsr	dModEnvProg(pc)
+	endif
+
+	dPortamento	\jump,\loop,\type
+	dModulate	\jump,\loop,\type
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Macro for generating portamento code
+; ---------------------------------------------------------------------------
+
+dPortamento	macro jump,loop,type
+	if FEATURE_PORTAMENTO
+		if FEATURE_MODULATION=0
+			tst.b	cPortaSpeed(a5)		; check if portamento is active
+			bne.s	.doporta		; if not, branch
+
+			if FEATURE_MODENV
+				tst.b	cModEnv(a5)	; check if modulation envelope ID is not 0
+				bne.s	.nowrap		; if so, update frequency nonetheless
+			endif
+
+			dGenLoops 1, \jump,\loop,\type
+		endif
+
+.doporta
+		move.w	cPortaFreq(a5),d5	; load portamento frequency to d5
+		beq.s	.nochk			; branch if 0 already
+		bmi.s	.ppos			; branch if negative
+
+		add.w	cPortaDisp(a5),d5	; add displacement to d5
+		bpl.s	.noover			; branch if overflow did not occur
+		bra.s	.pclr
+
+.ppos
+		add.w	cPortaDisp(a5),d5	; add displacement to d5
+		bmi.s	.noover			; branch if overflow did not occur
+.pclr		moveq	#0,d5			; if it did, clear displacement
+
+.noover		move.w	d5,cPortaFreq(a5)	; save portamento frequency back
+.nochk		add.w	d5,d6			; add it to the current pitch
+
+		if (type=0)|(type=1)
+			move.w	d6,d5		; special FM code to skip over some frequencies, because it sounds bad
+			move.w	#$800+$25D-$4C0,d4; prepare value into d4
+
+			and.w	#$7FF,d5	; get only the frequency offset
+			sub.w	#$25D,d5	; sub the lower bound
+			cmp.w	#$4C0-$25D,d5	; check if out of range of safe frequencies
+			bls.s	.nowrap		; branch if not
+
+			bpl.s	.pos		; branch if negative
+			sub.w	d4,d6		; add frequency offset to d4
+			sub.w	d4,cPortaFreq(a5); fix portamento frequency also
+			bpl.s	.nowrap		; branch if overflow did not occur
+			bra.s	.wrap2
+
+		.pos:
+			add.w	d4,d6		; add frequency offset to d4
+			add.w	d4,cPortaFreq(a5); fix portamento frequency also
+			bmi.s	.nowrap		; branch if overflow did not occur
+
+		.wrap2:
+			move.w	cPortaFreq(a5),d4; get portamento to d4 again
+			sub.w	d4,d6		; fix frequency, again
+			clr.w	cPortaFreq(a5)	; reset portamento frequency
+		endif
+
+	.nowrap:
+	endif
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; Macro for generating frequency modulation code
 ; ---------------------------------------------------------------------------
 
 dModulate	macro jump,loop,type
+	if FEATURE_MODULATION
 		btst	#cfbMod,(a5)		; check if modulation is active
 		beq.s	.noret			; if not, update volume and return
 		tst.b	cModDelay(a5)		; check if there is delay left
@@ -68,28 +147,16 @@ dModulate	macro jump,loop,type
 		subq.b	#1,cModDelay(a5)	; decrease delay
 
 .noret
-	if narg>0
-		if narg=3
-			if type<2
-				bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
-				beq.s	.noupdatevol		; if not, skip
-				jsr	dUpdateVolFM(pc)	; update FM volume
-			.noupdatevol:
-			endif
-			if type>=4
-				bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
-				beq.s	.noupdatevol		; if not, skip
-				jsr	dUpdateVolDAC(pc)	; update DAC volume
-			.noupdatevol:
-			endif
-			if \type<>5
-				dbf	d7,\loop		; loop for all channels
-			endif
+		if FEATURE_PORTAMENTO
+			tst.b	cPortaSpeed(a5)	; check if portamento is active
+			bne.s	.porta		; if is, branch
 		endif
-		bra.w	\jump			; jump to next routine
-	else
-		bra.s	.endm			; jump to the next .endm routine
-	endif
+
+		if FEATURE_MODENV
+			tst.b	cModEnv(a5)	; check if modulation envelope ID is not 0
+			bne.s	.porta		; if so, update frequency nonetheless
+		endif
+	dGenLoops 0, \jump,\loop,\type
 
 .started
 		subq.b	#1,cModSpeed(a5)	; decrease modulation speed counter
@@ -110,6 +177,36 @@ dModulate	macro jump,loop,type
 		add.w	cModFreq(a5),d5		; add modulation frequency to it
 		move.w	d5,cModFreq(a5)		; save as the modulation frequency
 		add.w	d5,d6			; add to channel base frequency
+
+.porta
+	endif
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Macro for generating fast looping code for modulation and portamento
+; ---------------------------------------------------------------------------
+
+dGenLoops macro	mode,jump,loop,type
+	if \type>=0
+		if FEATURE_DACFMVOLENV=0
+			bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
+			beq.s	.noupdatevol		; if not, skip
+		endif
+
+		if \type<2
+			jsr	dUpdateVolFM(pc)	; update FM volume
+		endif
+
+		if \type>=4
+			jsr	dUpdateVolDAC(pc)	; update DAC volume
+		endif
+
+		.noupdatevol:
+		if \type<>5
+			dbf	d7,\loop		; loop for all channels
+		endif
+	endif
+	bra.w	\jump			; jump to next routine
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -117,7 +214,7 @@ dModulate	macro jump,loop,type
 ; ---------------------------------------------------------------------------
 
 dDoTracker	macro
-		movea.l	cData(a5),a4		; grab tracker address
+		move.l	cData(a5),a4		; grab tracker address
 	if safe=1
 		AMPS_Debug_TrackUpd		; check if this address is valid
 	endif
@@ -130,31 +227,115 @@ dDoTracker	macro
 		jsr	dCommands(pc)		; run the condition flag
 		bra.s	.data			; for most commands, use this branch to loop
 		bra.s	.next			; however, for example sStop will make us return here.
+
 .notcomm
+	if FEATURE_PORTAMENTO
+		move.w	cFreq(a5),-(sp)		; we need to know the last frequency in portamento mode, so store it in stack
+	endif
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Macro for playing a note, and setting up for it (software updates only)
 ; ---------------------------------------------------------------------------
 
-dProcNote	macro sfx, psg
+dProcNote	macro sfx, chan
 		move.l	a4,cData(a5)		; save tracker address
 		move.b	cLastDur(a5),cDuration(a5); copy stored duration
+
+	if FEATURE_PORTAMENTO
+		move.w	(sp)+,d1		; load the last frequency to d1
+		if \chan<=0
+			beq.s	.noporta	; if it was not 0, branch
+		else
+			bmi.s	.noporta	; if it was not negative, branch
+		endif
+
+		tst.b	cPortaSpeed(a5)		; check if portamento is enabled
+		beq.s	.noporta		; branch if not
+
+	; check if portamento needs to be reset
+		move.w	cFreq(a5),d0		; load current frequency to d0
+		if \chan<=0
+			bne.s	.pno0		; if it was not 0, branch
+		else
+			bpl.s	.pno0		; if it was not negative, branch
+		endif
+
+		clr.w	cPortaFreq(a5)		; clear portamento frequency
+		clr.w	cPortaDisp(a5)		; clear portamento displacement
+		bra.s	.noporta
+
+.pno0	; process the portamento itself
+		add.w	cPortaFreq(a5),d1	; make sure pitch makes no jumps
+		sub.w	d1,d0			; get the frequency difference to d0
+
+		neg.w	d0			; store displacement as a negative value
+		move.w	d0,cPortaFreq(a5)	; save as new frequency displacement
+		neg.w	d0			; turn positive again for calculations
+
+		if \chan=0
+		; for FM, process frequency difference differently
+			move.w	#$800+$25D-$4C0,d2; get frequency addition to d2
+			move.w	d0,d1		; copy the difference to d0
+			bpl.s	.pposf		; branch if positive
+			neg.w	d1		; else, negate it
+			neg.w	d2		; also negate addition to become substraction
+
+.pposf
+			and.w	#$F800,d1	; get only the octave difference
+			beq.s	.skipfd		; if 0, branch
+
+.pgetf
+			sub.w	d2,d0		; account for skipping part of the frequency stuff
+			sub.w	#$800,d1	; check if octave difference is 0 now
+			bne.s	.pgetf		; if not, loop
+
+.skipfd
+		endif
+
+		ext.l	d0			; extend to long word (for divs)
+		moveq	#0,d1
+		move.b	cPortaSpeed(a5),d1	; load portamento speed to d1
+		divs	d1,d0			; divide offset by speed count
+
+	; make sure that the frequency displacement is never 0
+		tst.w	d0			; check if resulting displacement is 0
+		bne.s	.portanz		; branch if not
+		moveq	#1,d0			; prepare 1; forwards portamento
+
+		tst.w	cPortaFreq(a5)		; check if we need to go forwards
+		bpl.s	.portanz		; if so, branch
+		moveq	#-1,d0			; portamento backwards
+
+.portanz
+		move.w	d0,cPortaDisp(a5)	; save portamento displacement value
+
+.noporta
+	endif
+
+	if FEATURE_MODULATION|(\sfx=0)|(\chan=1)
 		btst	#cfbHold,(a5)		; check if we are holding
 		bne.s	.endpn			; if we are, branch
+	endif
 
-	if sfx=0
+	if \sfx=0
 		move.b	cNoteTimeMain(a5),cNoteTimeCur(a5); copy note timeout value
 	endif
 
-	if psg<>0
+	if FEATURE_DACFMVOLENV|(\chan=1)
 		clr.b	cEnvPos(a5)		; clear envelope position if PSG channel
 	endif
 
+	if FEATURE_MODENV
+		clr.b	cModEnvPos(a5)		; clear modulation envelope position
+		clr.b	cModEnvSens(a5)		; clear modulation envelope sensitivity (set to 1x)
+	endif
+
+	if FEATURE_MODULATION
 		btst	#cfbMod,(a5)		; check if modulation is enabled
 		beq.s	.endpn			; if not, branch
 
-		movea.l	cMod(a5),a1		; get modulation data address
+		move.l	cMod(a5),a1		; get modulation data address
 		move.b	(a1)+,cModDelay(a5)	; copy delay
 		move.b	(a1)+,cModSpeed(a5)	; copy speed
 		move.b	(a1)+,cModStep(a5)	; copy step offset
@@ -163,6 +344,7 @@ dProcNote	macro sfx, psg
 		lsr.b	#1,d0			; halve it
 		move.b	d0,cModCount(a5)	; save as the current number of steps
 		clr.w	cModFreq(a5)		; clear frequency offset
+	endif
 .endpn
     endm
 ; ===========================================================================
@@ -221,7 +403,7 @@ dKeyOnFM	macro
 dGetFreqPSG	macro
 		subi.b	#$81,d5			; sub $81 from the note (notes start at $80)
 		bhs.s	.norest			; branch if note wasnt $80 (rest)
-		bset	#cfbRest,(a5)		; set channel to resting
+		or.b	#(1<<cfbRest)|(1<<cfbVol),(a5); set channel to resting and request a volume update (update on next note-on)
 		move.w	#-1,cFreq(a5)		; set invalid PSG frequency
 		jsr	dMutePSGmus(pc)		; mute this PSG channel
 		bra.s	.freqgot
@@ -236,5 +418,37 @@ dGetFreqPSG	macro
 		AMPS_Debug_NotePSG		; check if the note was valid
 	endif
 .freqgot
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Macro for stopping channel based on its type
+; ---------------------------------------------------------------------------
+
+dStopChannel	macro	stop
+		tst.b	cType(a5)		; check if this was a PSG channel
+		bmi.s	.mutePSG		; if yes, mute it
+
+		btst	#ctbDAC,cType(a5)	; check if this was a DAC channel
+		bne.s	.cont			; if we are, skip
+
+	if stop=0
+		jsr	dKeyOffFM(pc)		; send key-off command to YM
+		bra.s	.cont
+	else
+		jmp	dKeyOffFM(pc)		; send key-off command to YM
+	endif
+; ---------------------------------------------------------------------------
+
+.mutePSG
+	if stop=0
+		jsr	dMutePSGmus(pc)		; mute PSG channel
+	else
+		jmp	dMutePSGmus(pc)		; mute PSG channel
+	endif
+
+.cont
+	if stop<>0
+		rts
+	endif
     endm
 ; ===========================================================================
