@@ -77,12 +77,12 @@ cModEnvSens	rs.b 1		; sensitivity of modulation envelope
 
 cLoop		rs.b 3		; loop counter values
 cSizeSFX	rs.w 0		; size of each SFX track (this also sneakily makes sure the memory is aligned to word always. Additional loop counter may be added if last byte is odd byte)
-cPrio =		__rs-2		; sound effect channel priority. SFX only
+cPrio =		__rs-1		; sound effect channel priority. SFX only
 
 	if FEATURE_DACFMVOLENV
-cStatPSG4 =	cVoice		; PSG4 type value. PSG3 only
+cStatPSG4 =	cPanning	; PSG4 type value. PSG3 only
 	else
-cStatPSG4 =	__rs-1		; PSG4 type value. PSG3 only
+cStatPSG4 =	__rs-2		; PSG4 type value. PSG3 only
 	endif
 
 cNoteTimeCur	rs.b 1		; frame counter to note off. Music only

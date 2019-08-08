@@ -73,9 +73,7 @@ dLoadFade:
 
 .nofade
 		move.l	a1,mFadeAddr.w		; save new fade program address to memory
-		move.b	(a1)+,mMasterVolFM.w	; save new FM master volume
-		move.b	(a1)+,mMasterVolDAC.w	; save new DAC master volume
-		move.b	(a1)+,mMasterVolPSG.w	; save new PSG master volume
+		move.b	d0,mMasterVolFM.w	; put vol back
 		rts
 
 .search
@@ -264,14 +262,13 @@ dUpdateAllAMPS:
 
 		btst	#mfbNoPAL,mFlags.w	; check if we have disabled the PAL fix
 		bne.s	.nofix			; if yes, run music and SFX
-		bsr.s	.nosfx			; run the sound driver
+		bsr.s	.driver			; run the sound driver
 
 .nofix
 		move.b	#6-1,mCtrPal.w		; reset counter
-.driver
-		bsr.w	dAMPSdoSFX		; run SFX this time
 
-.nosfx		; continue to run sound driver again
+.driver
+		; continue to run sound driver again
 ; ---------------------------------------------------------------------------
 ; There are 2 methods of handling tempo adjustments in SMPS,
 ; overflow (where a value is added to the accumulator, and when it

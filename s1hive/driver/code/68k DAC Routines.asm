@@ -190,10 +190,10 @@ dFreqDAC1:
 ; ---------------------------------------------------------------------------
 
 dAMPSdoSFX:
-		lea	mSFXDAC1-cSizeSFX.w,a5	; get SFX DAC1 channel RAM address into a5
+		lea	mSFXDAC1-cSize.w,a5	; get SFX DAC1 channel RAM address into a5
 
 dAMPSdoDACSFX:
-		add.w	#cSizeSFX,a5		; go to the next channel
+		add.w	#cSize,a5		; go to the next channel
 		tst.b	(a5)			; check if channel is running a tracker
 		bpl.w	.next			; if not, branch
 
