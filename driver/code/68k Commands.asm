@@ -614,7 +614,9 @@ locret_FreqOff:
 
 dcVolEnv:
 	if FEATURE_DACFMVOLENV=0
+	if safe=1
 		AMPS_Debug_dcVolEnv		; display an error if an invalid channel attempts to load a volume envelope
+	endif
 	endif
 
 		move.b	(a4)+,cVolEnv(a5)	; load the volume envelope ID
@@ -629,7 +631,7 @@ dcModEnv:
 		move.b	(a4)+,cModEnv(a5)	; load the modulation envelope ID
 		rts
 
-	else
+	elseif safe=1
 		AMPS_Debug_dcModEnv		; display an error if disabled
 	endif
 ; ===========================================================================
@@ -734,8 +736,10 @@ dcVoice:
 		move.b	d0,cVoice(a5)		; save to channel
 
 	if FEATURE_DACFMVOLENV
-		AMPS_Debug_dcVoiceEnv		; warn user if DAC & FM volume envelopes are enabled. This behaviour can be removed
-	else					; for better integration of FM/DAC tracker code with PSG channels.
+		if safe=1
+			AMPS_Debug_dcVoiceEnv	; warn user if DAC & FM volume envelopes are enabled. This behaviour can be removed
+		endif				; for better integration of FM/DAC tracker code with PSG channels.
+	else
 		tst.b	cType(a5)		; check if this is a PSG channel
 		bmi.s	locret_Backup		; if is, skip
 	endif

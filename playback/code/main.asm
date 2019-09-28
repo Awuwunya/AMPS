@@ -54,13 +54,13 @@ SystemFont:
 	include "code/decomp.asm"	; decompressor routines
 
 ; ===========================================================================
-	align $10000
-	include "driver/code/68k.asm"
-	opt ae-
-
 DualPCM:	z80prog 0
 		include "driver/code/z80.asm"
 DualPCM_sz:	z80prog
+
+	align $10000
+	include "driver/code/68k.asm"
+	opt ae-
 
 ; ===========================================================================
 	opt ae+

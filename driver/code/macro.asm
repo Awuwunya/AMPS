@@ -317,19 +317,19 @@ fLast		rs.l 0		; safe mode equate
 ; ---------------------------------------------------------------------------
 
 dCLEAR_MEM	macro len, block
-		move.w	#((\len)/(\block))-1,d1	; load repeat count to d7
+		move.w	#((\len)/(\block))-1,d1; load repeat count to d7
 .c\@
 	rept (\block)/4
-		clr.l	(a1)+			; clear driver and music channel memory
+		clr.l	(a1)+		; clear driver and music channel memory
 	endr
-		dbf	d1, .c\@		; loop for each longword to clear it...
+		dbf	d1, .c\@	; loop for each longword to clear it...
 
 	rept ((\len)%(\block))/4
-		clr.l	(a1)+			; clear extra longs of memory
+		clr.l	(a1)+		; clear extra longs of memory
 	endr
 
 	if (\len)&2
-		clr.w	(a1)+			; if there is an extra word, clear it too
+		clr.w	(a1)+		; if there is an extra word, clear it too
 	endif
     endm
 ; ===========================================================================

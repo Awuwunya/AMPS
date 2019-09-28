@@ -281,6 +281,7 @@ SWFR_Stop:	dcb.b	Z80E_Read*(MaxPitch/$100),$00
 	incSWF	KcTom, KcSnare, KcTamb, Kc87, KcCrash, KcCymbal
 	incSWF	KaikuL1, KaikuL2, KaikuL3, Kaiku1, Kaiku2, Kaiku3, Kaiku4, Kaiku5
 	incSWF	Meow, Lazer, Sarobasso
+	even
 	opt ae+				; enable automatic evens
 	list				; continue source listing
 ; ===========================================================================

@@ -289,7 +289,7 @@ dUpdateFreqFM3:
 		jsr	WriteChYM(pc)		; write to YM according to channel
 
 		move.b	d6,d1			; copy lower byte of frequency into d1 (value)
-		move.b	#$FFFFFFA0,d0		; YM command: Frequency LSB
+		moveq	#$FFFFFFA0,d0		; YM command: Frequency LSB
 		jmp	WriteChYM(pc)		; write to YM according to channel
 
 dUpdFreqFMrest:
