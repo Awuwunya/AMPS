@@ -255,8 +255,6 @@ dAMPSnextFM:
 ; ---------------------------------------------------------------------------
 
 dUpdateFreqFM:
-		btst	#cfbRest,(a5)		; is this channel resting
-		bne.s	locret_UpdFreqFM	; if is, skip
 		move.w	cFreq(a5),d6		; load channel base frequency to d6
 		beq.s	dUpdFreqFMrest		; if 0, this channel should be resting
 
@@ -283,6 +281,9 @@ dUpdateFreqFM2:
 		bne.s	locret_UpdFreqFM	; if is, do not update frequency anyway
 
 dUpdateFreqFM3:
+		btst	#cfbRest,(a5)		; is this channel resting
+		bne.s	locret_UpdFreqFM	; if is, skip
+
 		move.w	d6,d1			; copy frequency to d1
 		lsr.w	#8,d1			; shift upper byte into lower byte
 		moveq	#$FFFFFFA4,d0		; YM command: Frequency MSB & Octave

@@ -497,7 +497,7 @@ AMPS_Debug_dcBackup	macro
 	endif
     endm
 
-	if FEATURE_MODENV=0
+	if FEATURE_BACKUP=0
 	if def(RaiseError)	; check if Vladik's debugger is active
 AMPS_DebugR_dcBackup:
 		RaiseError "Backup feature is disabled. Set FEATURE_BACKUP to 1 to enable.", AMPS_Debug_Console_Channel
