@@ -12,4 +12,4 @@
 	include "driver/code/68k Envelopes.asm"		; code for processing various envelopes
 	include "driver/code/68k PlaySnd.asm"		; routine for playing sounds
 	include "driver/code/68k Commands.asm"		; routine for proecessing commands
-	include "driver/code/Data.asm"			; all the data related to the driver
+	include "driver/.Data"				; all the data related to the driver

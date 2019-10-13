@@ -380,7 +380,12 @@ ssLFO		macro reg, ams, fms, pan
 ;  zz: number of steps
 ; (MOD_SETUP)
 ssMod68k	macro wait, speed, step, count
-	dc.b $F0, \wait,\speed,\step,\count
+	dc.b $F0
+	sModData \wait,\speed,\step,\count
+    endm
+
+sModData	macro wait, speed, step, count
+	dc.b \speed, \count, \wait, \step
     endm
 
 ; F1xx - Set portamento speed to xx frames. 0 means portamento is disabled (PORTAMENTO)

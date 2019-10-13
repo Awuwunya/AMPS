@@ -4,6 +4,7 @@
 ; ---------------------------------------------------------------------------
 	opt ae+
 
+FEATURE_SFX_MASTERVOL =	0	; set to 1 to make SFX use master volumes
 FEATURE_MODULATION =	1	; set to 1 to enable software modulation effect
 FEATURE_PORTAMENTO =	1	; set to 1 to enable portamento flag
 FEATURE_MODENV =	1	; set to 1 to enable modulation envelopes

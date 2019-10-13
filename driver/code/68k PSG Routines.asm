@@ -19,7 +19,7 @@ dAMPSnextPSGSFX:
 		bsr.w	dUpdateFreqPSG3		; if frequency needs changing, do it
 
 .endm
-		bsr.w	dEnvelopePSG		; run envelope program
+		bsr.w	dEnvelopePSG_SFX	; run envelope program
 .next
 		dbf	d7,dAMPSnextPSGSFX	; make sure to run all the channels
 		jmp	dCheckTracker(pc)	; after that, check tracker and end loop
@@ -41,7 +41,7 @@ dAMPSnextPSGSFX:
 .pcnote
 	dProcNote 1, 1				; reset necessary channel memory
 		bsr.w	dUpdateFreqPSG		; update hardware frequency
-		bsr.w	dEnvelopePSG		; run envelope program
+		bsr.w	dEnvelopePSG_SFX	; run envelope program
 		dbf	d7,dAMPSnextPSGSFX	; make sure to run all the channels
 	; continue to check tracker and end loop
 ; ===========================================================================
@@ -178,16 +178,25 @@ locret_UpdateFreqPSG:
 ; Routine for running envelope programs
 ; ---------------------------------------------------------------------------
 
+dEnvelopePSG_SFX:
+	if FEATURE_SFX_MASTERVOL=0
+		btst	#cfbRest,(a5)		; check if channel is resting
+		bne.s	locret_UpdateFreqPSG	; if is, do not update anything
+
+		move.b	cVolume(a5),d5		; load channel volume to d5
+		bra.s	dEnvelopePSG2		; do not add master volume
+	endif
+
 dEnvelopePSG:
 		btst	#cfbRest,(a5)		; check if channel is resting
 		bne.s	locret_UpdateFreqPSG	; if is, do not update anything
 
 		move.b	mMasterVolPSG.w,d5	; load PSG master volume to d5
 		add.b	cVolume(a5),d5		; add channel volume to d5
-		bpl.s	.nocap			; branch if volume did not overflow
+		bpl.s	dEnvelopePSG2		; branch if volume did not overflow
 		moveq	#$7F,d5			; set to maximum volume
 
-.nocap
+dEnvelopePSG2:
 		moveq	#0,d4
 		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
 		beq.s	.ckflag			; if 0, check if volume update was needed

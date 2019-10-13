@@ -162,11 +162,11 @@ dModulate	macro jump,loop,type
 		subq.b	#1,cModSpeed(a5)	; decrease modulation speed counter
 		bne.s	.noret			; if there's still delay left, update vol and return
 		movea.l	cMod(a5),a1		; get modulation data offset to a1
-		move.b	1(a1),cModSpeed(a5)	; reset modulation speed counter
+		move.b	(a1)+,cModSpeed(a5)	; reset modulation speed counter
 
 		tst.b	cModCount(a5)		; check if this was the last step
 		bne.s	.norev			; if was not, do not reverse
-		move.b	3(a1),cModCount(a5)	; reset steps counter
+		move.b	(a1)+,cModCount(a5)	; reset steps counter
 		neg.b	cModStep(a5)		; negate step amount
 
 .norev
@@ -336,14 +336,15 @@ dProcNote	macro sfx, chan
 		beq.s	.endpn			; if not, branch
 
 		move.l	cMod(a5),a1		; get modulation data address
-		move.b	(a1)+,cModDelay(a5)	; copy delay
+		clr.w	cModFreq(a5)		; clear frequency offset
 		move.b	(a1)+,cModSpeed(a5)	; copy speed
-		move.b	(a1)+,cModStep(a5)	; copy step offset
 
-		move.b	(a1),d0			; get number of steps
+		move.b	(a1)+,d0		; get number of steps
 		lsr.b	#1,d0			; halve it
 		move.b	d0,cModCount(a5)	; save as the current number of steps
-		clr.w	cModFreq(a5)		; clear frequency offset
+
+		move.b	(a1)+,cModDelay(a5)	; copy delay
+		move.b	(a1)+,cModStep(a5)	; copy step offset
 	endif
 .endpn
     endm
