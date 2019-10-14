@@ -9,8 +9,8 @@ ChoosePath_Header:
 	sHeaderFM	ChoosePath_FM3, $02, $1A
 	sHeaderFM	ChoosePath_FM4, $02, $15
 	sHeaderFM	ChoosePath_FM5, $02, $1A
-	sHeaderPSG	ChoosePath_PSG1, $DE, $20, $00, v00
-	sHeaderPSG	ChoosePath_PSG2, $DE, $28, $00, v00
+	sHeaderPSG	ChoosePath_PSG1, $DE+$0C, $20, $00, v00
+	sHeaderPSG	ChoosePath_PSG2, $DE+$0C, $28, $00, v00
 	sHeaderPSG	ChoosePath_PSG3, $00, $00, $00, vRistar02
 
 	; Patch $00
@@ -500,24 +500,24 @@ ChoosePath_PSG3:
 	dc.b nRst, $06, nRst, $0C
 
 ChoosePath_Loop11:
-	dc.b nA5, $04, nA5, nA5, nA5, nA5, nA5, nA5
-	dc.b nA5, nA5, nA5, $02, nA5, nA5, nA5, nA5
-	dc.b nA5
+	dc.b nHiHat, $04, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat
+	dc.b nHiHat, nHiHat, nHiHat, $02, nHiHat, nHiHat, nHiHat, nHiHat
+	dc.b nHiHat
 	sLoop		$00, $02, ChoosePath_Loop11
 
 ChoosePath_Loop12:
-	dc.b nA5, $04, nA5, nA5
+	dc.b nHiHat, $04, nHiHat, nHiHat
 	sLoop		$00, $08, ChoosePath_Loop12
 
 ChoosePath_Loop13:
-	dc.b nA5, $04, nA5, nA5, nA5, nA5, nA5, nA5
-	dc.b nA5, nA5, nA5, $02, nA5, nA5, nA5, nA5
-	dc.b nA5
+	dc.b nHiHat, $04, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat
+	dc.b nHiHat, nHiHat, nHiHat, $02, nHiHat, nHiHat, nHiHat, nHiHat
+	dc.b nHiHat
 	sLoop		$00, $02, ChoosePath_Loop13
 
 ChoosePath_Loop14:
-	dc.b nA5, $04, nA5, nA5
+	dc.b nHiHat, $04, nHiHat, nHiHat
 	sLoop		$00, $06, ChoosePath_Loop14
-	dc.b nA5, $02, nA5, nA5, nA5, nA5, nA5, nA5
-	dc.b $04, nA5, nA5
+	dc.b nHiHat, $02, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat
+	dc.b $04, nHiHat, nHiHat
 	sJump		ChoosePath_Loop14

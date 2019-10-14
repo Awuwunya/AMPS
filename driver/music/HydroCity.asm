@@ -9,8 +9,8 @@ HCZ2_Header:
 	sHeaderFM	HCZ2_FM3, $18, $13
 	sHeaderFM	HCZ2_FM4, $0C, $0F
 	sHeaderFM	HCZ2_FM5, $0C, $0C
-	sHeaderPSG	HCZ2_PSG1, $F4-$0C, $20, $00, v00
-	sHeaderPSG	HCZ2_PSG2, $F4-$0C, $20, $00, v00
+	sHeaderPSG	HCZ2_PSG1, $F4, $20, $00, v00
+	sHeaderPSG	HCZ2_PSG2, $F4, $20, $00, v00
 	sHeaderPSG	HCZ2_PSG3, $00, $18, $00, v00
 
 	; Universal sound bank from S3K
@@ -1297,178 +1297,160 @@ HCZ2_PSG3:
 	sNoisePSG	$E7
 
 HCZ2_Jump1:
-	dc.b nRst, $18, nRst, $18, nRst, $18, nRst, $18
-	dc.b nRst, $18
+	dc.b nRst, $78
 	sVolEnv		vS3K_01
-	dc.b nA5, $04, nA5, $04, nA5, $04
+	dc.b nHiHat, $04, $04, $04
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, sHold, $06
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C, sHold, $18, sHold, $18, sHold, $18
-	dc.b sHold, $18, sHold, $18, sHold, $18, nA5, $04
-	dc.b nA5, $04, nA5, $04
+	dc.b $6C, sHold, $30, $04, $04, $04
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, sHold, $06
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C, sHold, $18
+	dc.b $24
 
 HCZ2_Loop1:
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06
+	dc.b $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06
+	dc.b $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06, $06
+	dc.b $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06
+	dc.b $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06
+	dc.b $06
 	sLoop		$01, $03, HCZ2_Loop1
-	dc.b nA5, $06, nA5, $06
+	dc.b $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06
+	dc.b $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, sHold, $18, sHold, $18
-	dc.b sHold, $18, sHold, $18
+	dc.b $06, $06, $06, $06, $06, $06, $06, $06
+	dc.b $06, $66
 
 HCZ2_Loop2:
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sLoop		$01, $03, HCZ2_Loop2
-	dc.b sHold, $18, sHold, $18, sHold, $18, sHold, $18
+	dc.b sHold, $60
 
 HCZ2_Loop3:
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_01
-	dc.b nA5, $0C
+	dc.b $0C
 	sVolEnv		vS3K_08
-	dc.b nA5, $0C
+	dc.b $0C
 	sLoop		$01, $03, HCZ2_Loop3
-	dc.b sHold, $18, sHold, $18, sHold, $18, sHold, $18
+	dc.b sHold, $60
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06
+	dc.b $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, sHold, $18, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06, $06
+	dc.b $06, $06, $06, $06, $1E, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, nA5, $06, nA5, $06, nA5, $06
-	dc.b nA5, $06, nA5, $06, nA5, $06
+	dc.b $06, $06, $06, $06, $06, $06, $06
 	sVolEnv		vS3K_08
-	dc.b nA5, $06
+	dc.b $06
 	sVolEnv		vS3K_01
-	dc.b nA5, $06, sHold, $18, sHold, $18, sHold, $18
-	dc.b sHold, $18
+	dc.b $66
 	sJump		HCZ2_Jump1

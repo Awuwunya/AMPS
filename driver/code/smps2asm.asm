@@ -27,6 +27,7 @@ _num =	$80
 	enum nC5,nCs5,nD5,nEb5,nE5,nF5,nFs5,nG5,nAb5,nA5,nBb5,nB5
 	enum nC6,nCs6,nD6,nEb6,nE6,nF6,nFs6,nG6,nAb6,nA6,nBb6,nB6
 	enum nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
+nHiHat =	nA6
 ; ---------------------------------------------------------------------------------------------
 ; Other Equates
 ; ---------------------------------------------------------------------------------------------
@@ -87,20 +88,20 @@ sHeaderDAC	macro loc,vol,samp
 ; Header - Set up FM Channel
 sHeaderFM	macro loc,pitch,vol
 	dc.w \loc-sPointZero
-	dc.b \pitch,\vol
+	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 
 ; Header - Set up PSG Channel
 sHeaderPSG	macro loc,pitch,vol,detune,volenv
 	dc.w \loc-sPointZero
-	dc.b \pitch,\vol,\detune,\volenv
+	dc.b (\pitch)&$FF,(\vol)&$FF,(\detune)&$FF,\volenv
     endm
 
 ; Header - Set up SFX Channel
 sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.b \flags,\type
 	dc.w \loc-sPointZero
-	dc.b \pitch,\vol
+	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 ; ---------------------------------------------------------------------------------------------
 ; Command Flag Macros and Equates. Based on the original s1smps2asm, and Flamewing's smps2asm
@@ -340,6 +341,16 @@ ssTempo		macro val
 	dc.b $EA, \val
     endm
 
+; FF18xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
+saTempoSpeed	macro tempo
+	dc.b $FF,$18, \tempo
+    endm
+
+; FF1Cxx - Add xx to music tempo (TEMPO - TEMPO_ADD)
+saTempo		macro tempo
+	dc.b $FF,$1C, \tempo
+    endm
+
 ; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
 sModeSampDAC	macro
 	dc.b $EB
@@ -373,7 +384,7 @@ ssLFO		macro reg, ams, fms, pan
 	endif
     endm
 
-; F0wwxxyyzz - Modulation
+; F0xxzzwwyy - Modulation
 ;  ww: wait time
 ;  xx: modulation speed
 ;  yy: change per step
@@ -482,16 +493,6 @@ sSpinRev	macro
 ; FF14 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
 sSpinReset	macro
 	dc.b $FF,$14
-    endm
-
-; FF18xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
-saTempoSpeed	macro tempo
-	dc.b $FF,$18, \tempo
-    endm
-
-; FF1Cxx - Add xx to music tempo (TEMPO - TEMPO_ADD)
-saTempo		macro tempo
-	dc.b $FF,$1C, \tempo
     endm
 
 ; FF20xyzz - Get RAM address pointer offset by y, compare zz with it using condition x (COMM_CONDITION - COMM_SPEC)

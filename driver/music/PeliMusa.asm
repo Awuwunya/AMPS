@@ -14,8 +14,8 @@ Pelimusa_Header:
 	sHeaderFM	Pelimusa_FM3, $00, $16
 	sHeaderFM	Pelimusa_FM4, $00, $17
 	sHeaderFM	Pelimusa_FM5, $00, $18
-	sHeaderPSG	Pelimusa_PSG1, $00, $50, $30, vRistar10
-	sHeaderPSG	Pelimusa_PSG2, $00, $40, $00, vCol3_02
+	sHeaderPSG	Pelimusa_PSG1, $0C, $50, $30, vRistar10
+	sHeaderPSG	Pelimusa_PSG2, $0C, $40, $00, vCol3_02
 	sHeaderPSG	Pelimusa_PSG3, $00, $40, $00, v00
 
 	; Patch $00 - Syntikkabasso 1 and 2 (From Columns III)
@@ -734,7 +734,7 @@ Pelimusa_PSG3_Hat	macro	len
 Pelimusa_PSG3_State = 0
 	endif
 
-	dc.b nA5
+	dc.b nHiHat
 	rept narg
 		dc.b \len
 	shift
@@ -749,7 +749,7 @@ Pelimusa_PSG3_Bell	macro	len
 Pelimusa_PSG3_State = 1
 	endif
 
-	dc.b nC5
+	dc.b nC6
 	rept narg
 		dc.b  \len
 	shift

@@ -9,9 +9,9 @@ Pray_Header:
 	sHeaderFM	Pray_FM3, $00, $0D
 	sHeaderFM	Pray_FM2, $00, $0D
 	sHeaderFM	Pray_FM5, $00, $15
-	sHeaderPSG	Pray_PSG1, $E8, $28, $00, v00
-	sHeaderPSG	Pray_PSG2, $E8, $28, $00, v00
-	sHeaderPSG	Pray_PSG3, $1B, $08, $00, v00
+	sHeaderPSG	Pray_PSG1, $E8+$0C, $28, $00, v00
+	sHeaderPSG	Pray_PSG2, $E8+$0C, $28, $00, v00
+	sHeaderPSG	Pray_PSG3, $00, $08, $00, v00
 
 	; Patch $00
 	; $3B
@@ -555,43 +555,43 @@ Pray_Jump2:
 Pray_PSG3:
 	sNoisePSG	$E7
 	ssMod68k	$01, $01, $00, $00
-	dc.b nRst, $7F, $7F, $7F, $02
+	dc.b nRst, $70, $70, $7F, $20
 
 Pray_Loop4:
 	sVolEnv		vRistar18
-	dc.b nFs3, $08, $04
+	dc.b nHiHat, $08, $04
 	sVolEnv		vRistar10
-	dc.b nFs3, $08
+	dc.b $08
 	sVolEnv		vRistar18
-	dc.b nFs3, $04
+	dc.b $04
 	sLoop		$00, $03, Pray_Loop4
 	sVolEnv		vRistar18
-	dc.b nFs3, $08, $04
+	dc.b $08, $04
 	sVolEnv		vRistar10
-	dc.b nFs3, $08, $04
+	dc.b $08, $04
 	sLoop		$01, $03, Pray_Loop4
-	dc.b nRst, $30, nRst
+	dc.b $30, nRst
 
 Pray_Cond1:
 Pray_Loop1:
 Pray_Jump1:
 	sVolEnv		vRistar18
-	dc.b nFs3, $08, $04
+	dc.b nHiHat, $08, $04
 	sVolEnv		vRistar10
-	dc.b nFs3, $08
+	dc.b $08
 	sVolEnv		vRistar18
-	dc.b nFs3, $04
+	dc.b $04
 	sLoop		$00, $16, Pray_Loop1
 	sVolEnv		vRistar10
-	dc.b nFs3, $14, $10, $0C
+	dc.b $14, $10, $0C
 	sVolEnv		vRistar18
 
 Pray_Loop2:
-	dc.b nFs3, $08, $04
+	dc.b $08, $04
 	sVolEnv		vRistar10
-	dc.b nFs3, $08
+	dc.b $08
 	sVolEnv		vRistar18
-	dc.b nFs3, $04
+	dc.b $04
 	sLoop		$00, $08, Pray_Loop2
 	sJump		Pray_Jump1
 

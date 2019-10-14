@@ -9,8 +9,8 @@ SmoothCriminal_Header:
 	sHeaderFM	SmoothCriminal_FM3, $00, $16
 	sHeaderFM	SmoothCriminal_FM4, $00, $16
 	sHeaderFM	SmoothCriminal_FM5, $00, $16
-	sHeaderPSG	SmoothCriminal_PSG1, $DC, $38, $00, v00
-	sHeaderPSG	SmoothCriminal_PSG2, $DC, $38, $00, v00
+	sHeaderPSG	SmoothCriminal_PSG1, $DC+$0C, $38, $00, v00
+	sHeaderPSG	SmoothCriminal_PSG2, $DC+$0C, $38, $00, v00
 	sHeaderPSG	SmoothCriminal_PSG3, $00, $18, $00, vMoonWalker04
 
 	; Patch $00
@@ -694,7 +694,7 @@ SmoothCriminal_Loop21:
 SmoothCriminal_PSG3:
 	sNoisePSG	$E7
 	sNoteTimeOut	$02
-	dc.b nRst, $06, nA5
+	dc.b nRst, $06, nHiHat
 	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06
@@ -703,7 +703,7 @@ SmoothCriminal_PSG3:
 	dc.b $06
 
 SmoothCriminal_Loop22:
-	dc.b nA5, $06, $06
+	dc.b $06, $06
 	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06
@@ -711,7 +711,7 @@ SmoothCriminal_Loop22:
 	sNoteTimeOut	$02
 	dc.b $06
 	sLoop		$00, $02, SmoothCriminal_Loop22
-	dc.b nA5, $06, $06
+	dc.b $06, $06
 	sNoteTimeOut	$0A
 	dc.b $06
 	saVol		-$10
@@ -763,7 +763,7 @@ SmoothCriminal_Call10:
 	sNoteTimeOut	$02
 
 SmoothCriminal_Loop23:
-	dc.b nA5, $06, $06
+	dc.b $06, $06
 	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06
@@ -771,7 +771,7 @@ SmoothCriminal_Loop23:
 	sNoteTimeOut	$02
 	dc.b $06
 	sLoop		$00, $03, SmoothCriminal_Loop23
-	dc.b nA5, $06, $06
+	dc.b $06, $06
 	sNoteTimeOut	$0A
 	dc.b $06
 	saVol		-$10
@@ -784,7 +784,7 @@ SmoothCriminal_Call11:
 	sNoteTimeOut	$02
 
 SmoothCriminal_Loop25:
-	dc.b nA5, $06, $06
+	dc.b $06, $06
 	saVol		-$10
 	sNoteTimeOut	$0A
 	dc.b $06

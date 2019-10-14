@@ -9,9 +9,9 @@ Zaxx_Header:
 	sHeaderFM	Zaxx_FM3, $00, $10
 	sHeaderFM	Zaxx_FM4, $00, $0B
 	sHeaderFM	Zaxx_FM5, $00, $04
-	sHeaderPSG	Zaxx_PSG1, $00-$0C, $18, $00, vZaxx04
-	sHeaderPSG	Zaxx_PSG2, $00-$0C, $18, $00, vZaxx04
-	sHeaderPSG	Zaxx_PSG3, $00-$0C, $00, $00, vZaxx04
+	sHeaderPSG	Zaxx_PSG1, $00, $18, $00, vZaxx04
+	sHeaderPSG	Zaxx_PSG2, $00, $18, $00, vZaxx04
+	sHeaderPSG	Zaxx_PSG3, $00, $00, $00, vZaxx04
 
 	; Patch $00
 	; $04

@@ -9,9 +9,9 @@ Shop_Header:
 	sHeaderFM	Shop_FM3, $0C, $10
 	sHeaderFM	Shop_FM4, $0C, $0F
 	sHeaderFM	Shop_FM5, $0C, $0F
-	sHeaderPSG	Shop_PSG1, $F4, $18, $00, vPhan3_05
-	sHeaderPSG	Shop_PSG2, $00, $30, $00, vPhan3_0A
-	sHeaderPSG	Shop_PSG2, $F4, $20, $00, vPhan3_05
+	sHeaderPSG	Shop_PSG1, $F4+$0C, $18, $00, vPhan3_05
+	sHeaderPSG	Shop_PSG2, $00+$0C, $30, $00, vPhan3_0A
+	sHeaderPSG	Shop_PSG2, $F4+$0C, $20, $00, vPhan3_05
 
 	; Patch $00
 	; $24

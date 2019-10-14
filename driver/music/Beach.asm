@@ -10,9 +10,9 @@ Beach_Header:
 	sHeaderFM	Beach_FM4, $00, $00
 	sHeaderFM	Beach_FM5, $00, $05
 ;	sHeaderFM	Beach_FM6, $00, $18
-	sHeaderPSG	Beach_PSG1, $E8-$0C, $10, $00, v00
-	sHeaderPSG	Beach_PSG2, $F4-$0C, $10, $00, v00
-	sHeaderPSG	Beach_PSG3, $F4-$0C, $10, $00, v00
+	sHeaderPSG	Beach_PSG1, $E8, $10, $00, v00
+	sHeaderPSG	Beach_PSG2, $F4, $10, $00, v00
+	sHeaderPSG	Beach_PSG3, $F4, $10, $00, v00
 
 	; Patch $00
 	; $3E

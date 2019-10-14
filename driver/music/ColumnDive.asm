@@ -9,9 +9,9 @@ ColumnDive_Header:
 	sHeaderFM	ColumnDive_FM3, $F4, $14
 	sHeaderFM	ColumnDive_FM4, $F4, $1A
 	sHeaderFM	ColumnDive_FM5, $F4, $14
-	sHeaderPSG	ColumnDive_PSG1, $E8-$0C, $20, $00, v00
-	sHeaderPSG	ColumnDive_PSG2, $E8-$0C, $20, $00, v00
-	sHeaderPSG	ColumnDive_PSG3, $00-$0D, $10, $00, v00
+	sHeaderPSG	ColumnDive_PSG1, $E8, $20, $00, v00
+	sHeaderPSG	ColumnDive_PSG2, $E8, $20, $00, v00
+	sHeaderPSG	ColumnDive_PSG3, $00, $10, $00, v00
 
 	; Patch $00
 	; $20
@@ -351,22 +351,22 @@ ColumnDive_Jump3:
 	sVolEnv		vCol3_02
 
 ColumnDive_Loop5:
-	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
-	dc.b nBb6
+	dc.b nHiHat, $08, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat
+	dc.b nHiHat
 	sLoop		$00, $0E, ColumnDive_Loop5
-	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
+	dc.b nHiHat, $08, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat
 	sVolEnv		vCol3_05
-	dc.b nA6, $20, nRst, $20, nRst, $08
+	dc.b nAb4, $20, nRst, $20, nRst, $08
 	sVolEnv		vCol3_02
 
 ColumnDive_Loop6:
-	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
-	dc.b nBb6
+	dc.b nHiHat, $08, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat
+	dc.b nHiHat
 	sLoop		$00, $0E, ColumnDive_Loop6
-	dc.b nBb6, $08, nBb6, nBb6, nBb6, nBb6, nBb6, nBb6
+	dc.b nHiHat, $08, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat, nHiHat
 	sVolEnv		vCol3_05
-	dc.b nA6, $20, nRst, $20, nRst, $08, nRst, $20
-	dc.b nRst, nRst, nRst, $18, nA6, $20, nRst, $20
+	dc.b nAb4, $20, nRst, $20, nRst, $08, nRst, $20
+	dc.b nRst, nRst, nRst, $18, nAb4, $20, nRst, $20
 	dc.b nRst, $08
 	sJump		ColumnDive_Jump3
 

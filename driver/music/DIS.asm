@@ -9,9 +9,9 @@ Dis_Header:
 	sHeaderFM	Dis_FM3, $0C, $10
 	sHeaderFM	Dis_FM4, $00, $10
 	sHeaderFM	Dis_FM5, $00, $10
-	sHeaderPSG	Dis_PSG1, $F4-$0C, $00, $00, vKc08
-	sHeaderPSG	Dis_PSG2, $F4-$0C, $18, $00, vKc08
-	sHeaderPSG	Dis_PSG3, $21-$0C, $08, $00, vKc02
+	sHeaderPSG	Dis_PSG1, $F4, $00, $00, vKc08
+	sHeaderPSG	Dis_PSG2, $F4, $18, $00, vKc08
+	sHeaderPSG	Dis_PSG3, $21, $08, $00, vKc02
 
 	; Patch $00
 	; $3A

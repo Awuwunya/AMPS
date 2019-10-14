@@ -281,7 +281,7 @@ dUpdateFreqFM:
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add to channel base frequency to d6
 
-	if FEATURE_PORTAMENTO
+	if FEATURE_MODENV
 		jsr	dModEnvProg(pc)		; process modulation envelope
 	endif
 

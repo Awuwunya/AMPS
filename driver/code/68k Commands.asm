@@ -413,7 +413,7 @@ dcsFreq:
 
 	if safe=1		; NOTE: You can remove this check, but its unsafe to do so!
 		btst	#ctbDAC,cType(a5)	; check if this is a DAC channel
-		bne.s	.rts			; if so, bránch
+		bne.s	.rts			; if so, branch
 		AMPS_Debug_dcInvalid		; this command should be only used with DAC channels
 	endif
 .rts
@@ -434,7 +434,7 @@ dcsFreqNote:
 
 	if safe=1		; NOTE: You can remove this check, but its unsafe to do so!
 		btst	#ctbDAC,cType(a5)	; check if this is a DAC channel
-		bne.s	.rts			; if so, bránch
+		bne.s	.rts			; if so, branch
 		AMPS_Debug_dcInvalid		; this command should be only used with DAC channels
 	endif
 .rts

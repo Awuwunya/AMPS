@@ -9,8 +9,8 @@ TowerPuppet_Header:
 	sHeaderFM	TowerPuppet_FM3, $00, $10
 	sHeaderFM	TowerPuppet_FM4, $00, $10
 	sHeaderFM	TowerPuppet_FM5, $00, $1F
-	sHeaderPSG	TowerPuppet_PSG1, $DC, $08, $00, v00
-	sHeaderPSG	TowerPuppet_PSG2, $DC, $18, $00, v00
+	sHeaderPSG	TowerPuppet_PSG1, $DC+$0C, $08, $00, v00
+	sHeaderPSG	TowerPuppet_PSG2, $DC+$0C, $18, $00, v00
 	sHeaderPSG	TowerPuppet_PSG3, $00, $08, $00, vDyHe03
 
 	; Patch $00
@@ -1767,53 +1767,53 @@ TowerPuppet_PSG3:
 TowerPuppet_Loop20:
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5, $03, nA5
+	dc.b nHiHat, $03, nHiHat
 	sNoteTimeOut	$03
 	sVolEnv		vDyHe05
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5, nA5, nA5
+	dc.b nHiHat, nHiHat, nHiHat
 	sNoteTimeOut	$03
 	sVolEnv		vDyHe05
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5, nA5, nA5
+	dc.b nHiHat, nHiHat, nHiHat
 	sNoteTimeOut	$03
 	sVolEnv		vDyHe05
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5, nA5
+	dc.b nHiHat, nHiHat
 	sNoteTimeOut	$03
 	sVolEnv		vDyHe05
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$04
 	sVolEnv		vDyHe05
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$05
 	sVolEnv		vDyHe03
-	dc.b nA5, $0C, nA5, nA5, nA5
+	dc.b nHiHat, $0C, nHiHat, nHiHat, nHiHat
 	sLoop		$00, $12, TowerPuppet_Loop20
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5, $03, nA5
+	dc.b nHiHat, $03, nHiHat
 	sNoteTimeOut	$03
 	sVolEnv		vDyHe05
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5, nA5, nA5
+	dc.b nHiHat, nHiHat, nHiHat
 	sNoteTimeOut	$03
 	sVolEnv		vDyHe05
-	dc.b nA5
+	dc.b nHiHat
 	sNoteTimeOut	$01
 	sVolEnv		vDyHe03
-	dc.b nA5
+	dc.b nHiHat
 	sJump		TowerPuppet_PSG3
 
 TowerPuppet_DAC1:

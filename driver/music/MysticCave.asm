@@ -9,8 +9,8 @@ MysticCave_Header:
 	sHeaderFM	MysticCave_FM3, $00, $0C
 	sHeaderFM	MysticCave_FM4, $00, $10
 	sHeaderFM	MysticCave_FM5, $00, $10
-	sHeaderPSG	MysticCave_PSG1, $DC, $20, $00, vS2_0B
-	sHeaderPSG	MysticCave_PSG2, $DC, $10, $00, vS2_01
+	sHeaderPSG	MysticCave_PSG1, $DC+$0C, $20, $00, vS2_0B
+	sHeaderPSG	MysticCave_PSG2, $DC+$0C, $10, $00, vS2_01
 	sHeaderPSG	MysticCave_PSG3, $00, $18, $00, vS2_02
 
 	; Patch $00
@@ -517,10 +517,10 @@ MysticCave_FM45DAC2_1:
 
 MysticCave_PSG3:
 	sNoisePSG	$E7
-	dc.b nRst, $30, nRst
+	dc.b nRst, $60
 
 MysticCave_Jump5:
-	dc.b nA5, $0C, $08, $04
+	dc.b nHiHat, $0C, $08, $04
 	sJump		MysticCave_Jump5
 
 MysticCave_DAC1:
