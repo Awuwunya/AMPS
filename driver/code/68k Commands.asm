@@ -779,10 +779,6 @@ dUpdateVoiceFM:
 		move.b	(a2)+,(a3)+		; copy each command
 	endr
 
-	if FEATURE_UNDERWATER
-		moveq	#0,d6			; reset the modulator offset
-	endif
-
 		moveq	#4-1,d5			; prepare 4 operators to d5
 		move.b	cVolume(a5),d3		; load FM channel volume to d3
 
@@ -798,15 +794,22 @@ dUpdateVoiceFM:
 .noover
 	if FEATURE_UNDERWATER
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
-		beq.s	.tlloop			; if not, skip
-		move.b	d4,d6			; copy algorithm and feedback to d6
-		and.w	#7,d6			; mask out everything but the algorithm
-		add.b	d6,d3			; add algorithm to Total Level carrier offset
-		bpl.s	.noover2		; if volume did not overflow, skip
-		moveq	#$7F,d3			; force FM volume to silence
+		beq.s	.nouw			; if not, skip
+		and.w	#7,d4			; mask out everything but the algorithm
 
-.noover2
-		move.b	d4,d6			; set algorithm and feedback to modulator offset
+		lea	dUnderwaterTbl(pc),a2	; get underwater table to a2
+		move.b	(a2,d4.w),d6		; get the value from table
+		move.b	d6,d4			; copy to d4
+		and.w	#7,d6			; mask out extra stuff
+
+		lea	dOpTLFM(pc),a2		; restore old array
+		add.b	d6,d3			; add algorithm to Total Level carrier offset
+		bpl.s	.tlloop			; if volume did not overflow, skip
+		moveq	#$7F,d3			; force FM volume to silence
+		bra.s	.tlloop
+
+.nouw
+		moveq	#0,d4			; no underwater 4 u
 	endif
 
 .tlloop
@@ -822,7 +825,7 @@ dUpdateVoiceFM:
 
 .noslot
 	if FEATURE_UNDERWATER
-		add.b	d6,d1			; add modulator offset to loaded value
+		add.b	d4,d1			; add modulator offset to loaded value
 	endif
 
 .slot

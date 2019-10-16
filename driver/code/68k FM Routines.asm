@@ -81,33 +81,37 @@ dUpdateVolFM2:
 		btst	#cfbInt,(a5)		; is the channel interrupted by SFX?
 		bne.s	locret_MuteFM		; if yes, do not update
 
-	if FEATURE_UNDERWATER
-		moveq	#0,d6			; reset the modulator offset
-	endif
-
 		moveq	#0,d0
 		move.b	cVoice(a5),d0		; load FM voice ID of the channel to d0
 		move.l	a6,a1			; copy music voice table address to a1
 
-	dCALC_VOICE				; get address of the specific voice to a1
-		move.b	(a1),d0			; load algorithm and feedback to d0
-
-	if FEATURE_UNDERWATER
-		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
-		beq.s	.uwdone			; if not, skip
-		move.b	d0,d6			; copy algorithm and feedback to d6
-		and.w	#7,d6			; mask out everything but the algorithm
-		add.b	d6,d5			; add algorithm to Total Level carrier offset
-		bpl.s	.noover2		; if volume did not overflow, skip
-		moveq	#$7F,d5			; force FM volume to silence
-
-.noover2
-		move.b	d0,d6			; set algorithm and feedback to modulator offset
-	endif
+	if FEATURE_UNDERWATER=0
+		dCALC_VOICE VoiceTL		; get address of the specific voice to a1
 
 .uwdone
-		moveq	#4-1,d3			; prepare 4 operators to d3
+	else
+		dCALC_VOICE			; get address of the specific voice to a1
+		moveq	#0,d2			; clear d0 (so no underwater by default)
+
+		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
+		beq.s	.uwdone			; if not, skip
+		move.b	(a1),d2			; load algorithm and feedback to d0
+		and.w	#7,d2			; mask out everything but the algorithm
+
+		lea	dUnderwaterTbl(pc),a2	; get underwater table to a2
+		move.b	(a2,d2.w),d6		; get the value from table
+		move.b	d6,d2			; copy to d0
+		and.w	#7,d6			; mask out extra stuff
+
+		add.b	d6,d5			; add algorithm to Total Level carrier offset
+		bpl.s	.uwdone			; if volume did not overflow, skip
+		moveq	#$7F,d5			; force FM volume to silence
+
+.uwdone
 		add.w	#VoiceTL,a1		; go to the Total Level offset of the voice
+	endif
+
+		moveq	#4-1,d3			; prepare 4 operators to d3
 		lea	dOpTLFM(pc),a2		; load Total Level address table to a3
 
 .tlloop
@@ -124,7 +128,7 @@ dUpdateVolFM2:
 
 .noslot
 	if FEATURE_UNDERWATER
-		add.b	d6,d1			; add modulator offset to loaded value
+		add.b	d2,d1			; add modulator offset to loaded value
 	endif
 
 .slot
@@ -138,6 +142,14 @@ dUpdateVolFM2:
 
 locret_VolFM:
 		rts
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; values for underwater mode update
+; ---------------------------------------------------------------------------
+
+	if FEATURE_UNDERWATER
+dUnderwaterTbl:	dc.b $08, $08, $08, $08, $0A, $0E, $0E, $0F
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; YM2612 register update list
