@@ -510,7 +510,8 @@ dcPortamento:
 		bne.s	.rts			; if non-zero, branch
 		clr.w	cPortaFreq(a5)		; clear portamento frequency
 .rts		rts
-	else
+
+	elseif safe=1
 		AMPS_Debug_dcPortamento		; display an error if disabled
 	endif
 ; ===========================================================================
@@ -521,17 +522,18 @@ dcPortamento:
 dcMod68K:
 	if FEATURE_MODULATION
 		move.l	a4,cMod(a5)		; set modulation data address
-		move.b	(a4)+,cModDelay(a5)	; load modulation delay from tracker to channel
+		clr.w	cModFreq(a5)		; reset modulation frequency offset to 0
 		move.b	(a4)+,cModSpeed(a5)	; load modulation speed from tracker to channel
-		move.b	(a4)+,cModStep(a5)	; load modulation step offset from tracker to channel
 
 		move.b	(a4)+,d0		; load modulation step count from tracker to d0
 		lsr.b	#1,d0			; halve it
 		move.b	d0,cModCount(a5)	; save as modulation step count to channel
-		clr.w	cModFreq(a5)		; reset modulation frequency offset to 0
+
+		move.b	(a4)+,cModDelay(a5)	; load modulation delay from tracker to channel
+		move.b	(a4)+,cModStep(a5)	; load modulation step offset from tracker to channel
 	; continue to enabling modulation
 
-	else
+	elseif safe=1
 		AMPS_Debug_dcModulate		; display an error if disabled
 	endif
 ; ===========================================================================
@@ -543,7 +545,8 @@ dcModOn:
 	if FEATURE_MODULATION
 		bset	#cfbMod,(a5)		; enable modulation
 		rts
-	else
+
+	elseif safe=1
 		AMPS_Debug_dcModulate		; display an error if disabled
 	endif
 
@@ -551,7 +554,8 @@ dcModOff:
 	if FEATURE_MODULATION
 		bclr	#cfbMod,(a5)		; disable modulation
 		rts
-	else
+
+	elseif safe=1
 		AMPS_Debug_dcModulate		; display an error if disabled
 	endif
 ; ===========================================================================
@@ -614,7 +618,9 @@ locret_FreqOff:
 
 dcVolEnv:
 	if FEATURE_DACFMVOLENV=0
+	if safe=1
 		AMPS_Debug_dcVolEnv		; display an error if an invalid channel attempts to load a volume envelope
+	endif
 	endif
 
 		move.b	(a4)+,cVolEnv(a5)	; load the volume envelope ID
@@ -629,7 +635,7 @@ dcModEnv:
 		move.b	(a4)+,cModEnv(a5)	; load the modulation envelope ID
 		rts
 
-	else
+	elseif safe=1
 		AMPS_Debug_dcModEnv		; display an error if disabled
 	endif
 ; ===========================================================================
@@ -717,7 +723,8 @@ dcBackup:
 		cmp.b	#ctPSG4,mPSG3+cType.w	; check if PSG3 channel is in PSG4 mode
 		bne.s	locret_Backup		; if not, skip
 		move.b	mPSG3+cStatPSG4.w,dPSG	; update PSG4 status to PSG port
-	else
+
+	elseif safe=1
 		AMPS_Debug_dcBackup
 	endif
 
@@ -734,8 +741,10 @@ dcVoice:
 		move.b	d0,cVoice(a5)		; save to channel
 
 	if FEATURE_DACFMVOLENV
-		AMPS_Debug_dcVoiceEnv		; warn user if DAC & FM volume envelopes are enabled. This behaviour can be removed
-	else					; for better integration of FM/DAC tracker code with PSG channels.
+		if safe=1
+			AMPS_Debug_dcVoiceEnv	; warn user if DAC & FM volume envelopes are enabled. This behaviour can be removed
+		endif				; for better integration of FM/DAC tracker code with PSG channels.
+	else
 		tst.b	cType(a5)		; check if this is a PSG channel
 		bmi.s	locret_Backup		; if is, skip
 	endif
@@ -771,9 +780,13 @@ dUpdateVoiceFM:
 	endr
 
 		moveq	#4-1,d5			; prepare 4 operators to d5
-		moveq	#0,d6			; reset the modulator offset
-
 		move.b	cVolume(a5),d3		; load FM channel volume to d3
+
+	if FEATURE_SFX_MASTERVOL=0
+		cmpa.w	#mSFXDAC1,a5		; is this a SFX channel
+		bhs.s	.noover			; if so, do not add master volume!
+	endif
+
 		add.b	mMasterVolFM.w,d3	; add master FM volume to d3
 		bpl.s	.noover			; if volume did not overflow, skip
 		moveq	#$7F,d3			; force FM volume to silence
@@ -781,15 +794,22 @@ dUpdateVoiceFM:
 .noover
 	if FEATURE_UNDERWATER
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
-		beq.s	.tlloop			; if not, skip
-		move.b	d4,d6			; copy algorithm and feedback to d6
-		and.w	#7,d6			; mask out everything but the algorithm
-		add.b	d6,d3			; add algorithm to Total Level carrier offset
-		bpl.s	.noover2		; if volume did not overflow, skip
-		moveq	#$7F,d3			; force FM volume to silence
+		beq.s	.nouw			; if not, skip
+		and.w	#7,d4			; mask out everything but the algorithm
 
-.noover2
-		move.b	d4,d6			; set algorithm and feedback to modulator offset
+		lea	dUnderwaterTbl(pc),a2	; get underwater table to a2
+		move.b	(a2,d4.w),d6		; get the value from table
+		move.b	d6,d4			; copy to d4
+		and.w	#7,d6			; mask out extra stuff
+
+		lea	dOpTLFM(pc),a2		; restore old array
+		add.b	d6,d3			; add algorithm to Total Level carrier offset
+		bpl.s	.tlloop			; if volume did not overflow, skip
+		moveq	#$7F,d3			; force FM volume to silence
+		bra.s	.tlloop
+
+.nouw
+		moveq	#0,d4			; no underwater 4 u
 	endif
 
 .tlloop
@@ -799,10 +819,15 @@ dUpdateVoiceFM:
 		add.b	d3,d1			; add carrier offset to loaded value
 		bmi.s	.slot			; if we did not overflow, branch
 		moveq	#-1,d1			; cap to silent volume
+	if FEATURE_UNDERWATER
 		bra.s	.slot
+	endif
 
 .noslot
-		add.b	d6,d1			; add modulator offset to loaded value
+	if FEATURE_UNDERWATER
+		add.b	d4,d1			; add modulator offset to loaded value
+	endif
+
 .slot
 		move.b	d1,(a3)+		; save the Total Level value
 		move.b	(a2)+,(a3)+		; copy total level command
@@ -994,6 +1019,11 @@ dcCondReg:
 ; Tracker command for checking communications bytes
 ; ---------------------------------------------------------------------------
 
+dcCondJump	macro x
+	\x	.false
+	rts
+     endm
+
 dcCond:
 		lea	mComm.w,a1		; get communications array to a1
 		move.b	(a4)+,d0		; load condition and offset from tracker to d0
@@ -1012,31 +1042,26 @@ dcCondCom:
 ; Code for setting the condition flag
 ; ---------------------------------------------------------------------------
 
-.c	macro x
-	\x	.false
-	rts
-     endm
-
 .false
 		bset	#cfbCond,(a5)		; set condition to false
 
-.cond	rts		; T
+.cond	rts			; T
 	rts
-	.c bra.s	; F
-	.c bls.s	; HI
-	.c bhi.s	; LS
-	.c blo.s	; HS/CC
-	.c bhs.s	; LO/CS
-	.c beq.s	; NE
-	.c bne.s	; EQ
-	.c bvs.s	; VC
-	.c bvc.s	; VS
-	.c bmi.s	; PL
-	.c bpl.s	; MI
-	.c blt.s	; GE
-	.c bge.s	; LT
-	.c ble.s	; GT
-	.c bgt.s	; LE
+	dcCondJump bra.s	; F
+	dcCondJump bls.s	; HI
+	dcCondJump bhi.s	; LS
+	dcCondJump blo.s	; HS/CC
+	dcCondJump bhs.s	; LO/CS
+	dcCondJump beq.s	; NE
+	dcCondJump bne.s	; EQ
+	dcCondJump bvs.s	; VC
+	dcCondJump bvc.s	; VS
+	dcCondJump bmi.s	; PL
+	dcCondJump bpl.s	; MI
+	dcCondJump blt.s	; GE
+	dcCondJump bge.s	; LT
+	dcCondJump ble.s	; GT
+	dcCondJump bgt.s	; LE
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker command for freezing the CPU. DEBUG FLAG

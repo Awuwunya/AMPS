@@ -3,7 +3,7 @@
 	sHeaderCh	$03
 	sHeaderSFX	$80, ctFM5, .FM5, $00, $00
 	sHeaderSFX	$80, ctFM4, .FM4, $00, $00
-	sHeaderSFX	$A1, ctPSG3, .PSG3, $00, $00
+	sHeaderSFX	$A1, ctPSG3, .PSG3, $00+$0C, $00
 
 .FM5	sVoice		$1E
 	dc.b nA0, $08, nRst, $02, nA0, $08

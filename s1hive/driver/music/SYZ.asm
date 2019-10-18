@@ -9,8 +9,8 @@ SpringYard_Header:
 	sHeaderFM	SpringYard_FM3, $F4, $14
 	sHeaderFM	SpringYard_FM4, $F4, $18
 	sHeaderFM	SpringYard_FM5, $F4, $18
-	sHeaderPSG	SpringYard_PSG1, $D0, $30, $00, v06
-	sHeaderPSG	SpringYard_PSG2, $E8, $38, $00, v00
+	sHeaderPSG	SpringYard_PSG1, $D0+$0C, $30, $00, v06
+	sHeaderPSG	SpringYard_PSG2, $E8+$0C, $38, $00, v00
 	sHeaderPSG	SpringYard_PSG3, $00, $28, $00, v04
 
 	; Patch $00
@@ -345,12 +345,12 @@ SpringYard_PSG3:
 	saVol		$08
 
 SpringYard_Loop2:
-	dc.b nRst, $04, nA5, $02
+	dc.b nRst, $04, nHiHat, $02
 	sLoop		$00, $08, SpringYard_Loop2
 	saVol		-$08
 
 SpringYard_Jump5:
-	dc.b $02, nRst, nA5
+	dc.b $02, nRst, nHiHat
 	sJump		SpringYard_Jump5
 
 SpringYard_DAC1:

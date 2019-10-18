@@ -1,7 +1,7 @@
 GotThrough_Header:
 	sHeaderInit
 	sHeaderTempo	$02, $55
-	sHeaderCh	$05, $03
+	sHeaderCh	$05, $02
 	sHeaderDAC	GotThrough_DAC1
 	sHeaderDAC	GotThrough_DAC2
 	sHeaderFM	GotThrough_FM1, $F4, $0A
@@ -9,9 +9,8 @@ GotThrough_Header:
 	sHeaderFM	GotThrough_FM3, $F4, $15
 	sHeaderFM	GotThrough_FM4, $F4, $15
 	sHeaderFM	GotThrough_FM5, $F4, $14
-	sHeaderPSG	GotThrough_PSG1, $D0, $28, $00, v05
-	sHeaderPSG	GotThrough_PSG2, $DC, $38, $00, v05
-	sHeaderPSG	GotThrough_PSG3, $DC, $00, $00, v04
+	sHeaderPSG	GotThrough_PSG1, $D0+$0C, $28, $00, v05
+	sHeaderPSG	GotThrough_PSG2, $DC+$0C, $38, $00, v05
 
 	; Patch $00
 	; $3D
@@ -157,7 +156,6 @@ GotThrough_PSG2:
 	dc.b nG5, $06, nC6, nB5, nG5, nC6, nB5, nG5
 	dc.b nC6, nB5, $0C, nC6, $09, nB5, $33
 
-GotThrough_PSG3:
 GotThrough_DAC2:
 	sStop
 

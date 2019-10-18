@@ -9,8 +9,8 @@ GreenHill_Header:
 	sHeaderFM	GreenHill_FM3, $F4, $14
 	sHeaderFM	GreenHill_FM4, $F4, $08
 	sHeaderFM	GreenHill_FM5, $F4, $20
-	sHeaderPSG	GreenHill_PSG1, $D0, $08, $00, v03
-	sHeaderPSG	GreenHill_PSG2, $D0, $08, $00, v06
+	sHeaderPSG	GreenHill_PSG1, $D0+$0C, $08, $00, v03
+	sHeaderPSG	GreenHill_PSG2, $D0+$0C, $08, $00, v06
 	sHeaderPSG	GreenHill_PSG3, $00, $18, $00, v04
 
 	; Patch $00
@@ -689,7 +689,7 @@ GreenHill_Loop19:
 GreenHill_PSG3:
 	sNoisePSG	$E7
 	sNoteTimeOut	$06
-	dc.b nA5, $10, $10, $10
+	dc.b nHiHat, $10, $10, $10
 
 GreenHill_Jump9:
 	dc.b $08

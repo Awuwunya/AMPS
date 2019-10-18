@@ -1,7 +1,7 @@
 Boss_Header:
 	sHeaderInit
 	sHeaderTempo	$02, $40
-	sHeaderCh	$05, $03
+	sHeaderCh	$05, $02
 	sHeaderDAC	Boss_DAC1
 	sHeaderDAC	Boss_DAC2
 	sHeaderFM	Boss_FM1, $F4, $12
@@ -9,9 +9,8 @@ Boss_Header:
 	sHeaderFM	Boss_FM3, $F4, $0F
 	sHeaderFM	Boss_FM4, $F4, $12
 	sHeaderFM	Boss_FM5, $E8, $0F
-	sHeaderPSG	Boss_PSG1, $D0, $18, $00, v05
-	sHeaderPSG	Boss_PSG2, $D0, $18, $00, v05
-	sHeaderPSG	Boss_PSG3, $DC, $08, $00, v08
+	sHeaderPSG	Boss_PSG1, $D0+$0C, $18, $00, v05
+	sHeaderPSG	Boss_PSG2, $D0+$0C, $18, $00, v05
 
 	; Patch $00
 	; $08
@@ -221,7 +220,6 @@ Boss_Call1:
 	dc.b nFs6, nB6, nCs7, nD7, $30
 	sRet
 
-Boss_PSG3:
 Boss_DAC2:
 	sStop
 

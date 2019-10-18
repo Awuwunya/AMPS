@@ -4,6 +4,7 @@
 ; ---------------------------------------------------------------------------
 	opt ae+
 
+FEATURE_SFX_MASTERVOL =	0	; set to 1 to make SFX use master volumes
 FEATURE_MODULATION =	1	; set to 1 to enable software modulation effect
 FEATURE_PORTAMENTO =	0	; set to 1 to enable portamento flag
 FEATURE_MODENV =	0	; set to 1 to enable modulation envelopes
@@ -317,19 +318,19 @@ fLast		rs.l 0		; safe mode equate
 ; ---------------------------------------------------------------------------
 
 dCLEAR_MEM	macro len, block
-		move.w	#((\len)/(\block))-1,d1	; load repeat count to d7
+		move.w	#((\len)/(\block))-1,d1; load repeat count to d7
 .c\@
 	rept (\block)/4
-		clr.l	(a1)+			; clear driver and music channel memory
+		clr.l	(a1)+		; clear driver and music channel memory
 	endr
-		dbf	d1, .c\@		; loop for each longword to clear it...
+		dbf	d1, .c\@	; loop for each longword to clear it...
 
 	rept ((\len)%(\block))/4
-		clr.l	(a1)+			; clear extra longs of memory
+		clr.l	(a1)+		; clear extra longs of memory
 	endr
 
 	if (\len)&2
-		clr.w	(a1)+			; if there is an extra word, clear it too
+		clr.w	(a1)+		; if there is an extra word, clear it too
 	endif
     endm
 ; ===========================================================================
@@ -418,69 +419,6 @@ m\name =	__menv			; create SMPS2ASM equate
 
 __menv =	__menv+1		; increase ID
 	shift				; shift next argument into view
-	endr
-    endm
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Creates SFX pointers table, and creates necessary equates
-; ---------------------------------------------------------------------------
-
-ptrSFX		macro type, file
-.type =		(\type)<<24		; create equate for the type mask
-
-	rept narg-1			; repeat for all arguments
-sfx_\file =	__sfx			; create sfx_ equate for the sfx
-dsfx\$__sfx	equs  "\file"		; create file name equate for later
-		dc.l dsfxa\$__sfx|.type	; create pointer with specified type
-__sfx =		__sfx+1			; increase SFX ID
-	shift				; shift next argument into view
-	endr
-    endm
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Creates music pointers table, and creates necessary equates
-; ---------------------------------------------------------------------------
-
-ptrMusic	macro file, sptempo
-	rept narg/2			; repeat for half of the arguments
-mus_\file =	__mus			; create mus_ equate for the music
-dmus\$__mus	equs "\file"		; create file name equate for later
-		dc.l ((\sptempo)<<24)|dmusa\$__mus; create pointer with tempo
-__mus =		__mus+1			; increase music ID
-	shift				; shift next argument into view
-	shift				; ''
-	endr
-    endm
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Include all SFX data
-; ---------------------------------------------------------------------------
-
-incSFX		macro
-	local a, b			; define these as local variables
-a =		SFXoff			; start from first sfx
-	rept __sfx-SFXoff		; repeat for all sfx we defined
-		even			; sfx header must be on even byte
-b		equs dsfx\$a		; hack to get the file name into b
-_sfx_\b					; create _sfx_<name> equate
-dsfxa\$a	include "driver/sfx/\b\.asm"; include SFX data
-a =		a+1			; increase ID
-	endr
-    endm
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Include all music data
-; ---------------------------------------------------------------------------
-
-incMus		macro file
-	local a, b			; define these as local variables
-a =		MusOff			; start from first music
-	rept __mus-MusOff		; repeat for all music we defined
-		even			; music header must be on even byte
-b		equs dmus\$a		; hack to get the file name into b
-_mus_\b					; create _mus_<name> equate
-dmusa\$a	include "driver/music/\b\.asm"; include music data
-a =		a+1			; increase ID
 	endr
     endm
 ; ===========================================================================

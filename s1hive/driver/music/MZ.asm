@@ -9,9 +9,9 @@ Marble_Header:
 	sHeaderFM	Marble_FM3, $E8, $15
 	sHeaderFM	Marble_FM4, $E8, $17
 	sHeaderFM	Marble_FM5, $E8, $17
-	sHeaderPSG	Marble_PSG1, $D0, $18, $00, v08
-	sHeaderPSG	Marble_PSG2, $D0, $28, $00, v08
-	sHeaderPSG	Marble_PSG3, $00, $18, $00, v09
+	sHeaderPSG	Marble_PSG1, $D0+$0C, $18, $00, v08
+	sHeaderPSG	Marble_PSG2, $D0+$0C, $28, $00, v08
+	sHeaderPSG	Marble_PSG3, $00+$0C, $18, $00, v09
 
 	; Patch $00
 	; $22

@@ -1637,11 +1637,11 @@ SetBank:
 ; Warning stuff
 ; ---------------------------------------------------------------------------
 
-  if (PCM1_Switch&0FFh)>0F8h
+  if (offset(PCM1_Switch)&0FFh)>0F8h
 	inform 3,"   Warning!  PCM1_Switch's instructions have crossed a boundary."
   endif
 
-  if (PCM2_Switch&0FFh)>0F8h
+  if (offset(PCM2_Switch)&0FFh)>0F8h
 	inform 3,"   Warning!  PCM1_Switch's instructions have crossed a boundary."
   endif
 

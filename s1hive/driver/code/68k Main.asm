@@ -4,40 +4,58 @@
 ; ---------------------------------------------------------------------------
 
 dFadeOutDataLog:
-	dc.b $01, $02, $01,  $02, $02, $02,  $02, $02, $02,  $03, $02, $03
-	dc.b $04, $05, $04,  $04, $05, $04,  $05, $05, $05,  $06, $05, $06
-	dc.b $07, $09, $07,  $09, $09, $09,  $0A, $09, $0A,  $0C, $09, $0C
-	dc.b $0E, $11, $0E,  $10, $11, $10,  $11, $11, $11,  $14, $11, $14
-	dc.b $16, $1B, $16,  $1A, $1B, $1A,  $1C, $1B, $1C,  $20, $1B, $20
-	dc.b $22, $28, $22,  $26, $28, $26,  $2C, $28, $2C,  $30, $28, $30
-	dc.b $34, $3E, $34,  $3C, $3E, $3C,  $40, $3E, $40,  $46, $3E, $46
-	dc.b $4C, $58, $4C,  $54, $58, $54,  $5C, $58, $5C,  $60, $58, $60
-	dc.b $6C, $7F, $6C,  $74, $7F, $74,  $7F, $7F, $7F,  fReset
+	dc.b $00, $00, $00,  $00, $00, $01,  $01, $00, $03,  $01, $00, $05
+	dc.b $02, $03, $06,  $03, $03, $08,  $04, $03, $0A,  $04, $03, $0C
+	dc.b $05, $06, $0D,  $06, $06, $0F,  $06, $06, $11,  $07, $06, $12
+	dc.b $08, $09, $14,  $09, $09, $15,  $09, $09, $17,  $0A, $09, $19
+	dc.b $0B, $0C, $1A,  $0C, $0C, $1C,  $0C, $0C, $1D,  $0D, $0C, $1F
+	dc.b $0E, $0F, $20,  $0F, $0F, $22,  $0F, $0F, $23,  $10, $0F, $25
+	dc.b $11, $12, $26,  $12, $12, $27,  $13, $12, $29,  $13, $12, $2A
+	dc.b $14, $15, $2C,  $15, $15, $2D,  $16, $15, $2E,  $17, $15, $30
+	dc.b $18, $19, $31,  $19, $19, $32,  $19, $19, $34,  $1A, $19, $35
+	dc.b $1B, $1C, $36,  $1C, $1C, $38,  $1D, $1C, $39,  $1E, $1C, $3A
+	dc.b $1F, $20, $3C,  $20, $20, $3D,  $21, $20, $3E,  $22, $20, $3F
+	dc.b $23, $24, $40,  $24, $24, $42,  $25, $24, $43,  $26, $24, $44
+	dc.b $27, $28, $45,  $28, $28, $46,  $29, $28, $48,  $2A, $28, $49
+	dc.b $2B, $2C, $4A,  $2C, $2C, $4B,  $2D, $2C, $4C,  $2E, $2C, $4D
+	dc.b $2F, $30, $4E,  $30, $30, $4F,  $31, $30, $50,  $32, $30, $51
+	dc.b $33, $34, $52,  $34, $34, $54,  $35, $34, $55,  $37, $34, $56
+	dc.b $38, $39, $57,  $39, $39, $58,  $3A, $39, $59,  $3B, $39, $5A
+	dc.b $3C, $3E, $5B,  $3E, $3E, $5C,  $3F, $3E, $5D,  $40, $3E, $5E
+	dc.b $40, $44, $5E,  $43, $44, $60,  $46, $44, $62,  $48, $44, $64
+	dc.b $4B, $4F, $66,  $4E, $4F, $67,  $51, $4F, $69,  $54, $4F, $6B
+	dc.b $57, $5C, $6D,  $5A, $5C, $6F,  $5E, $5C, $70,  $61, $5C, $72
+	dc.b $64, $69, $74,  $67, $69, $75,  $6B, $69, $77,  $6E, $69, $79
+	dc.b $72, $77, $7A,  $76, $77, $7C,  $79, $77, $7D,  $7D, $77, $7F
+	dc.b $7F, $7F, $7F, fReset
 
 	if FEATURE_BACKUP		; this data is only needed when backup feature is enabled also.
 dFadeInDataLog:				; you may enable this regardless for personal uses
-	dc.b $7F, $7F, $7F,  $74, $7F, $74,  $6C, $7F, $6C,  $60, $7F, $60
-	dc.b $5C, $50, $5C,  $54, $50, $54,  $4C, $50, $4C,  $46, $50, $46
-	dc.b $40, $38, $40,  $3C, $38, $3C,  $34, $38, $34,  $30, $38, $30
-	dc.b $2C, $24, $2C,  $26, $24, $26,  $22, $24, $22,  $20, $24, $20
-	dc.b $1C, $18, $1C,  $1A, $18, $1A,  $16, $18, $16,  $14, $18, $14
-	dc.b $11, $0F, $11,  $10, $0F, $10,  $0E, $0F, $0E,  $0C, $0F, $0C
-	dc.b $0A, $08, $0A,  $09, $08, $09,  $07, $08, $07,  $06, $08, $06
-	dc.b $05, $05, $05,  $04, $05, $04,  $04, $05, $04,  $03, $05, $03
-	dc.b $02, $02, $02,  $02, $02, $02,  $01, $02, $01,  $00, $00, $00
-	dc.b fEnd
+	dc.b $7F, $7F, $7F,  $7D, $77, $7F,  $79, $77, $7D,  $76, $77, $7C
+	dc.b $72, $77, $7A,  $6E, $69, $79,  $6B, $69, $77,  $67, $69, $75
+	dc.b $64, $69, $74,  $61, $5C, $72,  $5E, $5C, $70,  $5A, $5C, $6F
+	dc.b $57, $5C, $6D,  $54, $4F, $6B,  $51, $4F, $69,  $4E, $4F, $67
+	dc.b $4B, $4F, $66,  $48, $44, $64,  $46, $44, $62,  $43, $44, $60
+	dc.b $40, $44, $5E,  $40, $3E, $5E,  $3F, $3E, $5D,  $3E, $3E, $5C
+	dc.b $3C, $3E, $5B,  $3B, $39, $5A,  $3A, $39, $59,  $39, $39, $58
+	dc.b $38, $39, $57,  $37, $34, $56,  $35, $34, $55,  $34, $34, $54
+	dc.b $33, $34, $52,  $32, $30, $51,  $31, $30, $50,  $30, $30, $4F
+	dc.b $2F, $30, $4E,  $2E, $2C, $4D,  $2D, $2C, $4C,  $2C, $2C, $4B
+	dc.b $2B, $2C, $4A,  $2A, $28, $49,  $29, $28, $48,  $28, $28, $46
+	dc.b $27, $28, $45,  $26, $24, $44,  $25, $24, $43,  $24, $24, $42
+	dc.b $23, $24, $40,  $22, $20, $3F,  $21, $20, $3E,  $20, $20, $3D
+	dc.b $1F, $20, $3C,  $1E, $1C, $3A,  $1D, $1C, $39,  $1C, $1C, $38
+	dc.b $1B, $1C, $36,  $1A, $19, $35,  $19, $19, $34,  $19, $19, $32
+	dc.b $18, $19, $31,  $17, $15, $30,  $16, $15, $2E,  $15, $15, $2D
+	dc.b $14, $15, $2C,  $13, $12, $2A,  $13, $12, $29,  $12, $12, $27
+	dc.b $11, $12, $26,  $10, $0F, $25,  $0F, $0F, $23,  $0F, $0F, $22
+	dc.b $0E, $0F, $20,  $0D, $0C, $1F,  $0C, $0C, $1D,  $0C, $0C, $1C
+	dc.b $0B, $0C, $1A,  $0A, $09, $19,  $09, $09, $17,  $09, $09, $15
+	dc.b $08, $09, $14,  $07, $06, $12,  $06, $06, $11,  $06, $06, $0F
+	dc.b $05, $06, $0D,  $04, $03, $0C,  $04, $03, $0A,  $03, $03, $08
+	dc.b $02, $03, $06,  $01, $00, $05,  $01, $00, $03,  $00, $00, $01
+	dc.b $00, $00, $00,  fReset
 	endif
-
-;dFadeOutDataLinear:
-;	dc.b $01, $00, $00,  $02, $01, $00,  $02, $01, $01,  $03, $02, $01
-;	dc.b $04, $02, $01,  $04, $03, $02,  $05, $03, $02,  $06, $04, $02
-;	dc.b $07, $05, $03,  $09, $06, $03,  $0A, $08, $03,  $0C, $0A, $03
-;	dc.b $0E, $0D, $04,  $10, $0F, $04,  $11, $10, $04,  $14, $13, $05
-;	dc.b $16, $16, $05,  $1A, $1A, $05,  $1C, $1E, $06,  $20, $22, $06
-;	dc.b $22, $27, $07,  $26, $2A, $07,  $2C, $2E, $08,  $30, $34, $08
-;	dc.b $34, $39, $09,  $3C, $3E, $0A,  $40, $3F, $0A,  $46, $40, $0B
-;	dc.b $4C, $40, $0C,  $54, $40, $0D,  $5C, $40, $0D,  $60, $40, $0E
-;	dc.b $6C, $40, $0E,  $74, $40, $0F,  $7F, $40, $0F,  fReset
 	even
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -213,7 +231,12 @@ dUpdateAllAMPS:
 		cmp.b	mMasterVolFM.w,d0	; check if volume did not change
 		beq.s	.fadedac		; if did not, branch
 		move.b	d0,mMasterVolFM.w	; save the new volume
+
+	if FEATURE_SFX_MASTERVOL
 		jsr	dReqVolUpFM(pc)		; go request volume update for FM
+	else
+		jsr	dReqVolUpMusicFM(pc)	; only request music channels to update
+	endif
 
 .fadedac
 		move.b	(a1)+,d0		; get DAC volume byte from fade data
@@ -226,7 +249,10 @@ dUpdateAllAMPS:
 		or.b	d1,.ch.w		; tell the channel to update its volume
 .ch =		.ch+cSize			; go to next channel
 	endr
+
+	if FEATURE_SFX_MASTERVOL
 		or.b	d1,mSFXDAC1.w		; tell SFX DAC1 to update its volume
+	endif
 
 .fadepsg
 		move.b	(a1)+,d0		; get PSG volume byte from fade data
@@ -240,11 +266,13 @@ dUpdateAllAMPS:
 .ch =		.ch+cSize			; go to next channel
 	endr
 
-.ch =	mSFXPSG1				; start at SFX PSG1
-	rept SFX_PSG				; do for all SFX PSG channels
-		or.b	d1,.ch.w		; tell the channel to update its volume
-.ch =		.ch+cSizeSFX			; go to next channel
-	endr
+	if FEATURE_SFX_MASTERVOL
+.ch =		mSFXPSG1			; start at SFX PSG1
+		rept SFX_PSG			; do for all SFX PSG channels
+			or.b	d1,.ch.w	; tell the channel to update its volume
+.ch =			.ch+cSizeSFX		; go to next channel
+		endr
+	endif
 ; ---------------------------------------------------------------------------
 ; Since PAL Mega Drive's run slower than NTSC, if we want the music to
 ; sound consistent, we need to run the sound driver 1.2 times as fast
@@ -268,7 +296,7 @@ dUpdateAllAMPS:
 		move.b	#6-1,mCtrPal.w		; reset counter
 
 .driver
-		; continue to run sound driver again
+	; continue to run sound driver again
 ; ---------------------------------------------------------------------------
 ; There are 2 methods of handling tempo adjustments in SMPS,
 ; overflow (where a value is added to the accumulator, and when it

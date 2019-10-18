@@ -27,6 +27,7 @@ _num =	$80
 	enum nC5,nCs5,nD5,nEb5,nE5,nF5,nFs5,nG5,nAb5,nA5,nBb5,nB5
 	enum nC6,nCs6,nD6,nEb6,nE6,nF6,nFs6,nG6,nAb6,nA6,nBb6,nB6
 	enum nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
+nHiHat =	nA6
 ; ---------------------------------------------------------------------------------------------
 ; Other Equates
 ; ---------------------------------------------------------------------------------------------
@@ -38,7 +39,7 @@ m00 =	$00
 ; ---------------------------------------------------------------------------------------------
 
 sHeaderInit	macro
-sPointZero =	*
+sPointZero =	offset(*)
 sPatNum =	0
     endm
 
@@ -87,20 +88,20 @@ sHeaderDAC	macro loc,vol,samp
 ; Header - Set up FM Channel
 sHeaderFM	macro loc,pitch,vol
 	dc.w \loc-sPointZero
-	dc.b \pitch,\vol
+	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 
 ; Header - Set up PSG Channel
 sHeaderPSG	macro loc,pitch,vol,detune,volenv
 	dc.w \loc-sPointZero
-	dc.b \pitch,\vol,\detune,\volenv
+	dc.b (\pitch)&$FF,(\vol)&$FF,(\detune)&$FF,\volenv
     endm
 
 ; Header - Set up SFX Channel
 sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.b \flags,\type
 	dc.w \loc-sPointZero
-	dc.b \pitch,\vol
+	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 ; ---------------------------------------------------------------------------------------------
 ; Command Flag Macros and Equates. Based on the original s1smps2asm, and Flamewing's smps2asm
@@ -340,6 +341,16 @@ ssTempo		macro val
 	dc.b $EA, \val
     endm
 
+; FF18xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
+saTempoSpeed	macro tempo
+	dc.b $FF,$18, \tempo
+    endm
+
+; FF1Cxx - Add xx to music tempo (TEMPO - TEMPO_ADD)
+saTempo		macro tempo
+	dc.b $FF,$1C, \tempo
+    endm
+
 ; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
 sModeSampDAC	macro
 	dc.b $EB
@@ -373,14 +384,19 @@ ssLFO		macro reg, ams, fms, pan
 	endif
     endm
 
-; F0wwxxyyzz - Modulation
+; F0xxzzwwyy - Modulation
 ;  ww: wait time
 ;  xx: modulation speed
 ;  yy: change per step
 ;  zz: number of steps
 ; (MOD_SETUP)
 ssMod68k	macro wait, speed, step, count
-	dc.b $F0, \wait,\speed,\step,\count
+	dc.b $F0
+	sModData \wait,\speed,\step,\count
+    endm
+
+sModData	macro wait, speed, step, count
+	dc.b \speed, \count, \wait, \step
     endm
 
 ; F1xx - Set portamento speed to xx frames. 0 means portamento is disabled (PORTAMENTO)
@@ -401,7 +417,7 @@ sModOff		macro
 ; F4xxxx - Keep looping back to xxxx each time the SFX is being played (CONT_SFX)
 sCont		macro loc
 	dc.b $F4
-	dc.w \loc-*-1
+	dc.w \loc-offset(*)-1
     endm
 
 ; F5 - End of channel (TRK_END - TEND_STD)
@@ -412,20 +428,20 @@ sStop		macro
 ; F6xxxx - Jump to xxxx (GOTO)
 sJump		macro loc
 	dc.b $F6
-	dc.w \loc-*-1
+	dc.w \loc-offset(*)-1
     endm
 
 ; F7xxyyzzzz - Loop back to zzzz yy times, xx being the loop index for loop recursion fixing (LOOP)
 sLoop		macro index,loops,loc
 	dc.b $F7, \index
-	dc.w \loc-*-1
+	dc.w \loc-offset(*)-1
 	dc.b \loops
     endm
 
 ; F8xxxx - Call pattern at xxxx, saving return point (GOSUB)
 sCall		macro loc
 	dc.b $F8
-	dc.w \loc-*-1
+	dc.w \loc-offset(*)-1
     endm
 
 ; F9 - Return (RETURN)
@@ -477,16 +493,6 @@ sSpinRev	macro
 ; FF14 - Reset spindash rev counter (SPINDASH_REV - SDREV_RESET)
 sSpinReset	macro
 	dc.b $FF,$14
-    endm
-
-; FF18xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
-saTempoSpeed	macro tempo
-	dc.b $FF,$18, \tempo
-    endm
-
-; FF1Cxx - Add xx to music tempo (TEMPO - TEMPO_ADD)
-saTempo		macro tempo
-	dc.b $FF,$1C, \tempo
     endm
 
 ; FF20xyzz - Get RAM address pointer offset by y, compare zz with it using condition x (COMM_CONDITION - COMM_SPEC)

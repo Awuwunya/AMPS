@@ -6,6 +6,10 @@
 ; ---------------------------------------------------------------------------
 	dc.b "AMPS-v1.1 "		; ident str
 
+	if FEATURE_SFX_MASTERVOL
+		dc.b "SM"		; sfx ignore master volume
+	endif
+
 	if FEATURE_UNDERWATER
 		dc.b "UW"		; underwater mode enabled
 	endif

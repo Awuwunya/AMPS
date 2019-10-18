@@ -9,8 +9,8 @@ Labyrinth_Header:
 	sHeaderFM	Labyrinth_FM3, $F4, $18
 	sHeaderFM	Labyrinth_FM4, $F4, $18
 	sHeaderFM	Labyrinth_FM5, $00, $12
-	sHeaderPSG	Labyrinth_PSG1, $D0, $10, $00, v09
-	sHeaderPSG	Labyrinth_PSG2, $D0, $10, $00, v09
+	sHeaderPSG	Labyrinth_PSG1, $D0+$0C, $10, $00, v09
+	sHeaderPSG	Labyrinth_PSG2, $D0+$0C, $10, $00, v09
 	sHeaderPSG	Labyrinth_PSG3, $00, $10, $00, v04
 
 	; Patch $00
@@ -305,7 +305,7 @@ Labyrinth_PSG3:
 	sNoisePSG	$E7
 	dc.b nRst, $12
 	sNoteTimeOut	$0E
-	dc.b nA5, $0C
+	dc.b nHiHat, $0C
 	sNoteTimeOut	$03
 	dc.b $06, $0C
 
@@ -355,7 +355,7 @@ Labyrinth_Call10:
 Labyrinth_Call11:
 	dc.b nRst, $03
 	sNoteTimeOut	$03
-	dc.b nA5, $06, $06, $03
+	dc.b nHiHat, $06, $06, $03
 	sNoteTimeOut	$0E
 	dc.b $06
 	sNoteTimeOut	$03

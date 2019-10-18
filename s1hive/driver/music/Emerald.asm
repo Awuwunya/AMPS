@@ -1,7 +1,7 @@
 Emerald_Header:
 	sHeaderInit
 	sHeaderTempo	$01, $28
-	sHeaderCh	$05, $03
+	sHeaderCh	$05, $02
 	sHeaderDAC	Emerald_DAC1
 	sHeaderDAC	Emerald_DAC2
 	sHeaderFM	Emerald_FM1, $F4, $08
@@ -10,9 +10,8 @@ Emerald_Header:
 	sHeaderFM	Emerald_FM4, $F4, $16
 ;	sHeaderFM	Emerald_FM5, $F4, $16
 	sHeaderFM	Emerald_FM6, $F4, $16
-	sHeaderPSG	Emerald_PSG1, $F4, $10, $00, v04
-	sHeaderPSG	Emerald_PSG2, $F4, $10, $00, v05
-	sHeaderPSG	Emerald_DAC1, $F4, $00, $00, v04
+	sHeaderPSG	Emerald_PSG1, $F4+$0C, $10, $00, v04
+	sHeaderPSG	Emerald_PSG2, $F4+$0C, $10, $00, v05
 
 	; Patch $00
 	; $04

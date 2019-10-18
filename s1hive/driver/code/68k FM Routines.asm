@@ -38,6 +38,17 @@ locret_MuteFM:
 ; Subroutine for updating Total Levels for FM channel
 ; ---------------------------------------------------------------------------
 
+dUpdateVolFM_SFX:
+	if FEATURE_SFX_MASTERVOL=0
+		if FEATURE_DACFMVOLENV
+			btst	#cfbRest,(a5)	; check if channel is resting
+			bne.s	locret_MuteFM	; if is, do not update anything
+		endif
+
+		move.b	cVolume(a5),d5		; load FM channel volume to d3
+		bra.s	dUpdateVolFM3		; do NOT add the master volume!
+	endif
+
 dUpdateVolFM:
 	if FEATURE_DACFMVOLENV
 		btst	#cfbRest,(a5)		; check if channel is resting
@@ -46,10 +57,10 @@ dUpdateVolFM:
 
 		move.b	cVolume(a5),d5		; load FM channel volume to d3
 		add.b	mMasterVolFM.w,d5	; add master FM volume to d3
-		bpl.s	.nocap			; if volume did not overflow, skio
+		bpl.s	dUpdateVolFM3		; if volume did not overflow, skio
 		moveq	#$7F,d5			; force FM volume to silence
 
-.nocap
+dUpdateVolFM3:
 	if FEATURE_DACFMVOLENV
 		moveq	#0,d4
 		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
@@ -74,26 +85,33 @@ dUpdateVolFM2:
 		move.b	cVoice(a5),d0		; load FM voice ID of the channel to d0
 		move.l	a6,a1			; copy music voice table address to a1
 
-	dCALC_VOICE				; get address of the specific voice to a1
-		move.b	(a1),d0			; load algorithm and feedback to d0
-		moveq	#0,d6			; reset the modulator offset
-
-	if FEATURE_UNDERWATER
-		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
-		beq.s	.uwdone			; if not, skip
-		move.b	d0,d6			; copy algorithm and feedback to d6
-		and.w	#7,d6			; mask out everything but the algorithm
-		add.b	d6,d5			; add algorithm to Total Level carrier offset
-		bpl.s	.noover2		; if volume did not overflow, skip
-		moveq	#$7F,d5			; force FM volume to silence
-
-.noover2
-		move.b	d0,d6			; set algorithm and feedback to modulator offset
-	endif
+	if FEATURE_UNDERWATER=0
+		dCALC_VOICE VoiceTL		; get address of the specific voice to a1
 
 .uwdone
-		moveq	#4-1,d3			; prepare 4 operators to d3
+	else
+		dCALC_VOICE			; get address of the specific voice to a1
+		moveq	#0,d2			; clear d0 (so no underwater by default)
+
+		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
+		beq.s	.uwdone			; if not, skip
+		move.b	(a1),d2			; load algorithm and feedback to d0
+		and.w	#7,d2			; mask out everything but the algorithm
+
+		lea	dUnderwaterTbl(pc),a2	; get underwater table to a2
+		move.b	(a2,d2.w),d6		; get the value from table
+		move.b	d6,d2			; copy to d0
+		and.w	#7,d6			; mask out extra stuff
+
+		add.b	d6,d5			; add algorithm to Total Level carrier offset
+		bpl.s	.uwdone			; if volume did not overflow, skip
+		moveq	#$7F,d5			; force FM volume to silence
+
+.uwdone
 		add.w	#VoiceTL,a1		; go to the Total Level offset of the voice
+	endif
+
+		moveq	#4-1,d3			; prepare 4 operators to d3
 		lea	dOpTLFM(pc),a2		; load Total Level address table to a3
 
 .tlloop
@@ -104,10 +122,15 @@ dUpdateVolFM2:
 		add.b	d5,d1			; add carrier offset to loaded value
 		bmi.s	.slot			; if we did not overflow, branch
 		moveq	#-1,d1			; cap to silent volume
+	if FEATURE_UNDERWATER
 		bra.s	.slot
+	endif
 
 .noslot
-		add.b	d6,d1			; add modulator offset to loaded value
+	if FEATURE_UNDERWATER
+		add.b	d2,d1			; add modulator offset to loaded value
+	endif
+
 .slot
 		jsr	WriteChYM(pc)		; write Total Level to YM according to channel
 .ignore
@@ -119,6 +142,14 @@ dUpdateVolFM2:
 
 locret_VolFM:
 		rts
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; values for underwater mode update
+; ---------------------------------------------------------------------------
+
+	if FEATURE_UNDERWATER
+dUnderwaterTbl:	dc.b $08, $08, $08, $08, $0A, $0E, $0E, $0F
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; YM2612 register update list
@@ -155,7 +186,7 @@ dAMPSnextFMSFX:
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.next			; if not, skip
 	endif
-		jsr	dUpdateVolFM(pc)	; update FM volume
+		jsr	dUpdateVolFM_SFX(pc)	; update FM volume
 
 .next
 		dbf	d7,dAMPSnextFMSFX	; make sure to run all the channels
@@ -185,7 +216,7 @@ dAMPSnextFMSFX:
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.noupdate		; if not, branch
 	endif
-		jsr	dUpdateVolFM(pc)	; update FM volume
+		jsr	dUpdateVolFM_SFX(pc)	; update FM volume
 
 .noupdate	dbf	d7,dAMPSnextFMSFX	; make sure to run all the channels
 		jmp	dAMPSdoPSGSFX(pc)	; after that, process SFX PSG channels
@@ -262,7 +293,7 @@ dUpdateFreqFM:
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add to channel base frequency to d6
 
-	if FEATURE_PORTAMENTO
+	if FEATURE_MODENV
 		jsr	dModEnvProg(pc)		; process modulation envelope
 	endif
 
@@ -290,7 +321,7 @@ dUpdateFreqFM3:
 		jsr	WriteChYM(pc)		; write to YM according to channel
 
 		move.b	d6,d1			; copy lower byte of frequency into d1 (value)
-		move.b	#$FFFFFFA0,d0		; YM command: Frequency LSB
+		moveq	#$FFFFFFA0,d0		; YM command: Frequency LSB
 		jmp	WriteChYM(pc)		; write to YM according to channel
 
 dUpdFreqFMrest:
@@ -410,7 +441,7 @@ dFreqFM:dc.w								       $025E; Octave-1 - (80)
 	dc.w $1A84,$1AAB,$1AD3,$1AFE,$1B2D,$1B5C,$1B8F,$1BC5,$1BFF,$1C3C,$1C7C,$225E; Octave 3 - (A5 - B0)
 	dc.w $2284,$22AB,$22D3,$22FE,$232D,$235C,$238F,$23C5,$23FF,$243C,$247C,$2A5E; Octave 4 - (B1 - BC)
 	dc.w $2A84,$2AAB,$2AD3,$2AFE,$2B2D,$2B5C,$2B8F,$2BC5,$2BFF,$2C3C,$2C7C,$325E; Octave 5 - (BD - C8)
-	dc.w $3284,$32AB,$32D3,$32FE,$332D,$335C,$338F,$33C5,$33FF,$343C,$347C,$3A5E; Octave 6 - (c9 - D4)
+	dc.w $3284,$32AB,$32D3,$32FE,$332D,$335C,$338F,$33C5,$33FF,$343C,$347C,$3A5E; Octave 6 - (C9 - D4)
 	dc.w $3A84,$3AAB,$3AD3,$3AFE,$3B2D,$3B5C,$3B8F,$3BC5,$3BFF,$3C3C,$3C7C	    ; Octave 7 - (D5 - DF)
 dFreqFM_:
 	if safe=1				; in safe mode, we have extra debug data

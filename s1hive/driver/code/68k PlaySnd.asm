@@ -459,9 +459,12 @@ dPlaySnd_SFX:
 
 		tst.b	(a1,d7.w)		; check if this sound effect is continously looping
 		bpl.s	.nocont			; if not, skip
-		move.b	1(a4),mContCtr.w	; copy the number of channels as the new continous loop counter
+		clr.b	mContCtr.w		; reset continous sfx counter
+
 		cmp.b	mContLast.w,d1		; check if the last continous SFX had the same ID
 		bne.s	.setcont		; if not, play as a new sound effect anyway
+		move.b	1(a4),mContCtr.w	; copy the number of channels as the new continous loop counter
+		addq.b	#1,mContCtr.w		; increment by 1, since num of channels is -1 the actual channel count
 		rts
 
 .setcont
@@ -806,16 +809,18 @@ dPlaySnd_OutWater:
 
 dReqVolUpFM:
 		moveq	#1<<cfbVol,d0		; prepare volume update flag to d0
-.ch =	mFM1					; start at FM1
-	rept Mus_FM				; loop through all music FM channels
-		or.b	d0,.ch.w		; request channel volume update
-.ch =		.ch+cSize			; go to next channel
-	endr
-
 .ch =	mSFXFM3					; start at SFX FM3
 	rept SFX_FM				; loop through all SFX FM channels
 		or.b	d0,.ch.w		; request channel volume update
 .ch =		.ch+cSizeSFX			; go to next channel
+	endr
+
+dReqVolUpMusicFM:
+		moveq	#1<<cfbVol,d0		; prepare volume update flag to d0
+.ch =	mFM1					; start at FM1
+	rept Mus_FM				; loop through all music FM channels
+		or.b	d0,.ch.w		; request channel volume update
+.ch =		.ch+cSize			; go to next channel
 	endr
 
 locret_ReqVolUp:

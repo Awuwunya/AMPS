@@ -9,8 +9,8 @@ ScrabBrain_Header:
 	sHeaderFM	ScrabBrain_FM3, $F4, $13
 	sHeaderFM	ScrabBrain_FM4, $F4, $17
 	sHeaderFM	ScrabBrain_FM5, $F4, $17
-	sHeaderPSG	ScrabBrain_PSG1, $D0, $18, $00, v00
-	sHeaderPSG	ScrabBrain_PSG2, $D0, $18, $00, v00
+	sHeaderPSG	ScrabBrain_PSG1, $D0+$0C, $18, $00, v00
+	sHeaderPSG	ScrabBrain_PSG2, $D0+$0C, $18, $00, v00
 	sHeaderPSG	ScrabBrain_PSG3, $00, $18, $00, v04
 
 	; Patch $00
@@ -450,11 +450,11 @@ ScrabBrain_Call11:
 ScrabBrain_PSG3:
 	sNoisePSG	$E7
 	sNoteTimeOut	$03
-	dc.b nA5, $03, $06, nRst, nA5, $06, $0F, $0C
+	dc.b nHiHat, $03, $06, nRst, nHiHat, $06, $0F, $0C
 	dc.b $0C, $0C, $18
 
 ScrabBrain_Loop22:
-	dc.b nA5, $03, $03
+	dc.b nHiHat, $03, $03
 	saVol		$10
 	sVolEnv		v08
 	sNoteTimeOut	$08

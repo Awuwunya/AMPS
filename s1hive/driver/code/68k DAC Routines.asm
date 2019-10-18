@@ -132,7 +132,7 @@ dUpdateFreqOffDAC:
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add it to d6
 
-	if FEATURE_PORTAMENTO
+	if FEATURE_MODENV
 		jsr	dModEnvProg(pc)		; process modulation envelope
 	endif
 
@@ -209,7 +209,7 @@ dAMPSdoDACSFX:
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.next			; if not, skip
 	endif
-		bsr.w	dUpdateVolDAC		; update DAC volume
+		bsr.w	dUpdateVolDAC_SFX	; update DAC volume
 
 .next
 		jmp	dAMPSdoFMSFX(pc)	; after that, process SFX FM channels
@@ -240,7 +240,7 @@ dAMPSdoDACSFX:
 		bclr	#cfbVol,(a5)		; check if volume update is needed and clear bit
 		beq.s	.next2			; if not, skip
 	endif
-		bsr.w	dUpdateVolDAC		; update DAC volume
+		bsr.w	dUpdateVolDAC_SFX	; update DAC volume
 
 .next2
 		jmp	dAMPSdoFMSFX(pc)	; after that, process SFX FM channels
@@ -249,13 +249,19 @@ dAMPSdoDACSFX:
 ; Write DAC volume to Dual PCM
 ; ---------------------------------------------------------------------------
 
+dUpdateVolDAC_SFX:
+	if FEATURE_SFX_MASTERVOL=0
+		move.b	cVolume(a5),d5		; get channel volume to d3
+		bra.s	dUpdateVolDAC3		; do not add master volume
+	endif
+
 dUpdateVolDAC:
 		move.b	cVolume(a5),d5		; get channel volume to d3
 		add.b	mMasterVolDAC.w,d5	; add master volume to it
-		bpl.s	.gotvol			; if positive (in range), branch
+		bpl.s	dUpdateVolDAC3		; if positive (in range), branch
 		moveq	#$FFFFFF80,d5		; force volume to mute ($80 is the last valid volume)
 
-.gotvol
+dUpdateVolDAC3:
 	if FEATURE_DACFMVOLENV
 		moveq	#0,d4
 		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4

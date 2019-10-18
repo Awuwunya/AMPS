@@ -1,3 +1,5 @@
+Main		SECTION org(0)
+Z80_Space =	1994		; The amount of space reserved for Z80 driver. The batch file may ask you to increase the size...
 z80_ram:	equ $A00000
 z80_bus_request	equ $A11100
 z80_reset:	equ $A11200
@@ -8,7 +10,6 @@ ConsoleRegion	equ $FFFFFFF8
 align macro
 	cnop 0,\1
 	endm
-		org 0
 		opt w-
 ; ===========================================================================
 StartOfRom:
@@ -38128,10 +38129,35 @@ ObjPos_Null:	dc.b $FF, $FF, 0, 0, 0,	0
 
 		include "driver/code/smps2asm.asm"
 		include "driver/code/68k.asm"
-DualPCM:	z80prog 0
-		include "driver/code/z80.asm"
-DualPCM_sz:	z80prog
 
+DualPCM:
+		PUSHS					; store section information for Main
+Z80Code		SECTION	org(0), file("driver/.Z80")	; create a new section for Dual PCM
+		z80prog 0				; init z80 program
+		include "driver/code/z80.asm"		; code for Dual PCM
+DualPCM_sz:	z80prog					; end z80 program
+		POPS					; go back to Main section
+
+		PUSHS					; store section information for Main
+batcode		SECTION	file("driver/z80.bat"), org(0)	; create a new section for a batch file, that will insert compressed Dual PCM
+dpcm equ	offset(DualPCM)
+
+	dc.b "@echo off", $0A
+	dc.b "_dlls\koscmp.exe driver/.z80 driver/.z80.kos", $0A				; compress Z80 driver
+	dc.b "call :setsize ""driver/.z80.kos""", $0A						; get size of the compressed file
+	dc.b "if %size% GTR \#Z80_Space (", $0A							; check if file will fit
+	dc.b "echo Not enough space reserved for Z80 file! Please increase it to %size%!",$0A	; warn user about file size
+	dc.b "pause", $0A, "exit", $0A, ")", $0A
+	dc.b "echo 	incbin s1built.dat, 0, \#dpcm >driver/merge.asm",$0A			; include first part of s1built.md
+	dc.b "echo 	incbin driver/.z80.kos >>driver/merge.asm",$0A				; include compressed driver
+	dc.b "echo 	incbin s1built.dat, \#dpcm+\#Z80_Space >>driver/merge.asm",$0A		; include second part of s1built.md
+	dc.b "asm68k /p driver/merge.asm, s1built.md", $0A					; finally, merge the files. Why do I keep doing things like this =(
+	dc.b ":setsize", $0A
+	dc.b "set size=%~z1 & goto :eof"							; grav the file size
+		POPS					; go back to Main section
+
+	ds.b Z80_Space					; reserve space for the Z80 driver
+	even
 	opt ae+
 		include	"error/ErrorHandler.asm"
 EndOfRom:	END

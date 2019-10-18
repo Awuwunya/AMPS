@@ -9,8 +9,8 @@ Invincibility_Header:
 	sHeaderFM	Invincibility_FM3, $E8, $0F
 	sHeaderFM	Invincibility_FM4, $E8, $0F
 	sHeaderFM	Invincibility_FM5, $F4, $11
-	sHeaderPSG	Invincibility_PSG1, $D0, $28, $00, v05
-	sHeaderPSG	Invincibility_PSG1, $DC, $28, $00, v05
+	sHeaderPSG	Invincibility_PSG1, $D0+$0C, $28, $00, v05
+	sHeaderPSG	Invincibility_PSG1, $DC+$0C, $28, $00, v05
 	sHeaderPSG	Invincibility_PSG3, $00, $18, $00, v04
 
 	; Patch $00
@@ -134,7 +134,7 @@ Invincibility_PSG3:
 
 Invincibility_Jump2:
 	sNoteTimeOut	$03
-	dc.b nA5, $0C
+	dc.b nHiHat, $0C
 	sNoteTimeOut	$0C
 	dc.b $0C
 	sNoteTimeOut	$03

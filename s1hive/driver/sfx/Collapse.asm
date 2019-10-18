@@ -4,7 +4,7 @@
 	sHeaderSFX	$80, ctFM3, .FM3, $10, $00
 	sHeaderSFX	$80, ctFM4, .FM4, $00, $00
 	sHeaderSFX	$80, ctFM5, .FM5, $10, $00
-	sHeaderSFX	$A1, ctPSG3, .PSG3, $00, $00
+	sHeaderSFX	$A1, ctPSG3, .PSG3, $00+$0C, $00
 
 .FM3	sPan		spRight, $00
 	dc.b nRst, $02

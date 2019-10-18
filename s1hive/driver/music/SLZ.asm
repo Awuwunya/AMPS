@@ -9,8 +9,8 @@ StarLight_Header:
 	sHeaderFM	StarLight_FM3, $DC, $1A
 	sHeaderFM	StarLight_FM4, $DC, $1A
 	sHeaderFM	StarLight_FM5, $F4, $20
-	sHeaderPSG	StarLight_PSG1, $C4, $30, $00, v05
-	sHeaderPSG	StarLight_PSG2, $C4, $30, $00, v05
+	sHeaderPSG	StarLight_PSG1, $C4+$0C, $30, $00, v05
+	sHeaderPSG	StarLight_PSG2, $C4+$0C, $30, $00, v05
 	sHeaderPSG	StarLight_PSG3, $00, $20, $00, v04
 
 	; Patch $00
@@ -406,7 +406,7 @@ StarLight_PSG3:
 	dc.b nRst, $24
 
 StarLight_Jump6:
-	dc.b nA5, $03, $03
+	dc.b nHiHat, $03, $03
 	saVol		$10
 	sVolEnv		v08
 	sNoteTimeOut	$08

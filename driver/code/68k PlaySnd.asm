@@ -425,7 +425,7 @@ dPlaySnd_SFX:
 		bne.s	.noring			; if not, skip
 		bchg	#mfbRing,mFlags.w	; swap flag and check if it was set
 		beq.s	.noring			; if was not, do not change sound effect
-		move.w	#sfx_RingLeft,d7	; switch to left panned sound effect instead
+		moveq	#sfx_RingLeft,d7	; switch to left panned sound effect instead
 ; ---------------------------------------------------------------------------
 ; To save few cycles, we don't directly substract the SFX offset from
 ; the ID, and instead offset the table position. In practice this will

@@ -9,9 +9,9 @@ Credits_Header:
 	sHeaderFM	Credits_FM3, $F4, $14
 	sHeaderFM	Credits_FM4, $F4, $08
 	sHeaderFM	Credits_FM5, $F4, $20
-	sHeaderPSG	Credits_PSG1, $D0, $08, $00, v00
-	sHeaderPSG	Credits_PSG2, $D0, $18, $00, v00
-	sHeaderPSG	Credits_PSG3, $00, $18, $00, v04
+	sHeaderPSG	Credits_PSG1, $D0+$0C, $08, $00, v00
+	sHeaderPSG	Credits_PSG2, $D0+$0C, $18, $00, v00
+	sHeaderPSG	Credits_PSG3, $00+$0C, $18, $00, v04
 
 	; Patch $00
 	; $20

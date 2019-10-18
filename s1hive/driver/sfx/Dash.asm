@@ -2,7 +2,7 @@
 	sHeaderPrio	$70
 	sHeaderCh	$02
 	sHeaderSFX	$80, ctFM5, .FM5, $90, $00
-	sHeaderSFX	$A1, ctPSG3, .PSG3, $00, $00
+	sHeaderSFX	$A1, ctPSG3, .PSG3, $00+$0C, $00
 
 .FM5	sVoice		$13
 	ssMod68k	$01, $01, $C5, $1A

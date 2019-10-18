@@ -1,7 +1,7 @@
 	sHeaderInit
 	sHeaderPrio	$70
 	sHeaderCh	$02
-	sHeaderSFX	$A1, ctPSG3, .PSG3, $00, $00
+	sHeaderSFX	$A1, ctPSG3, .PSG3, $00+$0C, $00
 	sHeaderSFX	$80, ctFM5, .FM5, $00, $03
 
 .PSG3	sVolEnv		v00

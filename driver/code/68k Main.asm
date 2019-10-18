@@ -294,6 +294,7 @@ dUpdateAllAMPS:
 
 .nofix
 		move.b	#6-1,mCtrPal.w		; reset counter
+
 .driver
 	; continue to run sound driver again
 ; ---------------------------------------------------------------------------

@@ -9,8 +9,8 @@ Ending_Header:
 	sHeaderFM	Ending_FM3, $F4, $0D
 	sHeaderFM	Ending_FM4, $F4, $0D
 	sHeaderFM	Ending_FM5, $F4, $17
-	sHeaderPSG	Ending_PSG1, $D0, $28, $00, v05
-	sHeaderPSG	Ending_PSG2, $DC, $28, $00, v05
+	sHeaderPSG	Ending_PSG1, $D0+$0C, $28, $00, v05
+	sHeaderPSG	Ending_PSG2, $DC+$0C, $28, $00, v05
 	sHeaderPSG	Ending_PSG3, $00, $18, $00, v04
 
 	; Patch $00
@@ -213,7 +213,7 @@ Ending_PSG3:
 
 Ending_Loop4:
 	sNoteTimeOut	$03
-	dc.b nA5, $0C
+	dc.b nHiHat, $0C
 	sNoteTimeOut	$0C
 	dc.b $0C
 	sNoteTimeOut	$03
@@ -222,7 +222,7 @@ Ending_Loop4:
 	dc.b $0C
 	sLoop		$00, $0F, Ending_Loop4
 	sNoteTimeOut	$03
-	dc.b nA5, $06
+	dc.b $06
 	sNoteTimeOut	$0E
 	dc.b $12
 	sNoteTimeOut	$03

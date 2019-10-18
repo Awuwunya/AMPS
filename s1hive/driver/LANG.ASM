@@ -4,7 +4,7 @@
 z80prg =	0		; 0 IN 68K MODE, 1 IN Z80 MODE
 ztemp =		0		; TEMPORARY REGISTER
 zundoc =	0		; SET TO 0 TO USE UNDOCUMENTED OPCODES
-zchkoffs =	1		; SET TO 0 TO NOT CHECK IX/IY AND JR OFFSETS
+zchkoffs =	0		; SET TO 0 TO NOT CHECK IX/IY AND JR OFFSETS
 z80regstr	EQUS "a b c d e h l bc de hl sp af ix iy i r ixh ixl iyh iyl (bc) (de) (hl) (sp) af' (ix) (iy)"
 
 ; EASILY MAKE SECTIONS
@@ -14,6 +14,7 @@ z80prog	macro obj
 
 	; magic function that fixes all the jr and djnz opcodes, along with offsets.
 	; Used for detecting illegal forward jumps
+	if zchkoffs
 		local lastpos
 lastpos =	*
 			local off, byte
@@ -25,6 +26,7 @@ lastpos =	*
 		endr
 
 		org lastpos
+	endif
 
 		POPO		; restore options
 z80prg =	0
@@ -38,7 +40,7 @@ z80prg =	0
 	OPT D-			; make sure EQU/SET do not descope local lables
 
 zfutureobj =	\obj
-zfuturepos =	*
+zfuturepos =	offset(*)
 zfuturec =	0
 
 	if narg=1
@@ -155,7 +157,7 @@ zjrfuture macro off, byte
 zfuture	macro byte
 zfuturec =	zfuturec+1
 		local p,v
-p =		*-2
+p =		offset(*)-2
 v =		\byte
 		pushp "\#v"
 		pushp "\#p"

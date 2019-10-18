@@ -19,7 +19,7 @@ dAMPSnextPSGSFX:
 		bsr.w	dUpdateFreqPSG3		; if frequency needs changing, do it
 
 .endm
-		bsr.w	dEnvelopePSG		; run envelope program
+		bsr.w	dEnvelopePSG_SFX	; run envelope program
 .next
 		dbf	d7,dAMPSnextPSGSFX	; make sure to run all the channels
 		jmp	dCheckTracker(pc)	; after that, check tracker and end loop
@@ -41,7 +41,7 @@ dAMPSnextPSGSFX:
 .pcnote
 	dProcNote 1, 1				; reset necessary channel memory
 		bsr.w	dUpdateFreqPSG		; update hardware frequency
-		bsr.w	dEnvelopePSG		; run envelope program
+		bsr.w	dEnvelopePSG_SFX	; run envelope program
 		dbf	d7,dAMPSnextPSGSFX	; make sure to run all the channels
 	; continue to check tracker and end loop
 ; ===========================================================================
@@ -122,7 +122,7 @@ dUpdateFreqPSG:
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add to channel base frequency to d6
 
-	if FEATURE_PORTAMENTO
+	if FEATURE_MODENV
 		jsr	dModEnvProg(pc)		; process modulation envelope
 	endif
 
@@ -175,8 +175,17 @@ locret_UpdateFreqPSG:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Routine for running envelope programs
+; Routine for updating PSG volume
 ; ---------------------------------------------------------------------------
+
+dEnvelopePSG_SFX:
+	if FEATURE_SFX_MASTERVOL=0
+		btst	#cfbRest,(a5)		; check if channel is resting
+		bne.s	locret_UpdateFreqPSG	; if is, do not update anything
+
+		move.b	cVolume(a5),d5		; load channel volume to d5
+		bra.s	dEnvelopePSG2		; do not add master volume
+	endif
 
 dEnvelopePSG:
 		btst	#cfbRest,(a5)		; check if channel is resting
@@ -184,10 +193,10 @@ dEnvelopePSG:
 
 		move.b	mMasterVolPSG.w,d5	; load PSG master volume to d5
 		add.b	cVolume(a5),d5		; add channel volume to d5
-		bpl.s	.nocap			; branch if volume did not overflow
+		bpl.s	dEnvelopePSG2		; branch if volume did not overflow
 		moveq	#$7F,d5			; set to maximum volume
 
-.nocap
+dEnvelopePSG2:
 		moveq	#0,d4
 		move.b	cVolEnv(a5),d4		; load volume envelope ID to d4
 		beq.s	.ckflag			; if 0, check if volume update was needed
@@ -255,13 +264,14 @@ locret_MutePSG:
 ; Note to PSG frequency conversion table
 ; ---------------------------------------------------------------------------
 ;	dc.w	C     C#    D     Eb    E     F     F#    G     G#    A     Bb    B
-dFreqPSG:dc.w $0356,$0326,$02F9,$02CE,$02A5,$0280,$025C,$023A,$021A,$01FB,$01DF,$01C4; Octave 3 - (81 - 8C)
-	dc.w  $01AB,$0193,$017D,$0167,$0153,$0140,$012E,$011D,$010D,$00FE,$00EF,$00E2; Octave 4 - (8D - 98)
-	dc.w  $00D6,$00C9,$00BE,$00B4,$00A9,$00A0,$0097,$008F,$0087,$007F,$0078,$0071; Octave 5 - (99 - A4)
-	dc.w  $006B,$0065,$005F,$005A,$0055,$0050,$004B,$0047,$0043,$0040,$003C,$0039; Octave 6 - (A5 - B0)
-	dc.w  $0036,$0033,$0030,$002D,$002B,$0028,$0026,$0024,$0022,$0020,$001F,$001D; Octave 7 - (B1 - BC)
-	dc.w  $001B,$001A,$0018,$0017,$0016,$0015,$0013,$0012,$0011		     ; Notes (BD - C5)
-	dc.w  $0000								     ; Note (C6)
+dFreqPSG:dc.w $03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03F7,$03BE,$0388; Octave 2 - (81 - 8C)
+	dc.w  $0356,$0326,$02F9,$02CE,$02A5,$0280,$025C,$023A,$021A,$01FB,$01DF,$01C4; Octave 3 - (8D - 98)
+	dc.w  $01AB,$0193,$017D,$0167,$0153,$0140,$012E,$011D,$010D,$00FE,$00EF,$00E2; Octave 4 - (99 - A4)
+	dc.w  $00D6,$00C9,$00BE,$00B4,$00A9,$00A0,$0097,$008F,$0087,$007F,$0078,$0071; Octave 5 - (A5 - B0)
+	dc.w  $006B,$0065,$005F,$005A,$0055,$0050,$004B,$0047,$0043,$0040,$003C,$0039; Octave 6 - (B1 - BC)
+	dc.w  $0036,$0033,$0030,$002D,$002B,$0028,$0026,$0024,$0022,$0020,$001F,$001D; Octave 7 - (BD - C8)
+	dc.w  $001B,$001A,$0018,$0017,$0016,$0015,$0013,$0012,$0011		     ; Octave 8 - (B9 - D1)
+	dc.w  $0000								     ; Note (D2)
 dFreqPSG_:
 	if safe=1				; in safe mode, we have extra debug data
 .x = $100|((dFreqPSG_-dFreqPSG)/2)		; to check if we played an invalid note
