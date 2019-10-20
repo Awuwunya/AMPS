@@ -273,8 +273,8 @@ dPlaySnd_Music:
 		move.b	d5,cDuration(a1)	; reset channel duration
 		move.w	d3,cFreq(a1)		; reset channel base frequency
 
-		moveq	#0,d0
 		move.w	(a4)+,d0		; load tracker offset to d0
+		ext.l	d0			; extend parameter to longword (make sure negative values work)
 		add.l	a3,d0			; add music header offset to d0
 		move.l	d0,cData(a1)		; save as the tracker address of the channel
 	if safe=1
@@ -303,8 +303,8 @@ dPlaySnd_Music:
 		move.b	d1,cPanning(a1)		; reset panning to centre
 		move.b	d5,cDuration(a1)	; reset channel duration
 
-		moveq	#0,d0
 		move.w	(a4)+,d0		; load tracker offset to d0
+		ext.l	d0			; extend parameter to longword (make sure negative values work)
 		add.l	a3,d0			; add music header offset to d0
 		move.l	d0,cData(a1)		; save as the tracker address of the channel
 	if safe=1
@@ -343,8 +343,8 @@ dPlaySnd_Music:
 		move.b	d6,cStack(a1)		; reset channel stack pointer
 		move.b	d5,cDuration(a1)	; reset channel duration
 
-		moveq	#0,d0
 		move.w	(a4)+,d0		; load tracker offset to d0
+		ext.l	d0			; extend parameter to longword (make sure negative values work)
 		add.l	a3,d0			; add music header offset to d0
 		move.l	d0,cData(a1)		; save as the tracker address of the channel
 	if safe=1
@@ -543,8 +543,8 @@ dPlaySnd_SFX:
 		move.b	d5,cPrio(a5)		; set channel priority
 		move.b	d2,cDuration(a5)	; reset channel duration
 
-		moveq	#0,d0
 		move.w	(a1)+,d0		; load tracker offset to d0
+		ext.l	d0			; extend parameter to longword (make sure negative values work)
 		add.l	a4,d0			; add music header offset to d0
 		move.l	d0,cData(a5)		; save as the tracker address of the channel
 	if safe=1

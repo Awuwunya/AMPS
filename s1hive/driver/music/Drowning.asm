@@ -91,12 +91,16 @@ Drowning_FM1:
 	sNoteTimeOut	$05
 	sCall		Drowning_Call1
 	ssTempo		$55
+	ssTempoShoes	$55
 	sCall		Drowning_Call1
 	ssTempo		$40
+	ssTempoShoes	$40
 	sCall		Drowning_Call1
-	ssTempo		$28
+	ssTempo		$2A
+	ssTempoShoes	$2A
 	sCall		Drowning_Call1
-	ssTempo		$1A
+	ssTempo		$19
+	ssTempoShoes	$19
 	sCall		Drowning_Call1
 	dc.b nC5, $06
 	sStop

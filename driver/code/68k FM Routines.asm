@@ -91,16 +91,16 @@ dUpdateVolFM2:
 .uwdone
 	else
 		dCALC_VOICE			; get address of the specific voice to a1
-		moveq	#0,d2			; clear d0 (so no underwater by default)
+		moveq	#0,d4			; clear d0 (so no underwater by default)
 
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
 		beq.s	.uwdone			; if not, skip
-		move.b	(a1),d2			; load algorithm and feedback to d0
-		and.w	#7,d2			; mask out everything but the algorithm
+		move.b	(a1),d4			; load algorithm and feedback to d0
+		and.w	#7,d4			; mask out everything but the algorithm
 
 		lea	dUnderwaterTbl(pc),a2	; get underwater table to a2
-		move.b	(a2,d2.w),d6		; get the value from table
-		move.b	d6,d2			; copy to d0
+		move.b	(a2,d4.w),d6		; get the value from table
+		move.b	d6,d4			; copy to d0
 		and.w	#7,d6			; mask out extra stuff
 
 		add.b	d6,d5			; add algorithm to Total Level carrier offset
@@ -117,7 +117,11 @@ dUpdateVolFM2:
 .tlloop
 		move.b	(a2)+,d0		; load YM address to write to
 		move.b	(a1)+,d1		; get Total Level value from voice to d1
+	if FEATURE_UNDERWATER
 		bpl.s	.noslot			; if slot operator bit was not set, branch
+	else
+		bpl.s	.ignore			; if slot operator bit was not set, branch
+	endif
 
 		add.b	d5,d1			; add carrier offset to loaded value
 		bmi.s	.slot			; if we did not overflow, branch
@@ -128,7 +132,7 @@ dUpdateVolFM2:
 
 .noslot
 	if FEATURE_UNDERWATER
-		add.b	d2,d1			; add modulator offset to loaded value
+		add.b	d4,d1			; add modulator offset to loaded value
 	endif
 
 .slot

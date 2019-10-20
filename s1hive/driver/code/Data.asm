@@ -46,6 +46,13 @@
 
 __sfx =		SFXoff
 __mus =		MusOff
+
+MusicIndex:
+	ptrMusic GHZ, $25, LZ, $02, MZ, $02, SLZ, $07, SYZ, $0C, SBZ, $20, FZ, $10
+	ptrMusic Boss, $2E, SS, $00, Invincibility, $01, Drowning, $80
+	ptrMusic Title, $00, GotThroughAct, $00, Emerald, $00, ExtraLife, $33
+	ptrMusic GameOver, $00, Continue, $00, Ending, $00, Credits, $00, SEGA, $00
+
 SoundIndex:
 	ptrSFX	0, RingRight, RingLeft, RingLoss, Splash, Break
 	ptrSFX	0, Jump, Roll, Skid, Bubble, Drown, SpikeHit, Death
@@ -62,12 +69,6 @@ SoundIndex:
 
 ; unused SFX
 	ptrSFX	0, UnkA2, UnkAB, UnkB8
-
-MusicIndex:
-	ptrMusic GHZ, $25, LZ, $02, MZ, $02, SLZ, $07, SYZ, $0C, SBZ, $20, FZ, $10
-	ptrMusic Boss, $2E, SS, $00, Invincibility, $01, Drowning, $80
-	ptrMusic Title, $00, GotThroughAct, $00, Emerald, $00, ExtraLife, $33
-	ptrMusic GameOver, $00, Continue, $00, Ending, $00, Credits, $00, SEGA, $00
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define samples
