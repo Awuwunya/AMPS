@@ -6,12 +6,14 @@
 dMuteFM:
 		moveq	#$28,d0			; YM address: Key on/off
 		moveq	#%00000010,d3		; turn keys off, and start from YM channel 3
+	stopZ80
+	CheckCue				; check that cue is valid
 
 .noteoff
 		move.b	d3,d1			; copy value into d1
-		jsr	WriteYM_Pt1(pc)		; write to part 1 channel
+	WriteYM1	d0, d1			; write part 1 to YM
 		addq.b	#4,d1			; set this to part 2 channel
-		jsr	WriteYM_Pt1(pc)		; write to part 2 channel
+	WriteYM1	d0, d1			; write part 2 to YM
 		dbf	d3,.noteoff		; loop for all 3 channel groups
 
 		moveq	#$40,d0			; YM command: Total Level Operator 1
@@ -23,13 +25,15 @@ dMuteFM:
 		moveq	#$10-1,d5		; prepare the value for going to next channel to d5
 
 .oploop
-		jsr	WriteYM_Pt1(pc)		; write to part 1 channel
-		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
+	WriteYM1	d0, d1			; write part 1 to YM
+	WriteYM2	d0, d1			; write part 2 to YM
 		addq.w	#4,d0			; go to next operator (1 2 3 4)
 		dbf	d3,.oploop		; repeat for each operator
 
 		sub.b	d5,d0			; go to next FM channel
 		dbf	d4,.chloop		; repeat for each channel
+	;	st	(a0)			; write end marker
+	startZ80
 
 locret_MuteFM:
 		rts
@@ -84,14 +88,10 @@ dUpdateVolFM2:
 		moveq	#0,d0
 		move.b	cVoice(a5),d0		; load FM voice ID of the channel to d0
 		move.l	a6,a1			; copy music voice table address to a1
+	dCALC_VOICE				; get address of the specific voice to a1
 
-	if FEATURE_UNDERWATER=0
-		dCALC_VOICE VoiceTL		; get address of the specific voice to a1
-
-.uwdone
-	else
-		dCALC_VOICE			; get address of the specific voice to a1
-		moveq	#0,d2			; clear d0 (so no underwater by default)
+	if FEATURE_UNDERWATER
+		moveq	#0,d4			; clear d0 (so no underwater by default)
 
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
 		beq.s	.uwdone			; if not, skip
@@ -108,20 +108,16 @@ dUpdateVolFM2:
 		moveq	#$7F,d5			; force FM volume to silence
 
 .uwdone
-		add.w	#VoiceTL,a1		; go to the Total Level offset of the voice
 	endif
 
 		moveq	#4-1,d3			; prepare 4 operators to d3
-		lea	dOpTLFM(pc),a2		; load Total Level address table to a3
+		move.l	sp,a2			; copy stack pointer to a2
+		subq.l	#4,sp			; reserve some space in the stack
+		add.w	#VoiceTL,a1		; go to the Total Level offset of the voice
 
 .tlloop
-		move.b	(a2)+,d0		; load YM address to write to
 		move.b	(a1)+,d1		; get Total Level value from voice to d1
-	if FEATURE_UNDERWATER
 		bpl.s	.noslot			; if slot operator bit was not set, branch
-	else
-		bpl.s	.ignore			; if slot operator bit was not set, branch
-	endif
 
 		add.b	d5,d1			; add carrier offset to loaded value
 		bmi.s	.slot			; if we did not overflow, branch
@@ -136,9 +132,19 @@ dUpdateVolFM2:
 	endif
 
 .slot
-		jsr	WriteChYM(pc)		; write Total Level to YM according to channel
-.ignore
+		move.b	d1,-(a2)		; write total level to stack
 		dbf	d3,.tlloop		; repeat for each Total Level operator
+
+	CheckCue				; check that YM cue is valid
+	InitChYM				; prepare to write to channel
+	stopZ80
+	WriteChYM	#$4C, (a2)+		; Total Level: Load operator 4 from stack
+	WriteChYM	#$44, (a2)+		; Total Level: Load operator 2 from stack
+	WriteChYM	#$48, (a2)+		; Total Level: Load operator 3 from stack
+	WriteChYM	#$40, (a2)+		; Total Level: Load operator 1 from stack
+	;	st	(a0)			; write end marker
+	startZ80
+		move.l	a2,sp			; restore stack pointer
 
 	if safe=1
 		AMPS_Debug_UpdVolFM		; check if the voice was valid
@@ -159,12 +165,7 @@ dUnderwaterTbl:	dc.b $08, $08, $08, $08, $0A, $0E, $0E, $0F
 ; YM2612 register update list
 ; ---------------------------------------------------------------------------
 
-dOpListYM:	dc.b $30, $38, $34, $3C		; Detune, Multiple
-		dc.b $50, $58, $54, $5C		; Rate Scale, Attack Rate
 dAMSEn_Ops:	dc.b $60, $68, $64, $6C		; Decay 1 Rate
-		dc.b $70, $78, $74, $7C		; Decay 2 Rate
-		dc.b $80, $88, $84, $8C		; Decay 1 level, Release Rate
-		dc.b $90, $98, $94, $9C		; SSG-EG
 dOpTLFM:	dc.b $40, $48, $44, $4C		; Total Level
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -291,8 +292,11 @@ dAMPSnextFM:
 
 dUpdateFreqFM:
 		move.w	cFreq(a5),d6		; load channel base frequency to d6
-		beq.s	dUpdFreqFMrest		; if 0, this channel should be resting
+		bne.s	.norest			; if 0, this channel should be resting
+		bset	#cfbRest,(a5)		; set channel resting flag
+		rts
 
+.norest
 		move.b	cDetune(a5),d0		; load detune value to d0
 		ext.w	d0			; extend to word
 		add.w	d0,d6			; add to channel base frequency to d6
@@ -319,17 +323,15 @@ dUpdateFreqFM3:
 		btst	#cfbRest,(a5)		; is this channel resting
 		bne.s	locret_UpdFreqFM	; if is, skip
 
-		move.w	d6,d1			; copy frequency to d1
-		lsr.w	#8,d1			; shift upper byte into lower byte
-		moveq	#$FFFFFFA4,d0		; YM command: Frequency MSB & Octave
-		jsr	WriteChYM(pc)		; write to YM according to channel
-
-		move.b	d6,d1			; copy lower byte of frequency into d1 (value)
-		moveq	#$FFFFFFA0,d0		; YM command: Frequency LSB
-		jmp	WriteChYM(pc)		; write to YM according to channel
-
-dUpdFreqFMrest:
-		bset	#cfbRest,(a5)		; set channel resting flag
+		move.w	d6,d0			; copy frequency to d1
+		lsr.w	#8,d0			; shift upper byte into lower byte
+	CheckCue				; check that YM cue is valid
+	InitChYM				; prepare to write to channel
+	stopZ80
+	WriteChYM	#$A4, d0		; Frequency MSB & Octave
+	WriteChYM	#$A0, d6		; Frequency LSB
+	;	st	(a0)			; write end marker
+	startZ80
 
 locret_UpdFreqFM:
 		rts
@@ -370,68 +372,11 @@ dKeyOffFM2:
 		btst	#cfbHold,(a5)		; check if note is held
 		bne.s	locret_UpdFreqFM	; if so, do not note off
 
-		moveq	#$28,d0			; YM command: Key on
-		move.b	cType(a5),d1		; get channel type bits (and turn all operators off)
-		bra.s	WriteYM_Pt1		; write to part 1 channel
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Write to YMCue according to channel and check if interrupted by sfx
-; ---------------------------------------------------------------------------
-
-dWriteYMchnInt:
-		btst	#cfbInt,(a5)		; check if interrupted by sfx
-		bne.s	WriteYM_Pt1_rts		; if was, do not note on
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Write to YMCue according to channel
-; ---------------------------------------------------------------------------
-
-WriteChYM:
-		btst	#ctbPt2,cType(a5)	; check if this is a YM part 1 or 2 channel
-		bne.s	WriteChYM2		; if part 2, branch
-		add.b	cType(a5),d0		; add channel type to address
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Write to YMCue using part 1
-; ---------------------------------------------------------------------------
-
-WriteYM_Pt1:
-	if safe=1
-		AMPS_Debug_CuePtr 1		; check if cue pointer is valid
-	endif
-	StopZ80					; wait for Z80 to stop
-		sf	(a0)+			; set YM port address as 0
-		move.b	d1,(a0)+		; write data value to cue
-		move.b	d0,(a0)+		; write address to cue
-	;	st	(a0)			; mark as the end of the cue data
-	StartZ80				; enable Z80 execution
-
-WriteYM_Pt1_rts:
-		rts
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Write to YMCue according to channel in part 2
-; ---------------------------------------------------------------------------
-
-WriteChYM2:
-		move.b	cType(a5),d2		; get channel type to d2
-		bclr	#ctbPt2,d2		; remove part 2 marker from it
-		add.b	d2,d0			; add to YM address
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Write to YMCue using part 2
-; ---------------------------------------------------------------------------
-
-WriteYM_Pt2:
-	if safe=1
-		AMPS_Debug_CuePtr 2		; check if cue pointer is valid
-	endif
-	StopZ80					; wait for Z80 to stop
-		move.b	#$02,(a0)+		; set YM port address as 2
-		move.b	d1,(a0)+		; write data value to cue
-		move.b	d0,(a0)+		; write address to cue
-	;	st	(a0)			; mark as the end of the cue data
-	StartZ80				; enable Z80 execution
+	stopZ80
+	CheckCue				; check that cue is valid
+	WriteYM1	#$28, cType(a5)		; key on: turn all operators off for channel
+	;	st	(a0)			; write end marker
+	startZ80
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

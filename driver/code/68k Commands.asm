@@ -178,6 +178,8 @@ dcSpRev:
 
 dcSpReset:
 		clr.b	mSpindash.w		; reset spindash rev counter
+
+Return_dcSpReset:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -189,28 +191,42 @@ dcPan:
 		AMPS_Debug_dcPan		; check if this channel can pan
 	endif
 
-		moveq	#$37,d1			; prepare bits to keep
-		and.b	cPanning(a5),d1		; and with channel LFO settings
-		or.b	(a4)+,d1		; or panning value
-		move.b	d1,cPanning(a5)		; save as channel panning
+		moveq	#$37,d0			; prepare bits to keep
+		and.b	cPanning(a5),d0		; and with channel LFO settings
+		or.b	(a4)+,d0		; or panning value
+		move.b	d0,cPanning(a5)		; save as channel panning
 
-		moveq	#$FFFFFFB4,d0		; YM command: Panning & LFO
 		btst	#ctbDAC,cType(a5)	; check if this is a DAC channel
-		beq.w	dWriteYMchnInt		; if not, write channel-specific YM command
+		bne.s	.dac			; if yes, branch
+		btst	#cfbInt,(a5)		; check if interrupted by SFX
+		bne.s	Return_dcSpReset	; if yes, do not update
+
+	CheckCue				; check that YM cue is valid
+	InitChYM				; prepare to write to channel-specific YM channel
+	stopZ80
+	WriteChYM	#$B4, d0		; Panning & LFO
+	;	st	(a0)			; write end marker
+	startZ80
+		rts
 ; ---------------------------------------------------------------------------
 ; Since the DAC channels have or based panning behavior, we need this
 ; piece of code to update its panning
 ; ---------------------------------------------------------------------------
 
-		move.b	mDAC1+cPanning.w,d1	; read panning value from music DAC1
+.dac
+		move.b	mDAC1+cPanning.w,d0	; read panning value from music DAC1
 		btst	#cfbInt,mDAC1+cFlags.w	; check if music DAC1 is interrupted by SFX
 		beq.s	.nodacsfx		; if not, use music DAC1 panning
-		move.b	mSFXDAC1+cPanning.w,d1	; read panning value from SFX DAC1
+		move.b	mSFXDAC1+cPanning.w,d0	; read panning value from SFX DAC1
 
 .nodacsfx
-		or.b	mDAC2+cPanning.w,d1	; or the panning value from music DAC2
-		moveq	#$FFFFFFB4+2,d0		; YM address: Panning and LFO (FM3/6)
-		jmp	WriteYM_Pt2(pc)		; write to part 2 channel
+		or.b	mDAC2+cPanning.w,d0	; or the panning value from music DAC2
+	CheckCue				; check that YM cue is valid
+	stopZ80
+	WriteYM2	#$B4+2, d0		; Panning & LFO
+	;	st	(a0)			; write end marker
+	startZ80
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker commands for changing detune offset
@@ -389,19 +405,34 @@ dcFilter:
 ; ---------------------------------------------------------------------------
 
 dcYM:
-		move.b	(a4)+,d0		; load YM address from tracker to d0
-		move.b	(a4)+,d1		; get command value from tracker to d1
+		move.b	(a4)+,d3		; load YM address from tracker to d3
+		move.b	(a4)+,d0		; get command value from tracker to d0
 		btst	#cfbInt,(a5)		; is this channel overridden by SFX?
 		bne.s	Return_dcSound		; if so, skip
 
-		cmp.b	#$30,d0			; is this register 00-2F?
-		blo.w	WriteYM_Pt1		; if so, write to part 1 always
+		cmp.b	#$30,d3			; is this register 00-2F?
+		blo.s	.pt1			; if so, write to part 1 always
 
-		move.b	d0,d2			; copy address to d2
+		move.b	d3,d2			; copy address to d2
 		sub.b	#$A8,d2			; align $A8 with 0
 		cmp.b	#$08,d2			; is this egister A8-AF?
-		blo.w	WriteYM_Pt1		; if so, write to part 1 always
-		jmp	WriteChYM(pc)		; write to YM according to channel
+		blo.s	.pt1			; if so, write to part 1 always
+
+	CheckCue				; check that cue is valid
+	InitChYM				; prepare to write to YM channel
+	stopZ80
+	WriteChYM	d3, d0			; write to the channel
+	;	st	(a0)			; write end marker
+	startZ80
+		rts
+
+.pt1
+	CheckCue				; check that cue is valid
+	stopZ80
+	WriteYM1	d3, d0			; write register to YM1
+	;	st	(a0)			; write end marker
+	startZ80
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker command for setting channel base frequency
@@ -764,20 +795,41 @@ dcVoice:
 ; some cycles for 68000, but it will help improve DAC quality.
 ; ---------------------------------------------------------------------------
 
+WriteReg	macro	reg
+	rept narg
+		move.b	(a1)+,(a3)+		; write value to buffer
+		if \reg<$80
+			moveq	#\reg,d0	; load register to d0
+		else
+			moveq	#$FFFFFF00|\reg,d0; load register to d0
+		endif
+
+		or.b	d2,d0			; add channel offset to register
+		move.b	d0,(a3)+		; write register to buffer
+	shift
+	endr
+    endm
+
 dUpdateVoiceFM:
 	dCALC_VOICE				; get address of the specific voice to a1
 		sub.w	#(VoiceRegs+1)*2,sp	; prepapre space in the stack
 		move.l	sp,a3			; copy pointer to the free space to a3
 
+		move.b	cType(a5),d2		; load channel type to d1
+		and.b	#3,d2			; keep in range
+
 		move.b	(a1)+,d4		; load feedback and algorithm to d4
 		move.b	d4,(a3)+		; save it to free space
-		move.b	#$B0,(a3)+		; YM command: Algorithm & FeedBack
+		moveq	#$FFFFFFB0,d0		; YM command: Algorithm & FeedBack
+		or.b	d2,d0			; add channel offset to register
+		move.b	d0,(a3)+		; write register to buffer
 
-		lea	dOpListYM(pc),a2	; load YM2612 operator list into a2
-	rept VoiceRegs-5
-		move.b	(a1)+,(a3)+		; copy each value (except Total Level)
-		move.b	(a2)+,(a3)+		; copy each command
-	endr
+	WriteReg	$30, $38, $34, $3C	; Detune, Multiple
+	WriteReg	$50, $58, $54, $5C	; Rate Scale, Attack Rate
+	WriteReg	$60, $68, $64, $6C	; Decay 1 Rate
+	WriteReg	$70, $78, $74, $7C	; Decay 2 Rate
+	WriteReg	$80, $88, $84, $8C	; Decay 1 level, Release Rate
+	WriteReg	$90, $98, $94, $9C	; SSG-EG
 
 		moveq	#4-1,d5			; prepare 4 operators to d5
 		move.b	cVolume(a5),d3		; load FM channel volume to d3
@@ -795,22 +847,25 @@ dUpdateVoiceFM:
 	if FEATURE_UNDERWATER
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
 		beq.s	.nouw			; if not, skip
-		and.w	#7,d4			; mask out everything but the algorithm
-
 		lea	dUnderwaterTbl(pc),a2	; get underwater table to a2
+
+		and.w	#7,d4			; mask out everything but the algorithm
 		move.b	(a2,d4.w),d6		; get the value from table
 		move.b	d6,d4			; copy to d4
 		and.w	#7,d6			; mask out extra stuff
 
-		lea	dOpTLFM(pc),a2		; restore old array
 		add.b	d6,d3			; add algorithm to Total Level carrier offset
-		bpl.s	.tlloop			; if volume did not overflow, skip
+		bpl.s	.uwdone			; if volume did not overflow, skip
 		moveq	#$7F,d3			; force FM volume to silence
-		bra.s	.tlloop
+		bra.s	.uwdone
 
 .nouw
 		moveq	#0,d4			; no underwater 4 u
+
+.uwdone
 	endif
+
+		lea	dOpTLFM(pc),a2		; restore old array
 
 .tlloop
 		move.b	(a1)+,d1		; get Total Level value from voice to d1
@@ -830,44 +885,42 @@ dUpdateVoiceFM:
 
 .slot
 		move.b	d1,(a3)+		; save the Total Level value
-		move.b	(a2)+,(a3)+		; copy total level command
+		move.b	(a2)+,d0		; load register to d0
+		or.b	d2,d0			; add channel offset to register
+		move.b	d0,(a3)+		; write register to buffer
 		dbf	d5,.tlloop		; repeat for each Total Level operator
 
 	if safe=1
 		AMPS_Debug_UpdVoiceFM		; check if the voice was valid
 	endif
 
-		bclr	#cfbVol,(a5)		; reset volume update request flag
 		move.b	cPanning(a5),(a3)+	; copy panning value to free space
-		move.b	#$B4,(a3)+		; YM command: Panning & LFO
+		moveq	#$FFFFFFB4,d0		; YM command: Panning & LFO
+		or.b	d2,d0			; add channel offset to register
+		move.b	d0,(a3)+		; write register to buffer
 
-		moveq	#0,d2			; prepare part 1 value
-		move.b	cType(a5),d3		; load FM channel type to d3
-		btst	#ctbPt2,d3		; check if its part 1
-		beq.s	.ptok			; if so, branch
-		and.b	#3,d3			; get channel offset only
-		moveq	#2,d2			; prepare part 2 value
+		move.b	cType(a5),d2		; load FM channel type to d2
+		lsr.b	#1,d2			; halve part value
+		and.b	#2,d2			; clear extra bits away
 
 .ptok
 		move.l	sp,a3			; copy free space pointer to a3 again
-		moveq	#VoiceRegs,d1		; prepare loop point
 	if safe=1
 		AMPS_Debug_CuePtr 0		; make sure cue is valid
 	endif
 	StopZ80					; wait for Z80 to stop
 
 .write
+	rept VoiceRegs+1
 		move.b	d2,(a0)+		; select YM port to access (4000 or 4002)
-		move.b	(a3)+,(a0)+		; write command values
+		move.b	(a3)+,(a0)+		; write values
+		move.b	(a3)+,(a0)+		; write registers
+	endr
 
-		move.b	(a3)+,d4		; load YM command
-		or.b	d3,d4			; add the channel offset to command
-		move.b	d4,(a0)+		; save to Z80 cue
-		dbf	d1,.write		; write all registers
-		st	(a0)			; mark as end of the cue
-
+	;	st	(a0)			; mark as end of the cue
 	StartZ80				; enable Z80 execution
-		add.w	#(VoiceRegs+1)*2,sp	; reset stack pointer
+		move.l	a3,sp			; fix stack pointer
+		bclr	#cfbVol,(a5)		; reset volume update request flag
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -903,6 +956,7 @@ dcStop:
 
 		bset	#cfbRest,(a5)		; Set channel resting flag
 		move.l	mVctMus.w,a1		; load music voice table to a1
+		moveq	#0,d0
 		move.b	cVoice(a5),d0		; load FM voice ID of the channel to d0
 		jsr	dUpdateVoiceFM(pc)	; send FM voice for this channel
 
@@ -935,33 +989,43 @@ dcsLFO:
 		moveq	#0,d0
 		move.b	cVoice(a5),d0		; load FM voice ID of the channel to d0
 		move.l	a6,a1			; load voice table to a1
-
 	dCALC_VOICE 9				; get address of the specific voice to a1
+
 		move.b	(a4),d3			; load LFO enable operators to d3
 		lea	dAMSEn_Ops(pc),a2	; load Decay 1 Rate address table to a2
 		moveq	#4-1,d6			; prepare 4 operators to d5
+	CheckCue				; check that cue is valid
+
+	InitChYM				; prepare to write Channel-specific YM registers
+	stopZ80
+		btst	#cfbInt,(a5)		; check if channel is interrupted
+		bne.s	.skipLFO		; if so, skip loading LFO
 
 .decayloop
 		move.b	(a1)+,d1		; get Decay 1 Level value from voice to d1
 		move.b	(a2)+,d0		; load YM address to write to d0
 
-		add.b	d3,d3			; check if LFO is enabled for this channeö
+		add.b	d3,d3			; check if LFO is enabled for this channel
 		bcc.s	.noLFO			; if not, skip
 		or.b	#$80,d1			; set enable LFO bit
-		jsr	WriteChYM(pc)		; write to YM according to channel
+	WriteChYM	d0, d1			; Decay 1 level: Decay 1 + AMS enable bit
 
 .noLFO
 		dbf	d6,.decayloop		; repeat for each Decay 1 Level operator
 
-		move.b	(a4)+,d1		; load LFO frequency value from tracker
-		moveq	#$22,d0			; YM command: LFO
-		jsr	WriteYM_Pt1(pc)		; write to part 1 channel
+.skipLFO
+	WriteYM1	#$22, (a4)+		; LFO: LFO frequency and enable
+		move.b	(a4)+,d0		; load AMS, FMS & Panning from tracker
+		move.b	d0,cPanning(a5)		; save to channel panning
 
-		move.b	(a4)+,d1		; load AMS, FMS & Panning from tracker
-		move.b	d1,cPanning(a5)		; save to channel panning
+		btst	#cfbInt,(a5)		; check if channel is interrupted
+		bne.s	.skipPan		; if so, skip panning
+	WriteChYM	#$B4, d0		; Panning & LFO: AMS + FMS + Panning
 
-		moveq	#$FFFFFFB4,d0		; YM command: Panning & LFO
-		jmp	dWriteYMchnInt(pc)	; write to YM according to channel
+.skipPan
+	;	st	(a0)			; write end marker
+	startZ80
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Tracker command for resetting condition

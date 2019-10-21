@@ -696,10 +696,8 @@ AMPS_Debug_CuePtr	macro id
     endm
 
 	if def(RaiseError)	; check if Vladik's debugger is active
-AMPS_Debug_CuePtr1:
-		RaiseError2 "CUE invalid at WriteYM_Pt1: %<.l a0>", AMPS_Debug_Console_Channel
-AMPS_Debug_CuePtr2:
-		RaiseError2 "CUE invalid at WriteYM_Pt2: %<.l a0>", AMPS_Debug_Console_Channel
+AMPS_Debug_CuePtrGen:
+		RaiseError2 "CUE invalid at macro: %<.l a0>", AMPS_Debug_Console_Channel
 AMPS_Debug_CuePtr0:
 		RaiseError2 "CUE invalid at dUpdateVoiceFM: %<.l a0>", AMPS_Debug_Console_Channel
 AMPS_Debug_CuePtr3:

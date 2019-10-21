@@ -390,10 +390,14 @@ dKeyOnFM	macro
 		bne.s	.k			; if so, do not note on
 	endif
 
-		moveq	#$28,d0			; YM command: Key on
-		move.b	cType(a5),d1		; get channel type bits
-		ori.b	#$F0,d1			; turn all FM operators on
-		bsr.w	WriteYM_Pt1		; send note-on event
+		move.b	cType(a5),d0		; get channel type bits
+		ori.b	#$F0,d0			; turn all FM operators on
+	CheckCue				; check that cue is valid
+	stopZ80
+	WriteYM1	#$28, d0		; Key on: turn all FM operators on
+	;	st	(a0)			; write end marker
+	startZ80
+
 .k
     endm
 ; ===========================================================================

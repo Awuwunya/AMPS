@@ -13,11 +13,18 @@ dPlaySnd_Pause:
 
 		moveq	#3-1,d3			; 3 channels per YM2616 "part"
 		moveq	#$FFFFFFB4,d0		; YM address: Panning and LFO
-		moveq	#0,d1			; pan to neither speaker and remove LFO
+		moveq	#2,d1			; prepare part 2 value
+	CheckCue				; check that cue is correct
+	stopZ80
 
 .muteFM
-		jsr	WriteYM_Pt1(pc)		; write to part 1 channel
-		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
+		clr.b	(a0)+			; write to part 1
+		clr.b	(a0)+			; pan to neither speaker and remove LFO
+		move.b	d0,(a0)+		; YM address: Panning and LFO
+		move.b	d1,(a0)+		; write to part 2
+		clr.b	(a0)+			; pan to neither speaker and remove LFO
+		move.b	d0,(a0)+		; YM address: Panning and LFO
+
 		addq.b	#1,d0			; go to next FM channel
 		dbf	d3,.muteFM		; write each 3 channels per part
 ; ---------------------------------------------------------------------------
@@ -33,10 +40,12 @@ dPlaySnd_Pause:
 
 .note
 		move.b	d3,d1			; copy value into d1
-		jsr	WriteYM_Pt1(pc)		; write to part 1 channel
+	WriteYM1	d0, d1			; write part 1 to YM
 		addq.b	#4,d1			; set this to part 2 channel
-		jsr	WriteYM_Pt1(pc)		; write to part 2 channel
+	WriteYM1	d0, d1			; write part 2 to YM
 		dbf	d3,.note		; loop for all 3 channel groups
+	;	st	(a0)			; write end marker
+	startZ80
 
 		jsr	dMutePSG(pc)		; mute all PSG channels
 	; continue to mute all DAC channels
@@ -95,9 +104,11 @@ dPlaySnd_Unpause:
 		btst	#cfbInt,(a5)		; is the channel interrupted by SFX?
 		bne.s	.skipmus		; if is, do not update
 
-		moveq	#$FFFFFFB4,d0		; YM address: Panning and LFO
-		move.b	cPanning(a5),d1		; read panning and LFO value from channel
-		jsr	WriteChYM(pc)		; write to appropriate YM register
+	CheckCue				; check that we have cue is valid
+	InitChYM				; prepare to write to YM
+	stopZ80
+	WriteChYM	#$B4, cPanning(a5)	; Panning and LFO: read from channel
+	stopZ80
 
 .skipmus
 		adda.w	d3,a5			; go to next channel
@@ -111,9 +122,11 @@ dPlaySnd_Unpause:
 		tst.b	(a5)			; check if the channel is running a tracker
 		bpl.s	.skipsfx		; if not, do not update
 
-		moveq	#$FFFFFFB4,d0		; YM address: Panning and LFO
-		move.b	cPanning(a5),d1		; read panning and LFO value from channel
-		jsr	WriteChYM(pc)		; write to appropriate YM register
+	CheckCue				; check that we have cue is valid
+	InitChYM				; prepare to write to YM
+	stopZ80
+	WriteChYM	#$B4, cPanning(a5)	; Panning and LFO: read from channel
+	stopZ80
 
 .skipsfx
 		adda.w  d3,a5			; go to next channel
@@ -123,15 +136,21 @@ dPlaySnd_Unpause:
 ; piece of code to update its panning
 ; ---------------------------------------------------------------------------
 
-		move.b	mDAC1+cPanning.w,d1	; read panning value from music DAC1
+		move.b	mDAC1+cPanning.w,d0	; read panning value from music DAC1
 		btst	#cfbInt,mDAC1+cFlags.w	; check if music DAC1 is interrupted by SFX
 		beq.s	.nodacsfx		; if not, use music DAC1 panning
-		move.b	mSFXDAC1+cPanning.w,d1	; read panning value from SFX DAC1
+		move.b	mSFXDAC1+cPanning.w,d0	; read panning value from SFX DAC1
 
 .nodacsfx
-		or.b	mDAC2+cPanning.w,d1	; or the panning value from music DAC2
-		moveq	#$FFFFFFB4+2,d0		; YM address: Panning and LFO (FM3/6)
-		jmp	WriteYM_Pt2(pc)		; write to part 2 channel
+		or.b	mDAC2+cPanning.w,d0	; or the panning value from music DAC2
+	CheckCue				; check that YM cue is valid
+	stopZ80
+	WriteYM1	#$B4+2, d0		; Panning & LFO
+	;	st	(a0)			; write end marker
+	startZ80
+
+locret_Unpause:
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Subroutine to play any queued music tracks, sound effects or commands
@@ -145,7 +164,7 @@ dPlaySnd:
 		move.b	(a6)+,d7		; get sound ID for this slot
 		bne.s	.found			; if nonzero, a sound is queued
 		move.b	(a6)+,d7		; get sound ID for this slot
-		beq.s	locret_MuteDAC		; if 0, no sounds were queued, return
+		beq.s	locret_Unpause		; if 0, no sounds were queued, return
 
 .found
 		clr.b	-1(a6)			; clear the slot we are processing
@@ -371,29 +390,20 @@ dPlaySnd_Music:
 ; clears some YM registers.
 ; ---------------------------------------------------------------------------
 
-		moveq	#$28,d0			; YM address: Key on/off
-		moveq	#6,d1			; FM6, all operators off
-		jsr	WriteYM_Pt1(pc)		; write to part 2 channel
-
-		moveq	#$7F,d1			; set total level to $7F (silent)
-		moveq	#$42,d0			; YM address: Total Level Operator 1 (FM3/6)
-		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
-		moveq	#$4A,d0			; YM address: Total Level Operator 2 (FM3/6)
-		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
-		moveq	#$46,d0			; YM address: Total Level Operator 3 (FM3/6)
-		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
-		moveq	#$4E,d0			; YM address: Total Level Operator 4 (FM3/6)
-		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
-
-		moveq	#$FFFFFFC0,d1		; set panning to centre
-		moveq	#$FFFFFFB4+2,d0		; YM address: Panning and LFO (FM3/6)
-		jsr	WriteYM_Pt2(pc)		; write to part 2 channel
+	CheckCue				; check that cue is valid
+	stopZ80
+	WriteYM1	#$28, #6		; Key on/off: FM6, all operators off
+		moveq	#$7F, d0		; set total level to $7F (silent)
+	WriteYM2	#$42, d0		; Total Level Operator 1 (FM3/6)
+	WriteYM2	#$4A, d0		; Total Level Operator 2 (FM3/6)
+	WriteYM2	#$46, d0		; Total Level Operator 3 (FM3/6)
+	WriteYM2	#$4E, d0		; Total Level Operator 4 (FM3/6)
+	WriteYM2	#$B4+2, #$C0		; Panning and LFO (FM3/6): centre
+	;	st	(a0)			; write end marker
+	startZ80
 
 		move.w	#fLog>>$0F,d0		; use logarithmic filter
 		jmp	dSetFilter(pc)		; set filter
-
-locret_PlaySnd:
-		rts
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -407,6 +417,9 @@ dPSGtypeVals:	dc.b ctPSG1, ctPSG2, ctPSG3
 ; ---------------------------------------------------------------------------
 ; Subroutine to play a queued sound effect
 ; ---------------------------------------------------------------------------
+
+locret_PlaySnd:
+		rts
 
 dPlaySnd_SFX:
 	if FEATURE_BACKUP&FEATURE_BACKUPNOSFX
@@ -469,6 +482,7 @@ dPlaySnd_SFX:
 
 .setcont
 		move.b	d1,mContLast.w		; save new continous SFX ID
+
 .nocont
 		movea.l	a4,a1			; copy tracker header pointer to a1
 
@@ -555,10 +569,14 @@ dPlaySnd_SFX:
 		tst.b	d4			; check if this channel is a PSG channel
 		bmi.s	.loop			; if is, skip over this
 
-		moveq	#$FFFFFFC0,d1		; set panning to centre
-		move.b	d1,cPanning(a5)		; save to channel memory too
-		moveq	#$FFFFFFB4,d0		; YM address: Panning and LFO
-		jsr	WriteChYM(pc)		; write to part 2 channel
+		moveq	#$FFFFFFC0,d0		; set panning to centre
+		move.b	d0,cPanning(a5)		; save to channel memory too
+	CheckCue				; check that YM cue is valid
+	InitChYM				; prepare to write to channel
+	stopZ80
+	WriteChYM	#$B4, d0		; Panning and LFO: centre
+	;	st	(a0)			; write end marker
+	startZ80
 
 		cmp.w	#mSFXDAC1,a5		; check if this channel is a DAC channel
 		bne.s	.fm			; if not, branch
@@ -575,19 +593,17 @@ dPlaySnd_SFX:
 ; ---------------------------------------------------------------------------
 
 .fm
-		moveq	#$F,d1			; set to release note instantly
-		moveq	#$FFFFFF80,d0		; YM address: Release Rate Operator 1
-		jsr	WriteChYM(pc)		; write to YM according to channel
-		moveq	#$FFFFFF88,d0		; YM address: Release Rate Operator 3
-		jsr	WriteChYM(pc)		; write to YM according to channel
-		moveq	#$FFFFFF84,d0		; YM address: Release Rate Operator 2
-		jsr	WriteChYM(pc)		; write to YM according to channel
-		moveq	#$FFFFFF8C,d0		; YM address: Release Rate Operator 4
-		jsr	WriteChYM(pc)		; write to YM according to channel
-
-		moveq	#$28,d0			; YM address: Key on/off
-		move.b	cType(a5),d1		; FM channel, all operators off
-		bsr.w	WriteYM_Pt1		; write to part 1 or 2 channel
+		moveq	#$F,d3			; set to release note instantly
+	CheckCue				; check that YM cue is valid
+	InitChYM				; prepare to write to channel
+	stopZ80
+	WriteChYM	#$80, d3		; Release Rate Operator 1
+	WriteChYM	#$88, d3		; Release Rate Operator 2
+	WriteChYM	#$84, d3		; Release Rate Operator 3
+	WriteChYM	#$8C, d3		; Release Rate Operator 4
+	WriteYM1	#$28, cType(a5)		; Key on/off: all operators off
+	;	st	(a0)			; write end marker
+	startZ80
 
 		dbf	d7,.loopSFX		; repeat for each requested channel
 		rts
@@ -662,13 +678,11 @@ dPlaySnd_Stop:
 		bclr	#mfbBacked,mFlags.w	; reset backed up song bit
 	endif
 
-; Not needed,	moveq	#$2B,d0			; YM command: DAC Enable
-; Dual PCM does	moveq	#$FFFFFF80,d1		; FM6 acts as DAC
-; this for us	jsr	WriteYM_Pt1(pc)		; write to YM global register
-
-		moveq	#$27,d0			; YM command: Channel 3 Mode & Timer Control
-		moveq	#0,d1			; disable timers and channel 3 special mode
-		jsr	WriteYM_Pt1(pc)		; write to YM global register
+	CheckCue				; check that cue is valid
+	stopZ80
+	WriteYM1	#$27, #0		; Channel 3 Mode & Timer Control: disable timers and channel 3 special mode
+	;	st	(a0)			; write end marker
+	startZ80
 
 ;		lea	mSFXDAC1.w,a1		; prepare SFX DAC 1 to start clearing from
 ;	dCLEAR_MEM	mChannelEnd-mSFXDAC1, 16; clear this block of memory with 16 byts per loop

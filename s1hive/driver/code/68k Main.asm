@@ -165,10 +165,23 @@ dCalcDuration:
 ; ---------------------------------------------------------------------------
 
 UpdateAMPS:
+		moveq	#4-1,d1			; check Dual PCM status max 4 times
+
+.recheck
 	StopZ80					; wait for Z80 to stop
 		move.b	dZ80+YM_Buffer,d0	; load current cue buffer in use
 	StartZ80				; enable Z80 execution
 
+		cmp.b	mLastCue.w,d0		; check if last queue was the same
+		bne.s	.bufferok		; if it is same, Dual PCM is delayed and its baaad =(
+
+		moveq	#$20-1,d0		; loop for $80 times
+		dbf	d0,offset(*)		; in place, to wait for Dual PCM maybe! =I
+		dbf	d1,.recheck		; if we still have cycles to check, do it
+		rts				; fuck it, Dual PCM does not want to cooperate
+
+.bufferok
+		move.b	d0,mLastCue.w		; update the last queue
 		move.l	#dZ80+YM_Buffer1,a0	; set the cue address to buffer 1
 		tst.b	d0			; check buffer to use
 		bne.s	.gotbuffer		; if Z80 is reading buffer 2, branch
