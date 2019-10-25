@@ -420,8 +420,6 @@ WriteYM2	macro reg, value
 	move.b	\value,(a0)+		; write value to cue
 	move.b	\reg,(a0)+		; write register to cue
     endm
-
-	;	st	(a0)			; write end marker
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Macro to check cue address

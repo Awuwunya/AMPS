@@ -15,22 +15,37 @@ dMuteFM:
 		addq.b	#4,d1			; set this to part 2 channel
 	WriteYM1	d0, d1			; write part 2 to YM
 		dbf	d3,.noteoff		; loop for all 3 channel groups
+; ---------------------------------------------------------------------------
+; The following code will set release rate to maximum. This is to
+; make sure all channels stop decaying the note and go to maximum
+; attentuation immediately. It should prevent the previous song from
+; making any noise after its played. The following code will also set
+; all Total Level operators to maximum (mute)
+; ---------------------------------------------------------------------------
 
+.muteFM
+		moveq	#$10-1,d5		; prepare the value for going to next channel to d5
 		moveq	#$40,d0			; YM command: Total Level Operator 1
 		moveq	#$7F,d1			; set total level to $7F (silent)
+		moveq	#$FFFFFF80,d2		; YM address: Release Rate Operator 1
+		moveq	#$F,d6			; release rate value
 		moveq	#3-1,d4			; prepare 3 groups of channels to d4
 
 .chloop
 		moveq	#4-1,d3			; prepare 4 operator writes per channel to d3
-		moveq	#$10-1,d5		; prepare the value for going to next channel to d5
 
 .oploop
 	WriteYM1	d0, d1			; write part 1 to YM
 	WriteYM2	d0, d1			; write part 2 to YM
-		addq.w	#4,d0			; go to next operator (1 2 3 4)
+		addq.w	#4,d0			; go to next Total Level operator (1 2 3 4)
+
+	WriteYM1	d2, d6			; write part 1 to YM
+	WriteYM2	d2, d6			; write part 2 to YM
+		addq.w	#4,d2			; go to next Release Rate operator (1 2 3 4)
 		dbf	d3,.oploop		; repeat for each operator
 
 		sub.b	d5,d0			; go to next FM channel
+		sub.b	d5,d2			; go to next FM channel
 		dbf	d4,.chloop		; repeat for each channel
 	;	st	(a0)			; write end marker
 	startZ80
@@ -223,7 +238,8 @@ dAMPSnextFMSFX:
 	endif
 		jsr	dUpdateVolFM_SFX(pc)	; update FM volume
 
-.noupdate	dbf	d7,dAMPSnextFMSFX	; make sure to run all the channels
+.noupdate
+		dbf	d7,dAMPSnextFMSFX	; make sure to run all the channels
 		jmp	dAMPSdoPSGSFX(pc)	; after that, process SFX PSG channels
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -271,6 +287,7 @@ dAMPSnextFM:
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
+
 .pcnote
 	dProcNote 0, 0				; reset necessary channel memory
 		bsr.s	dUpdateFreqFM		; send FM frequency to hardware
@@ -372,10 +389,15 @@ dKeyOffFM2:
 		btst	#cfbHold,(a5)		; check if note is held
 		bne.s	locret_UpdFreqFM	; if so, do not note off
 
+		move.b	cType(a5),d0		; load channel type value to d0
+		moveq	#$28,d1			; load key on/off to d1
 	stopZ80
 	CheckCue				; check that cue is valid
-	WriteYM1	#$28, cType(a5)		; key on: turn all operators off for channel
-	;	st	(a0)			; write end marker
+	WriteYM1	d1, d0			; key on: turn all operators off for channel
+	WriteYM1	d1, d0			; the reason we do this, is to work around some YM2612 bug or quirk
+	WriteYM1	d1, d0			; if you key off and key on too quickly, the sound is somewhat wrong
+	WriteYM1	d1, d0			; this was noticeable on few SFX, particularly the death sfx
+	;	st	(a0)			; I am not sure why it works, but I am gonna be honest, I don't care enough to find out
 	startZ80
 		rts
 ; ===========================================================================

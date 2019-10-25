@@ -145,7 +145,7 @@ dPlaySnd_Unpause:
 		or.b	mDAC2+cPanning.w,d0	; or the panning value from music DAC2
 	CheckCue				; check that YM cue is valid
 	stopZ80
-	WriteYM1	#$B4+2, d0		; Panning & LFO
+	WriteYM2	#$B4+2, d0		; Panning & LFO
 	;	st	(a0)			; write end marker
 	startZ80
 
@@ -597,11 +597,11 @@ dPlaySnd_SFX:
 	CheckCue				; check that YM cue is valid
 	InitChYM				; prepare to write to channel
 	stopZ80
+	WriteYM1	#$28, cType(a5)		; Key on/off: all operators off
 	WriteChYM	#$80, d3		; Release Rate Operator 1
 	WriteChYM	#$88, d3		; Release Rate Operator 2
 	WriteChYM	#$84, d3		; Release Rate Operator 3
 	WriteChYM	#$8C, d3		; Release Rate Operator 4
-	WriteYM1	#$28, cType(a5)		; Key on/off: all operators off
 	;	st	(a0)			; write end marker
 	startZ80
 
