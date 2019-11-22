@@ -165,6 +165,8 @@ dCalcDuration:
 ; ---------------------------------------------------------------------------
 
 UpdateAMPS:
+		bset	#mfbExec,mFlags.w	; check if AMPS is already running, and set flag
+		bne.s	.rts			; if is, DO NOT run it again
 		moveq	#4-1,d1			; check Dual PCM status max 4 times
 
 .recheck
@@ -178,6 +180,9 @@ UpdateAMPS:
 		moveq	#$20-1,d0		; loop for $80 times
 		dbf	d0,*			; in place, to wait for Dual PCM maybe! =I
 		dbf	d1,.recheck		; if we still have cycles to check, do it
+		bclr	#mfbExec,mFlags.w	; set AMPS as finished running
+
+.rts
 		rts				; fuck it, Dual PCM does not want to cooperate
 
 .bufferok
@@ -196,6 +201,7 @@ UpdateAMPS:
 	StopZ80					; wait for Z80 to stop
 		st	(a0)			; make sure cue is marked as completed
 	StartZ80				; enable Z80 execution
+		bclr	#mfbExec,mFlags.w	; set AMPS as finished running
 
 dPaused:
 		rts

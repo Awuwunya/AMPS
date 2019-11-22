@@ -242,10 +242,10 @@ dPlaySnd_Music:
 ; out the exact same though...
 ; ---------------------------------------------------------------------------
 
+		move.b	d6,mTempoSpeed.w	; save loaded value into tempo speed setting
 		jsr	dStopMusic(pc)		; mute hardware and reset all driver memory
 		jsr	dResetVolume(pc)	; reset volumes and end any fades
 
-		move.b	d6,mTempoSpeed.w	; save loaded value into tempo speed setting
 		move.l	a4,a3			; copy pointer to a3
 		addq.w	#4,a4			; go to DAC1 data section
 
@@ -310,9 +310,9 @@ dPlaySnd_Music:
 		dbf	d7,.loopDAC		; repeat for all DAC channels
 
 		moveq	#0,d7
-		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbRest),d2; prepare running tracker and channel rest flags
 		move.b	2(a3),d7		; load the FM channel count to d7
 		bmi.s	.doPSG			; if no FM channels are loaded, branch
+		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbRest),d2; prepare running tracker and channel rest flags
 
 .loopFM
 		move.b	d2,(a1)			; save channel flags
@@ -390,6 +390,11 @@ dPlaySnd_Music:
 ; clears some YM registers.
 ; ---------------------------------------------------------------------------
 
+	if FEATURE_FM6
+		tst.b	mFM6.w			; check if FM6 is used by music
+		bmi.s	.yesFM6			; if so, do NOT initialize FM6 to mute
+	endif
+
 	CheckCue				; check that cue is valid
 	stopZ80
 	WriteYM1	#$28, #6		; Key on/off: FM6, all operators off
@@ -402,6 +407,7 @@ dPlaySnd_Music:
 	;	st	(a0)			; write end marker
 	startZ80
 
+.yesFM6
 		move.w	#fLog>>$0F,d0		; use logarithmic filter
 		jmp	dSetFilter(pc)		; set filter
 
@@ -411,6 +417,9 @@ dPlaySnd_Music:
 ; ---------------------------------------------------------------------------
 dDACtypeVals:	dc.b ctDAC1, ctDAC2
 dFMtypeVals:	dc.b ctFM1, ctFM2, ctFM3, ctFM4, ctFM5
+	if FEATURE_FM6
+		dc.b ctFM6
+	endif
 dPSGtypeVals:	dc.b ctPSG1, ctPSG2, ctPSG3
 		even
 ; ===========================================================================

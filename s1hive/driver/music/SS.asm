@@ -1,15 +1,15 @@
 SpecialStage_Header:
 	sHeaderInit
 	sHeaderTempo	$02, $20
-	sHeaderCh	$05, $02
+	sHeaderCh	$06, $02
 	sHeaderDAC	SpecialStage_DAC1
 	sHeaderDAC	SpecialStage_DAC2
 	sHeaderFM	SpecialStage_FM1, $DC, $18
-	sHeaderFM	SpecialStage_FM6, $E8, $14
 	sHeaderFM	SpecialStage_FM2, $DC, $0C
 	sHeaderFM	SpecialStage_FM3, $E8, $18
 	sHeaderFM	SpecialStage_FM4, $E8, $18
-;	sHeaderFM	SpecialStage_FM5, $E8, $18
+	sHeaderFM	SpecialStage_FM5, $E8, $18
+	sHeaderFM	SpecialStage_FM6, $E8, $14
 	sHeaderPSG	SpecialStage_PSG1, $DC+$0C, $18, $00, v04
 	sHeaderPSG	SpecialStage_PSG2, $FD+$0C, $08, $00, v08
 

@@ -191,6 +191,9 @@ dcPan:
 		AMPS_Debug_dcPan		; check if this channel can pan
 	endif
 
+	; WARNING: FM6 is not properly implemented, so panning for FM6 WILL
+	; break DAC channels and SFX DAC channels. Please be careful!
+
 		moveq	#$37,d0			; prepare bits to keep
 		and.b	cPanning(a5),d0		; and with channel LFO settings
 		or.b	(a4)+,d0		; or panning value

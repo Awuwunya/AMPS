@@ -682,7 +682,7 @@ AMPS_DebugR_UpdVolFM:
 AMPS_Debug_CuePtr	macro id
 	cmp.l	#$A00000+YM_Buffer1,a0	; check against min
 	blo.s	.fail\@			; if not in range, branch
-	cmp.l	#$A00000+YM_Buffer2+$400,a0; check against max
+	cmp.l	#$A00000+YM_BufferEnd,a0; check against max
 	blo.s	.ok\@			; if in range, branch
 
 .fail\@

@@ -48,8 +48,14 @@ sHeaderCh	macro fm,psg
 	dc.b \fm-1
 
 	if narg=2
-		if \fm>5
-			inform 2,"You sure there are \fm FM channels?"
+		if FEATURE_FM6
+			if \fm>6
+				inform 2,"You sure there are \fm FM channels?"
+			endif
+		else
+			if \fm>5
+				inform 2,"You sure there are \fm FM channels?"
+			endif
 		endif
 
 		dc.b \psg-1

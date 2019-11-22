@@ -1,5 +1,5 @@
 Main		SECTION org(0)
-Z80_Space =	1994		; The amount of space reserved for Z80 driver. The batch file may ask you to increase the size...
+Z80_Space =	2056		; The amount of space reserved for Z80 driver. The batch file may ask you to increase the size...
 z80_ram:	equ $A00000
 z80_bus_request	equ $A11100
 z80_reset:	equ $A11200
