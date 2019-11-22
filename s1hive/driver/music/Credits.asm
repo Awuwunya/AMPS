@@ -1188,14 +1188,8 @@ Credits_Call18y:
 
 ; fuck yeah, nice crap here
 Credits_Call18x:
-	ssDetune	$44	; damn borked notes >_>
-	dc.b nC4, $01, sHold
-	ssDetune	$00	; damn borked notes >_>
-	dc.b nG6, $04, nRst, $07
-	ssDetune	$44	; damn borked notes >_>
-	dc.b nC4, $01, sHold
-	ssDetune	$00	; damn borked notes >_>
-	dc.b nG6, $04, nRst, $07
+	dc.b nBb3, $01, sHold, nB3, $04, nRst, $07
+	dc.b nBb3, $01, sHold, nB3, $04, nRst, $07
 	dc.b nC4, $01, sHold, nAb4, $04, nRst, $07
 	dc.b nC4, $01, sHold, nAb4, $04, nRst, $07
 	sJump		Credits_Call18y
