@@ -2950,8 +2950,8 @@ Sega_WaitPallet:
 		bsr.w	PalCycle_Sega
 		bne.s	Sega_WaitPallet
 
-	;	moveq	#mus_SEGA,d0
-	;	bsr.w	PlaySound_Special ; play "SEGA"	sound
+		moveq	#mus_SEGA,d0
+		bsr.w	PlaySound_Special ; play "SEGA"	sound
 		move.b	#$14,($FFFFF62A).w
 		bsr.w	DelayProgram
 

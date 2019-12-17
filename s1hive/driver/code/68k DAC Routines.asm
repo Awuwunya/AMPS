@@ -197,8 +197,8 @@ locret_UpdFreqDAC;
 
 dFreqDAC1:
 	StopZ80					; wait for Z80 to stop
-		move.b	d6,dZ80+PCM1_PitchHigh+1
-		move.b	d0,dZ80+PCM1_PitchLow+1
+		move.b	d2,dZ80+PCM1_PitchHigh+1
+		move.b	d3,dZ80+PCM1_PitchLow+1
 		move.b	#$D2,dZ80+PCM1_ChangePitch; change "JP C" to "JP NC"
 	StartZ80				; enable Z80 execution
 		rts

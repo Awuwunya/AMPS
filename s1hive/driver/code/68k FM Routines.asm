@@ -362,7 +362,7 @@ dUpdateFreqFM3:
 		bne.s	locret_UpdFreqFM	; if is, skip
 
 		move.w	d2,d3			; copy frequency to d3
-		lsr.w	#8,d0			; shift upper byte into lower byte
+		lsr.w	#8,d3			; shift upper byte into lower byte
 	CheckCue				; check that YM cue is valid
 	InitChYM				; prepare to write to channel
 	stopZ80
