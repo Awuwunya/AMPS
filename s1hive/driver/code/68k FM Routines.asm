@@ -31,7 +31,6 @@ dMuteFM:
 		moveq	#$40,d6			; YM command: Total Level Operator 1
 		moveq	#$7F,d1			; set total level to $7F (silent)
 		moveq	#$FFFFFF80,d2		; YM address: Release Rate Operator 1
-		moveq	#$F,d6			; release rate value
 		moveq	#3-1,d4			; prepare 3 groups of channels to d4
 
 .chloop
@@ -365,6 +364,7 @@ dUpdateFreqFM3:
 		lsr.w	#8,d3			; shift upper byte into lower byte
 	CheckCue				; check that YM cue is valid
 	InitChYM				; prepare to write to channel
+
 	stopZ80
 	WriteChYM	#$A4, d3		; Frequency MSB & Octave
 	WriteChYM	#$A0, d2		; Frequency LSB
@@ -421,9 +421,10 @@ dKeyOffFM:
 
 dKeyOffFM2:
 		btst	#cfbHold,(a1)		; check if note is held
-		bne.s	.rts	; if so, do not note off
+		bne.s	.rts			; if so, do not note off
 		move.b	cType(a1),d3		; load channel type value to d3
 		moveq	#$28,d4			; load key on/off to d4
+
 	stopZ80
 	CheckCue				; check that cue is valid
 	WriteYM1	d4, d3			; key on: turn all operators off for channel

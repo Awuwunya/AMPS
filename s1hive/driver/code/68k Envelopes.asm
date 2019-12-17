@@ -129,7 +129,6 @@ dVolEnvProg:
 		lea	VolEnvs-4(pc),a2	; load volume envelope data array
 		add.w	d4,d4			; quadruple volume envelope ID
 		add.w	d4,d4			; (each entry is 4 bytes in size)
-		move.l	(a1,d4.w),a1		; get pointer to volume envelope data
 
 		move.l	(a2,d4.w),a2		; get pointer to volume envelope data
 		moveq	#0,d4

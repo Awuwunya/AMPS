@@ -281,7 +281,7 @@ dUpdateVolDAC_SFX:
 	endif
 
 dUpdateVolDAC:
-		move.b	cVolume(a1),d1		; get channel volume to d1
+		move.b	cVolume(a1),d1		; get channel volume to d3
 		add.b	mMasterVolDAC.w,d1	; add master volume to it
 		bpl.s	dUpdateVolDAC3		; if positive (in range), branch
 		moveq	#$FFFFFF80,d1		; force volume to mute ($80 is the last valid volume)

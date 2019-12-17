@@ -19,7 +19,8 @@ dAMPSnextPSGSFX:
 		bsr.w	dUpdateFreqPSG3		; if frequency needs changing, do it
 
 .endm
-		jsr	dEnvelopePSG_SFX	; run envelope program
+		jsr	dEnvelopePSG_SFX(pc)	; run envelope program
+
 .next
 		dbf	d0,dAMPSnextPSGSFX	; make sure to run all the channels
 		jmp	dCheckTracker(pc)	; after that, check tracker and end loop
@@ -38,6 +39,7 @@ dAMPSnextPSGSFX:
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
+
 .pcnote
 	dProcNote 1, 1				; reset necessary channel memory
 		bsr.w	dUpdateFreqPSG		; update hardware frequency
@@ -81,6 +83,7 @@ dAMPSnextPSG:
 
 .endm
 		jsr	dEnvelopePSG(pc)		; run envelope program
+		
 .next
 		dbf	d0,dAMPSnextPSG		; make sure to run all the channels
 		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
@@ -172,12 +175,12 @@ dUpdateFreqPSG3:
 ; such case, but beware of this issue!
 ; ---------------------------------------------------------------------------
 
-		lsr.w	#4,d6			; get the 2 higher nibbles of frequency
+		lsr.w	#4,d2			; get the 2 higher nibbles of frequency
 	if FEATURE_SAFE_PSGFREQ
-		andi.b	#$3F,d6			; clear any extra bits that aren't valid
+		andi.b	#$3F,d2			; clear any extra bits that aren't valid
 	endif
-		move.b	d0,dPSG			; write frequency low nibble and latch channel
-		move.b	d6,dPSG			; write frequency high nibbles to PSG
+		move.b	d6,dPSG.l			; write frequency low nibble and latch channel
+		move.b	d2,dPSG.l			; write frequency high nibbles to PSG
 
 locret_UpdateFreqPSG:
 		rts
