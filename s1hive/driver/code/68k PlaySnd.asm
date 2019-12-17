@@ -344,8 +344,8 @@ dPlaySnd_Music:
 		add.w	d6,a1			; go to the next channel
 		dbf	d0,.loopDAC		; repeat for all DAC channels
 
-		moveq	#0,d7
-		move.b	-$A(a2),d7		; load the FM channel count to d0
+		moveq	#0,d0
+		move.b	-$A(a2),d0		; load the FM channel count to d0
 		bmi.w	.doPSG			; if no FM channels are loaded, branch
 		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbRest),d2; prepare running tracker and channel rest flags
 

@@ -812,55 +812,26 @@ dcVoice:
 ;   d5 - Used for TL calculations
 ;   d6 - Used for modulator offset
 ; ---------------------------------------------------------------------------
-;needfix
-WriteReg	macro	reg
-	rept narg
-		move.b	(a4)+,(a5)+		; write value to buffer
-		if \reg<$80
-			moveq	#\reg,d3	; load register to d3
-		else
-			moveq	#$FFFFFF00|\reg,d3; load register to d3
-		endif
 
-		or.b	d2,d3			; add channel offset to register
-		move.b	d3,(a5)+		; write register to buffer
-	shift
-	endr
+WriteReg    macro    offset, reg
+.offs =    \offset
+
+    rept narg-1
+        move.b    (a4)+,(a5)+        ; write value to buffer
+        if \reg<$80
+            moveq    #\reg,d3    ; load register to d3
+        else
+            moveq    #$FFFFFF00|\reg,d3; load register to d3
+        endif
+
+        if .offs>1
+            addq.w    #.offs-1,a4    ; offset a4 by specific amount
+        endif
+        or.b    d2,d3            ; add channel offset to register
+        move.b    d3,(a5)+        ; write register to buffer
+    shift
+    endr
     endm
-
-;Original ASM68k version
-;WriteReg	macro	reg
-;	rept narg
-;		move.b	(a1)+,(a3)+		; write value to buffer
-;		if \reg<$80
-;			moveq	#\reg,d0	; load register to d0
-;		else
-;			moveq	#$FFFFFF00|\reg,d0; load register to d0
-;		endif
-;
-;		or.b	d2,d0			; add channel offset to register
-;		move.b	d0,(a3)+		; write register to buffer
-;	shift
-;	endr
-;    endm
-
-;Ass Version
-;WriteReg	macro	offset, reg
-;._x :=		offset
-;	if "reg"<>""
-;		move.b	(a4)+,(a5)+		; write value to buffer
-;		moveq	#reg,d3			; load register to d3
-;		or.b	d2,d3			; add channel offset to register
-;		move.b	d3,(a5)+		; write register to buffer
-;		if offset>1
-;			addq.w	#offset-1,a4	; offset a4 by specific amount
-;		endif
-;
-;		shift				; shift the next argument to view
-;		shift				; ''
-;		WriteReg ._x, ALLARGS		; get the next argument
-;	endif
-;    endm
 
 dUpdateVoiceFM:
 			move.l	a2,-(sp)		; save the tracker address to stack
@@ -986,7 +957,7 @@ dcStop:
 		and.b	#$FF-(1<<cfbHold)-(1<<cfbRun),(a1); clear hold and running tracker flags
 	dStopChannel	0			; stop channel operation
 
-		cmpa.w	#mSFXFM3,a5		; check if this is a SFX channel
+		cmpa.w	#mSFXFM3,a1		; check if this is a SFX channel
 		blo.s	.exit			; if not, skip all this mess
 		clr.b	cPrio(a1)		; clear channel priority
 

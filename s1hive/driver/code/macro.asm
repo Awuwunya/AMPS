@@ -285,9 +285,9 @@ Mus_Unpause	rs.b 1		; unpause the music
 Mus_StopSFX	rs.b 1		; stop all sfx
 MusOff		rs.b 0		; first music ID
 
-MusCount = 	$14 		; number of installed music tracks
-SFXoff =	MusCount+MusOff 	;first SFX ID
-SFXcount = $30 			; number of installed sound effects
+MusCount =	$14		; number of installed music tracks
+SFXoff =	MusCount+MusOff	; first SFX ID
+SFXcount =	$30		; number of intalled sound effects
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
