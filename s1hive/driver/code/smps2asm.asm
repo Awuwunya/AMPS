@@ -39,7 +39,6 @@ m00 =	$00
 ; ---------------------------------------------------------------------------------------------
 
 sHeaderInit	macro
-sPointZero =	offset(*)
 sPatNum =	0
     endm
 
@@ -70,6 +69,17 @@ sHeaderTempo	macro tmul,tempo
 	dc.b \tmul-1,\tempo
     endm
 
+; Convert S1 tempo to S3 tempo
+sConvS1Tempo    macro tempo
+s2tempo = ((((((((tempo=0)&1)<<8)|tempo)-1)<<8)+(((((tempo=0)&1)<<8)|tempo)>>1))/((((tempo=0)&1)<<8)|tempo))&$FF
+s3tempo = ($100-(((s2tempo=0)&1)|s2tempo))&$FF
+    endm
+
+sHeaderTempoS1    macro tmul,tempo
+    sConvS1Tempo \tempo
+    dc.b \tmul-1,s3tempo
+    endm
+
 ; Header - Set priority leve
 sHeaderPrio	macro prio
 	dc.b \prio
@@ -77,7 +87,7 @@ sHeaderPrio	macro prio
 
 ; Header - Set up DAC Channel
 sHeaderDAC	macro loc,vol,samp
-	dc.w \loc-sPointZero
+	dc.w \loc-*
 
 	if narg>=2
 		dc.b \vol
@@ -93,20 +103,20 @@ sHeaderDAC	macro loc,vol,samp
 
 ; Header - Set up FM Channel
 sHeaderFM	macro loc,pitch,vol
-	dc.w \loc-sPointZero
+	dc.w \loc-*
 	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 
 ; Header - Set up PSG Channel
 sHeaderPSG	macro loc,pitch,vol,detune,volenv
-	dc.w \loc-sPointZero
+	dc.w \loc-*
 	dc.b (\pitch)&$FF,(\vol)&$FF,(\detune)&$FF,\volenv
     endm
 
 ; Header - Set up SFX Channel
 sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.b \flags,\type
-	dc.w \loc-sPointZero
+	dc.w \loc-*
 	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 ; ---------------------------------------------------------------------------------------------
@@ -401,6 +411,13 @@ ssMod68k	macro wait, speed, step, count
 	sModData \wait,\speed,\step,\count
     endm
 
+ssModZ80    macro wait, speed, step, count
+speedconv    = ((((\speed)=0)&1)<<8)|(\speed)
+countconv    = ((((\count)=0)&1)<<8)|(\count)
+    dc.b $F0
+    sModData (\wait)-1,\speed,\step,countconv/speedconv-1
+    endm
+
 sModData	macro wait, speed, step, count
 	dc.b \speed, \count, \wait, \step
     endm
@@ -434,20 +451,20 @@ sStop		macro
 ; F6xxxx - Jump to xxxx (GOTO)
 sJump		macro loc
 	dc.b $F6
-	dc.w \loc-offset(*)-1
+	dc.w \loc-offset(*)-2
     endm
 
 ; F7xxyyzzzz - Loop back to zzzz yy times, xx being the loop index for loop recursion fixing (LOOP)
 sLoop		macro index,loops,loc
 	dc.b $F7, \index
-	dc.w \loc-offset(*)-1
+	dc.w \loc-offset(*)-2
 	dc.b \loops
     endm
 
 ; F8xxxx - Call pattern at xxxx, saving return point (GOSUB)
 sCall		macro loc
 	dc.b $F8
-	dc.w \loc-offset(*)-1
+	dc.w \loc-offset(*)-2
     endm
 
 ; F9 - Return (RETURN)
