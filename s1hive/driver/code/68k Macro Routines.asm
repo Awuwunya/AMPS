@@ -362,7 +362,7 @@ dTrackNoteDAC   macro
 .pitch
         	subi.b   #$80,d1            	; sub $80 from the note (notes start at $80)
         	bne.s    .noprest        	; branch if note wasnt $80 (rest)
-        	moveq    #-$80,d6        	; tell the code we are resting
+        	moveq    #-$80,d4        	; tell the code we are resting
         	bra.s    .cont
 
 .noprest

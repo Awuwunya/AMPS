@@ -33,7 +33,7 @@ dAMPSnextDAC:
 .update
 		and.b	#$FF-(1<<cfbHold),(a1)	; clear hold flag
 	dDoTracker				; process tracker
-		moveq	#0,d6			; clear rest flag
+		moveq	#0,d4			; clear rest flag
 		tst.b	d1			; check if note is being played
 		bpl.s	.timer			; if not, it must be a timer. Branch
 
@@ -48,7 +48,7 @@ dAMPSnextDAC:
 		
 .pcnote
 		dProcNote 0, -1			; reset necessary channel memory
-        	tst.b   d6            		; check if channel was resting
+        	tst.b   d4            		; check if channel was resting
         	bmi.s   .rest            	; if yes, we do not want to note on anymore
         	bsr.s   dNoteOnDAC        	; do hardware note-on behavior
         	bra.s   .ckvol
@@ -240,7 +240,7 @@ dAMPSdoDACSFX:
 .update
 		and.b	#$FF-(1<<cfbHold),(a1)	; clear hold flag
 	dDoTracker				; process tracker
-		moveq	#0,d6			; clear rest flag
+		moveq	#0,d4			; clear rest flag
 		tst.b	d1			; check if note is being played
 		bpl.s	.timer			; if not, it must be a timer. Branch
 
@@ -254,7 +254,7 @@ dAMPSdoDACSFX:
 		jsr	dCalcDuration(pc)	; calculate duration
 .pcnote
 	dProcNote 1, -1				; reset necessary channel memory
-        	tst.b    d6            		; check if channel was resting
+        	tst.b    d4            		; check if channel was resting
         	bmi.s    .rest            	; if yes, we do not want to note on anymore
         	bsr.w    dNoteOnDAC        	; do hardware note-on behavior
         	bra.s    .ckvol
