@@ -1737,8 +1737,8 @@ PCM_OverflwCalc:
 ; This SHOULD be at offset 1200 (Flood this space with FF's on 68k side...)
 ; ---------------------------------------------------------------------------
 
-YM_Buffer1 =		offset(*)
-YM_Buffer2 =		offset(*)+((02000h-offset(*))/2)
+YM_Buffer1 =		*
+YM_Buffer2 =		*+((02000h-*)/2)
 YM_BufferEnd =		02000h
 
 ; ===========================================================================
