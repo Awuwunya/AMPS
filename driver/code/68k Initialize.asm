@@ -10,15 +10,11 @@ LoadDualPCM:
 
 		lea	DualPCM,a0		; load Dual PCM address into a0
 		lea	dZ80,a1			; load Z80 RAM address into a1
-		move.w	#DualPCM_sz-1,d1	; get lenght counter for dbf into d1
 
 .z80
 		btst	#$00,$A11100		; check if Z80 has stopped
 		bne.s	.z80			; if not, wait more
-
-.load
-		move.b	(a0)+,(a1)+		; copy the Dual PCM driver into Z80 RAM
-		dbf	d1,.load		; write every single byte
+		jsr	KosDec			; decompress the kosinski data
 
 		moveq	#2,d0			; set flush timer for 60hz systems
 		btst	#6,ConsoleRegion.w	; is this a PAL Mega Drive?

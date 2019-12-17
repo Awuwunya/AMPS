@@ -695,8 +695,8 @@ dcBackup:
 		move.l	mBackTempoMain.w,mTempoMain.w; restore tempo settings
 		move.l	mBackVctMus.w,mVctMus.w	; restore voice table address
 
-		lea	mDAC1.w,a4		; load source address to a4
-		lea	mBackDAC1.w,a3		; load destination address to a3
+		lea	mBackUpLoc.w,a4		; load source address to a4
+		lea	mBackUpArea.w,a3	; load destination address to a3
 		move.w	#(mSFXDAC1-mDAC1)/4-1,d4; load backup size to d4
 
 .backup

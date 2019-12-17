@@ -248,8 +248,8 @@ dPlaySnd_Music:
 		move.l	mTempoMain.w,mBackTempoMain.w; backup tempo settings
 		move.l	mVctMus.w,mBackVctMus.w	; backup voice table address
 
-		lea	mDAC1.w,a4		; load source address to a4
-		lea	mBackDAC1.w,a3		; load destination address to a3
+		lea	mBackUpArea.w,a4	; load source address to a4
+		lea	mBackUpLoc.w,a3		; load destination address to a3
 		move.w	#(mSFXDAC1-mDAC1)/4-1,d3; load backup size to d3
 
 .backup

@@ -206,6 +206,7 @@ mContLast	rs.b 1		; last continous sfx played
 mLastCue	rs.b 1		; last YM Cue the sound driver was accessing
 		rs.w 0		; align channel data
 
+mBackUpArea rs.b 0		; this is where backup stuff starts
 mDAC1		rs.b cSize	; DAC 1 data
 mDAC2		rs.b cSize	; DAC 2 data
 mFM1		rs.b cSize	; FM 1 data
@@ -229,6 +230,7 @@ mSFXPSG3	rs.b cSizeSFX	; SFX PSG 3 data
 mChannelEnd	rs.w 0		; used to determine where channel RAM ends
 
 	if FEATURE_BACKUP
+mBackUpLoc  rs.b 0		; this is where backup stuff is loaded
 mBackDAC1	rs.b cSize	; back-up DAC 1 data
 mBackDAC2	rs.b cSize	; back-up DAC 2 data
 mBackFM1	rs.b cSize	; back-up FM 1 data

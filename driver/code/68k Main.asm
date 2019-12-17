@@ -72,54 +72,69 @@ dFadeInDataLog:				; you may enable this regardless for personal uses
 ; it may still cause a jump in their volume (especially if only,
 ; say, DAC fades volume). In the future, there might be a fix for
 ; that.
+;
+; input:
+;   a4 - Fade out data
+; thrash:
+;   a4 - Best fade out data position
+;   a5 - Current fade out data position
+;   d3 - FM volume copy
+;   d4 - Difference of target FM volume from actual FM volume
+;   d5 - Copy of smallest difference recorded
 ; ---------------------------------------------------------------------------
 
 dPlaySnd_FadeOut:
-		lea	dFadeOutDataLog(pc),a1	; prepare stock fade out program to a1
+		lea	dFadeOutDataLog(pc),a4	; prepare stock fade out program to a4
 
 dLoadFade:
-		move.b	mMasterVolFM.w,d0	; load FM master volume to d0
+		move.b	mMasterVolFM.w,d3	; load FM master volume to d3
 		tst.b	mFadeAddr+1.w		; check if a fade program is already executing
 		beq.s	.nofade			; if not, load fade as is
 
-		move.l	a1,a2			; copy fade program address to a2
-		moveq	#-1,d2			; prepare max byter difference
+		move.l	a4,a5			; copy fade program address to a5
+		moveq	#-1,d5			; prepare max byter difference
 
 .find
-		move.b	(a2),d1			; load the next FM volume from fade program
+		move.b	(a5),d4			; load the next FM volume from fade program
 		bpl.s	.search			; branch if this is not a command
 
 .nofade
-		move.l	a1,mFadeAddr.w		; save new fade program address to memory
-		move.b	d0,mMasterVolFM.w	; put vol back
+		move.l	a4,mFadeAddr.w		; save new fade program address to memory
+		move.b	d3,mMasterVolFM.w	; put vol back
 		rts
 
 .search
-		addq.l	#3,a2			; skip over the current volume group
-		sub.b	d0,d1			; sub current FM volume from read volume
+		addq.l	#3,a5			; skip over the current volume group
+		sub.b	d3,d4			; sub current FM volume from read volume
 		bpl.s	.abs			; if positive, do not negate
-		neg.b	d1			; negative to positive
+		neg.b	d4			; negative to positive
 
 .abs
-		cmp.b	d2,d1			; check if volume difference was smaller than before
+		cmp.b	d5,d4			; check if volume difference was smaller than before
 		bhs.s	.find			; if not, read next group
 
-		move.b	d1,d2			; else save the new difference
-		move.l	a2,a1			; also save the fade program address where we found it
+		move.b	d4,d5			; else save the new difference
+		move.l	a5,a4			; also save the fade program address where we found it
 		bra.s	.find			; loop through each group in the program
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Routine for loading a volume filter into Dual PCM ROM.
 ; This routine will actually write the bank number the volume filter
-; is in. This requires volume filters are aligned to Z80 banks, and
-; just because we can, we write 9 bits (yeah its not necessary, but
-; what the hell, you have to have fun sometimes!)
+; is in. This requires volume filters are aligned to Z80 banks.
+;
+; input:
+;   d4 - Bank ID of filter
+; thrash:
+;   a4 - Target address in Z80 RAM
+;   d4 - Lowest byte gets cleared.
+;   d5 - Base Z80 instruction used for calculation
+;   d6 - The final instruction written to Z80 RAM
 ; ---------------------------------------------------------------------------
 
 dSetFilter:
-		lea	dZ80+SV_VolumeBank,a1	; load volume bank instructions address to a1
-		moveq	#$74,d1			; prepare the "ld  (hl),h" instruction to d1
-		moveq	#9-1,d2			; prepare number of instructions to write to d2
+		lea	dZ80+SV_VolumeBank.l,a4	; load volume bank instructions address to a1
+		moveq	#$74,d5			; prepare the "ld  (hl),h" instruction to d1
+
 	StopZ80					; wait for Z80 to stop
 ; ---------------------------------------------------------------------------
 ; addx in Motorola 68000 is much like adc in Z80. It allows us to add
@@ -130,13 +145,13 @@ dSetFilter:
 ; Dual PCM to bank switch into the appropriate bank.
 ; ---------------------------------------------------------------------------
 
-.loop
-		moveq	#0,d3			; prepare 0 into d3 (because of addx)
-		lsr.w	#1,d0			; shift lsb into carry
-		addx.b	d1,d3			; add instruction and carry into d3
+	rept 8
+		moveq	#0,d6			; prepare 0 into d3 (because of addx)
+		lsr.w	#1,d4			; shift lsb into carry
+		addx.b	d5,d6			; add instruction and carry into d3
+		move.b	d6,(a4)+		; save instruction into Z80 memory
+	endr
 
-		move.b	d3,(a1)+		; save instruction into Z80 memory
-		dbf	d2,.loop		; repeat for each bit/instruction
 	StartZ80				; enable Z80 execution
 
 locret_SetFilter:
@@ -146,18 +161,24 @@ locret_SetFilter:
 ; Routine to multiply duration by tick rate
 ; We actually use a dbf loop instead of mulu, because 2 rounds
 ; around the loop will be faster than a single mulu instruction
+;
+; input:
+;   d1 - Duration length
+; thrash:
+;   d5 - Tick counter
+;   d6 - The final duration value
 ; ---------------------------------------------------------------------------
 
 dCalcDuration:
-		moveq	#0,d0			; clear duration
-		moveq	#0,d1			; clear upper bytes (for dbf)
-		move.b	cTick(a5),d1		; get tick multiplier to d1
+		moveq	#0,d6			; clear duration
+		moveq	#0,d5			; clear upper bytes (for dbf)
+		move.b	cTick(a1),d5		; get tick multiplier to d5
 
 .multiply
-		add.b	d5,d0			; add duration value to d0
-		dbf	d1,.multiply		; multiply by tick rate
+		add.b	d1,d6			; add duration value to d0
+		dbf	d5,.multiply		; multiply by tick rate
 
-		move.b	d0,cLastDur(a5)		; save as the new duration
+		move.b	d6,cLastDur(a1)		; save as the new duration
 		rts				; get copied to duration by later code
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -177,8 +198,8 @@ UpdateAMPS:
 		cmp.b	mLastCue.w,d0		; check if last queue was the same
 		bne.s	.bufferok		; if it is same, Dual PCM is delayed and its baaad =(
 
-		moveq	#$20-1,d0		; loop for $80 times
-		dbf	d0,*			; in place, to wait for Dual PCM maybe! =I
+		moveq	#$20-1,d0		; loop for $20 times
+		dbf	d0,offset(*)		; in place, to wait for Dual PCM maybe! =I
 		dbf	d1,.recheck		; if we still have cycles to check, do it
 		bclr	#mfbExec,mFlags.w	; set AMPS as finished running
 
@@ -193,7 +214,7 @@ UpdateAMPS:
 		add.w	#YM_Buffer2-YM_Buffer1,a0; set the cue address to buffer 2
 
 .gotbuffer
-		bsr.s	dUpdateAllAMPS		; process the driver
+		bsr.w	dUpdateAllAMPS		; process the driver
 	if safe=1				; this must always happen at the end
 		AMPS_Debug_CuePtr 3		; check if the cue is still valid
 	endif
@@ -230,26 +251,26 @@ dUpdateAllAMPS:
 		beq.s	.chkregion		; branch if not
 	endif
 
-		move.l	mFadeAddr.w,a1		; get the fade porogram address to a1
+		move.l	mFadeAddr.w,a4		; get the fade porogram address to a4
 		addq.l	#3,mFadeAddr.w		; set the fade address to next group
 
-		moveq	#(1<<cfbVol),d1		; prepare volume update to d1
-		moveq	#0,d0
-		move.b	(a1)+,d0		; get FM/command byte from fade data
+		moveq	#(1<<cfbVol),d0		; prepare volume update to d1
+		moveq	#0,d2
+		move.b	(a4)+,d2		; get FM/command byte from fade data
 		bpl.s	.nofadeend		; branch if this is not a command
 
 	if safe=1
 		AMPS_Debug_FadeCmd		; check if this command is valid
 	endif
-		lea	dFadeCommands(pc),a2	; load fade commands pointer table to a2
-		jsr	-$80(a2,d0.w)		; run the fade command code
+		lea	dFadeCommands(pc),a3	; load fade commands pointer table to a3
+		jsr	-$80(a3,d2.w)		; run the fade command code
 		clr.b	mFadeAddr+1.w		; mark the fade program as completed
 		bra.s	.chkregion		; go check the region
 
 .nofadeend
-		cmp.b	mMasterVolFM.w,d0	; check if volume did not change
+		cmp.b	mMasterVolFM.w,d2	; check if volume did not change
 		beq.s	.fadedac		; if did not, branch
-		move.b	d0,mMasterVolFM.w	; save the new volume
+		move.b	d2,mMasterVolFM.w	; save the new volume
 
 	if FEATURE_SFX_MASTERVOL
 		jsr	dReqVolUpFM(pc)		; go request volume update for FM
@@ -258,37 +279,37 @@ dUpdateAllAMPS:
 	endif
 
 .fadedac
-		move.b	(a1)+,d0		; get DAC volume byte from fade data
-		cmp.b	mMasterVolDAC.w,d0	; check if volume did not change
+		move.b	(a4)+,d2		; get DAC volume byte from fade data
+		cmp.b	mMasterVolDAC.w,d2	; check if volume did not change
 		beq.s	.fadepsg		; if did not, branch
-		move.b	d0,mMasterVolDAC.w	; save new volume
+		move.b	d2,mMasterVolDAC.w	; save new volume
 
 .ch =	mDAC1					; start at DAC1
 	rept Mus_DAC				; do for all music DAC channels
-		or.b	d1,.ch.w		; tell the channel to update its volume
+		or.b	d0,.ch.w		; tell the channel to update its volume
 .ch =		.ch+cSize			; go to next channel
 	endr
 
 	if FEATURE_SFX_MASTERVOL
-		or.b	d1,mSFXDAC1.w		; tell SFX DAC1 to update its volume
+		or.b	d0,mSFXDAC1.w		; tell SFX DAC1 to update its volume
 	endif
 
 .fadepsg
-		move.b	(a1)+,d0		; get PSG volume byte from fade data
-		cmp.b	mMasterVolPSG.w,d0	; check if volume did not change
+		move.b	(a4)+,d2		; get PSG volume byte from fade data
+		cmp.b	mMasterVolPSG.w,d2	; check if volume did not change
 		beq.s	.chkregion		; if did not, branch
-		move.b	d0,mMasterVolPSG.w	; save new volume
+		move.b	d2,mMasterVolPSG.w	; save new volume
 
 .ch =	mPSG1					; start at PSG1
 	rept Mus_PSG				; do for all music PSG channels
-		or.b	d1,.ch.w		; tell the channel to update its volume
+		or.b	d0,.ch.w		; tell the channel to update its volume
 .ch =		.ch+cSize			; go to next channel
 	endr
 
 	if FEATURE_SFX_MASTERVOL
 .ch =		mSFXPSG1			; start at SFX PSG1
 		rept SFX_PSG			; do for all SFX PSG channels
-			or.b	d1,.ch.w	; tell the channel to update its volume
+			or.b	d0,.ch.w	; tell the channel to update its volume
 .ch =			.ch+cSizeSFX		; go to next channel
 		endr
 	endif
@@ -331,8 +352,8 @@ dUpdateAllAMPS:
 ; ---------------------------------------------------------------------------
 
 	if tempo=0	; Overflow method
-		move.b	mTempo.w,d0		; get tempo to d0
-		add.b	d0,mTempoCur.w		; add to accumulator
+		move.b	mTempo.w,d3		; get tempo to d3
+		add.b	d3,mTempoCur.w		; add to accumulator
 		bcc.s	dAMPSdoDAC		; if carry clear, branch
 
 	else		; Counter method
