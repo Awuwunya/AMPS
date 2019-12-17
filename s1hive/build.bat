@@ -1,5 +1,5 @@
 @echo off
-"..\driver\AMPS Includer.exe" ASM68K driver driver\.Data
+"driver\AMPS Includer.exe" ASM68K driver driver\.Data
 asm68k /m /p /o ae- /e safe=1 sonic1.asm, s1built.dat, , .lst>.log
 type .log
 if NOT EXIST s1built.dat pause & exit
