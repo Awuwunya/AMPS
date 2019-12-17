@@ -284,6 +284,7 @@ Mus_ToWater	rs.b 1		; enable underwater mode
 Mus_OutWater	rs.b 1		; disable underwater mode
 Mus_Pause	rs.b 1		; pause the music
 Mus_Unpause	rs.b 1		; unpause the music
+Mus_StopSFX	ds.b 1		; stop all sfx
 MusOff		rs.b 0		; first music ID
 
 MusCount =	$70		; number of installed music tracks
