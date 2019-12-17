@@ -199,7 +199,7 @@ UpdateAMPS:
 		bne.s	.bufferok		; if it is same, Dual PCM is delayed and its baaad =(
 
 		moveq	#$20-1,d0		; loop for $20 times
-		dbf	d0,offset(*)		; in place, to wait for Dual PCM maybe! =I
+		dbf	d0,*		; in place, to wait for Dual PCM maybe! =I
 		dbf	d1,.recheck		; if we still have cycles to check, do it
 		bclr	#mfbExec,mFlags.w	; set AMPS as finished running
 

@@ -40,7 +40,7 @@ z80prg =	0
 	OPT D-			; make sure EQU/SET do not descope local lables
 
 zfutureobj =	\obj
-zfuturepos =	offset(*)
+zfuturepos =	*
 zfuturec =	0
 
 	if narg=1
@@ -157,7 +157,7 @@ zjrfuture macro off, byte
 zfuture	macro byte
 zfuturec =	zfuturec+1
 		local p,v
-p =		offset(*)-2
+p =		*-2
 v =		\byte
 		pushp "\#v"
 		pushp "\#p"

@@ -1746,14 +1746,14 @@ YM_BufferEnd =		02000h
 ; Warning stuff
 ; ---------------------------------------------------------------------------
 
-	if (offset(PCM1_Switch)&0FFh)>0F8h
+	if (PCM1_Switch)&0FFh>0F8h
 		inform 0," "
 		inform 0,"   Warning!  PCM1_Switch's instructions have crossed a boundary."
 		inform 0," "
 		inform 3," "
 	endif
 
-	if (offset(PCM2_Switch)&0FFh)>0F8h
+	if (PCM2_Switch)&0FFh>0F8h
 		inform 0," "
 		inform 0,"   Warning!  PCM2_Switch's instructions have crossed a boundary."
 		inform 0," "

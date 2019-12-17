@@ -46,29 +46,15 @@
 
 __sfx =		SFXoff
 __mus =		MusOff
+SoundIndex:
+	ptrSFX	0, RingRight, RingLeft
 
 MusicIndex:
-	ptrMusic GHZ, $25, LZ, $02, MZ, $02, SLZ, $07, SYZ, $0C, SBZ, $20, FZ, $10
-	ptrMusic Boss, $2E, SS, $00, Invincibility, $01, Drowning, $80
-	ptrMusic Title, $00, GotThroughAct, $00, Emerald, $00, ExtraLife, $33
-	ptrMusic GameOver, $00, Continue, $00, Ending, $00, Credits, $00, SEGA, $00
-
-SoundIndex:
-	ptrSFX	0, RingRight, RingLeft, RingLoss, Splash, Break
-	ptrSFX	0, Jump, Roll, Skid, Bubble, Drown, SpikeHit, Death
-	ptrSFX	0, AirDing, Register, Bonus, Shield, Dash, Signpost
-	ptrSFX	0, Lamppost, BossHit, Bumper, Spring
-	ptrSFX	0, Collapse, BigRing, Smash, Switch, Explode
-	ptrSFX	0, BuzzExplode, Basaran, Electricity, Flame, LavaBall
-	ptrSFX	0, SpikeMove, Rumble, Door, Stomp, Chain, Saw, Lava
-
-	ptrSFX	0, EnterSS, Goal, ActionBlock, Diamonds, Continue
-
-; SFX with special features
-	ptrSFX	$80, PushBlock
-
-; unused SFX
-	ptrSFX	0, UnkA2, UnkAB, UnkB8
+	ptrMusic Test, $00
+	ptrMusic Pelimusa, $1A, MysticCave, $34, DIS, $1E, ZaxxRemix, $00
+	ptrMusic ColumnDive, $3C, Pray, $0B, HydroCity, $1E, GameNo, $74
+	ptrMusic TowerPuppet, $00, ChoosePath, $0E, Shop, $74, Beach, $32
+	ptrMusic SmoothCriminal, $2A
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define samples
@@ -78,12 +64,43 @@ __samp =	$80
 SampleList:
 	sample $0000, Stop, Stop		; 80 - Stop sample (DO NOT EDIT)
 	sample $0100, Kick, Stop		; 81 - Kick
-	sample $0100, Snare, Stop		; 82 - Snare
-	sample $0100, Timpani, Stop, HiTimpani	; 83 - Hi Timpani
-	sample $00E6, Timpani, Stop, MidTimpani	; 84 - Timpani
-	sample $00C2, Timpani, Stop, LowTimpani	; 85 - Low Timpani
-	sample $00B6, Timpani, Stop, FloorTimpani; 86 - Floor Timpani
-	sample $0100, Sega, Stop		; 87 - SEGA screen
+	sample $0100, LowKick, Stop		; 82 - Low Kick
+	sample $0100, Snare, Stop		; 83 - Snare
+	sample $0100, Clap, Stop		; 84 - Clap
+	sample $0180, Tom, Stop, HiTom		; 85 - High Tom
+	sample $0100, Tom, Stop			; 86 - Mid Tom
+	sample $00C0, Tom, Stop, LowTom		; 87 - Low Tom
+	sample $0080, Tom, Stop, FloorTom	; 88 - Floor Tom
+
+	sample $0100, OrchHit, Stop		; 89 - Orchestra hit (Dynamite Headdy)
+	sample $0100, ZaxxOOH, Stop		; 8A - OOH 0-4 (Zaxxon Motherbase 2000)
+	sample $0080, ZaxxOOH, Stop, ZaxxLoOOH	; 8B - OOH Low 0-6 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxGO, Stop		; 8C - GO 0-5 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxDIS, Stop		; 8D - DIS 2-3 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxIT, Stop		; 8E - IT 2-9 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxEYO, Stop		; 8F - EYO 2-A (Zaxxon Motherbase 2000)
+
+	sample $0100, KcTom, Stop		; 90 - Tom (Knuckles Chaotix)
+	sample $00C0, KcTom, Stop, KcLowTom	; 91 - Low Tom (Knuckles Chaotix)
+	sample $0080, KcTom, Stop, KcFloorTom	; 92 - Floor Tom (Knuckles Chaotix)
+	sample $0100, kcCymbal, Stop		; 93 - Cymbal? (Knuckles Chaotix)
+	sample $0100, KcSnare, Stop		; 94 - Snare (Knuckles Chaotix)
+	sample $0100, KcTamb, Stop		; 95 - Tambourine? (Knuckles Chaotix)
+	sample $0100, Kc87, Stop		; 96 - Not really sure? (Knuckles Chaotix)
+	sample $0100, KcCrash, Stop		; 97 - Crash Cymbal (Knuckles Chaotix)
+
+	sample $0100, Meow, Stop	; AVG	; 98 - Meow (Meow Mix - Cyriak)
+	sample $0100, Wooh, WoohLoop	; AVG	; 99 - Wooh (The Amazing Atheist)
+	sample $0100, Lazer, Stop	; AVG	; 9A - Lazer (R2D2 bird)
+
+	sample $0100, Kaiku1, Stop		; 9B - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku2, Stop		; 9C - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku3, Stop		; 9D - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku4, Stop		; 9E - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku5, Stop		; 9F - Kaiku (Wings - Pelimusa)
+	sample $0100, KaikuL1, KaikuL2, KaikuL2	; A0 - Kaiku (Wings - Pelimusa)
+	sample $0100, KaikuL1, KaikuL3, KaikuL3	; A1 - Kaiku (Wings - Pelimusa)
+	sample $0100, Sarobasso, Stop		; A2 - Sarobasso (Wings - Pelimusa)
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define volume envelopes and their data
@@ -91,48 +108,136 @@ SampleList:
 
 __venv =	$01
 VolEnvs:
-	volenv 01, 02, 03, 04, 05, 06, 07, 08
-	volenv 09
+	volenv Ristar02, Ristar07, Ristar10, Ristar18, Ristar1D, GameNo01
+	volenv S3K_02, S3K_01, S3K_08, S3K_0A, Phan3_05, Phan3_0A, Zaxx04
+	volenv DyHe03, DyHe05, DyHe0A, Col3_02, Col3_03, Col3_05
+	volenv WOI_0C, WOI_0D, Kc02, Kc05, Kc08, MoonWalker04
+	volenv S2_02, S2_01, S2_0B
 VolEnvs_End:
 ; ---------------------------------------------------------------------------
 
-vd01:		dc.b $00, $00, $00, $08, $08, $08, $10, $10
+; Sonic 2 01
+vdS2_01:	dc.b $00, $00, $00, $08, $08, $08, $10, $10
 		dc.b $10, $18, $18, $18, $20, $20, $20, $28
 		dc.b $28, $28, $30, $30, $30, $38, eHold
 
-vd02:		dc.b $00, $10, $20, $30, $40, $7F, eHold
+; Sonic 2 0B
+vdS2_0B:	dc.b $20, $20, $20, $18, $18, $18, $10, $10
+		dc.b $10, $08, $08, $08, $08, $08, $08, $08
+		dc.b $10, $10, $10, $10, $10, $18, $18, $18
+		dc.b $18, $18, $20, eHold
 
-vd03:		dc.b $00, $00, $08, $08, $10, $10, $18, $18
-		dc.b $20, $20, $28, $28, $30, $30, $38, $38
-		dc.b eHold
-
-vd04:		dc.b $00, $00, $10, $18, $20, $20, $28, $28
+; Michael Jackson's Moonwalker 04
+vdMoonWalker04:	dc.b $00, $00, $10, $18, $20, $20, $28, $28
 		dc.b $28, $30, eHold
 
-vd05:		dc.b $00, $00, $00, $00, $00, $00, $00, $00
+; Knuckles Chaotix 08
+vdKc08:		dc.b $10, $08, $00, $00, $08, $08, $10, eHold
+
+; Zaxxon Motherbase 04
+vdZaxx04:	dc.b $10, $08, $00, $00, $08, $10, $10, $10
+		dc.b $10, $10, $10, $10, $10, $10, $10, $10
+		dc.b $10, $18, $18, $18, $20, $20, $20, $28, eHold
+
+; World of Illusion 0C
+vdWOI_0C:	dc.b $30, $28, $20, $18, $08, $08, $00, $00
+		dc.b $00, $00, $00, $00, $00, $00, $08, $08
+		dc.b $10, $10, $18, $18, $20, $20, eHold
+
+; World of Illusion 0D
+vdWOI_0D:	dc.b $20, $18, $10, $08, $00, $08, $08, $10
+		dc.b $10, $18, $18, $20, $20, $28, $28, $30
+		dc.b $30, $38, $38, eHold
+
+; Phantasy Star III & Knuckles Chaotix 05
+vdKc05:
+vdPhan3_05:	dc.b $18, $00, $08, $08, $08, $10, $18, $20
+		dc.b $20, $28, eHold
+
+; Phantasy Star III 0A
+vdPhan3_0A:	dc.b $08, $00, $00, $00, $00, $08, $08, $08
+		dc.b $10, $10, $10, $18, $18, $18, $18, $20
+		dc.b $20, $20, $28, $28, eHold
+
+; Game no Kanzume Otokuyou 01
+vdGameNo01:	dc.b $00, $08, $08, $08, $08, $08, $08, $08
+		dc.b $08, $10, $10, $10, $10, $10, $10, $10
+		dc.b $10, $18, $18, $18, $18, $18, $18, $18
+		dc.b $18, $20, $20, $20, $20, $20, $20, $20
+		dc.b $20, $28, $28, $28, $28, $28, $28, $28
+		dc.b $28, $30, eHold
+
+; Ristar 07
+vdRistar07:	dc.b $18, $10, $08, $00, $00, $08, $08, $10, eHold
+
+; Knuckles Chaotix 02
+vdKc02:		dc.b $00, $00		; continue to volenv below
+
+; Ristar & S2 & S3K & Columns III 02
+vdS2_02:
+vdCol3_02:
+vdS3K_02:
+vdRistar02:	dc.b $00, $10, $20, $30, $40, $7F, eStop
+
+; Ristar 1D
+vdRistar1D:	dc.b $00, $00, $00, $00, $08, $08, $08, $08
+		dc.b $08, $10, $10, $18, $18, $20, $20, $20
+		dc.b $20, $18, $18, $10, $10, $08, eHold
+
+; Ristar 10 & S3K 08
+vdS3K_08:
+vdRistar10:	dc.b $00, $00, $00, $10, $18, $18, $20, $28
+		dc.b $30, $38, $40, $48, $50, $48, $60, $68, eStop
+
+; Ristar 18
+vdRistar18:	dc.b $00, $18, $30, $48, eStop
+
+; S3K 01
+vdS3K_01:	dc.b $10, eStop
+
+; S3K 0A
+vdS3K_0A:	dc.b $08, $00, $00, $00, $00, $08, $08, $08
+		dc.b $10, $10, $10, $18, $18, $18, $18, $20
+		dc.b $20, $20, $28, $28, eHold
+
+; Dynamite Headdy 03
+vdDyHe03:	dc.b $00, $00, $08, $08, $18, $18, $20, $28, eStop
+
+; Dynamite Headdy 05
+vdDyHe05:	dc.b $20, $20, $20, $20, $18, $18, $18, $18
+		dc.b $10, $10, $10, $10, $08, $08, $08, $08
+		dc.b $00, $00, $00, $00, $00, $00, $00, $00
 		dc.b $00, $00, $08, $08, $08, $08, $08, $08
 		dc.b $08, $08, $08, $08, $08, $08, $08, $08
 		dc.b $10, $10, $10, $10, $10, $10, $10, $10
 		dc.b $18, $18, $18, $18, $18, $18, $18, $18
-		dc.b $20, eHold
+		dc.b $20, eStop
 
-vd06:		dc.b $18, $18, $18, $10, $10, $10, $10, $08
-		dc.b $08, $08, $00, $00, $00, $00, eHold
+; Dynamite Headdy 0A
+vdDyHe0A:	dc.b $38, $30, $30, $30, $28, $28, $28, $20
+		dc.b $20, $18, $18, $18, $18, $18, $10, $10
+		dc.b $10, $08, $08, $08, $00, $00, $00, $00
+		dc.b $00, $00, $00, $00, $00, $00, $00, $00
+		dc.b $00, $00, $00, $00, $00, $00, $00, $00
+		dc.b $00, $00, $00, $00, $00, $00, $00, $00
+		dc.b $00, $00, $08, $08, $08, $08, $08, $08
+		dc.b $08, $08, $08, $08, $08, $08, $08, $08
+		dc.b $08, $08, $08, $08, $08, $08, $10, $10
+		dc.b $10, $10, $10, $10, $18, $18, $18, $18
+		dc.b $20, $20, $20, $20, $20, $28, $28, $28
+		dc.b $28, $28, $30, $30, $30, $30, $30, $38
+		dc.b $38, $38, $38, $38, $40, $40, $40, $40
+		dc.b $40, $48, $48, $48, $48, $48, eHold
 
-vd07:		dc.b $00, $00, $00, $00, $00, $00, $08, $08
-		dc.b $08, $08, $08, $10, $10, $10, $10, $10
-		dc.b $18, $18, $18, $20, $20, $20, $28, $28
-		dc.b $28, $30, $38, eHold
+; Columns III 03
+vdCol3_03:	dc.b $10, $08, $00, $00, $08, $10, $10, $10
+		dc.b $10, $10, $10, $10, $10, $10, $10, $10
+		dc.b $10, $18, $18, $18, $20, $20, $20, $28, eHold
 
-vd08:		dc.b $00, $00, $00, $00, $00, $08, $08, $08
-		dc.b $08, $08, $10, $10, $10, $10, $10, $10
-		dc.b $18, $18, $18, $18, $18, $20, $20, $20
-		dc.b $20, $20, $28, $28, $28, $28, $28, $30
-		dc.b $30, $30, $30, $30, $38, $38, $38, eHold
-
-vd09:		dc.b $00, $08, $10, $18, $20, $28, $30, $38
-		dc.b $40, $48, $50, $58, $60, $68, $70, $78
-		dc.b eHold
+; Columns III 05
+vdCol3_05:	dc.b $10, $08, $00, $00, $08, $10, $10, $10
+		dc.b $10, $10, $10, $10, $10, $10, $10, $10
+		dc.b $10, $18, $18, $18, $20, $20, $20, $28, eStop
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define volume envelopes and their data
@@ -142,12 +247,13 @@ vd09:		dc.b $00, $08, $10, $18, $20, $28, $30, $38
 __menv =	$01
 
 ModEnvs:
-	modenv
+	modenv Test
 ModEnvs_End:
 ; ---------------------------------------------------------------------------
 
 	if FEATURE_MODENV
-
+; just testin'
+mdTest:		dc.b $08, eaSens, $01, eLoop, $00
 	endif
 
 ; ===========================================================================
@@ -174,7 +280,12 @@ dacaddr		dcb.b	Z80E_Read*(MaxPitch/$100),$00
 SWF_Stop:	dcb.b	$8000-(2*Z80E_Read*(MaxPitch/$100)),$80
 SWFR_Stop:	dcb.b	Z80E_Read*(MaxPitch/$100),$00
 
-	incSWF	Kick, Timpani, Snare, Sega
+	incSWF	Kick, LowKick, Snare, Clap, Tom, Wooh, WoohLoop
+	incSWF	OrchHit, ZaxxOOH, ZaxxDIS, ZaxxEYO, ZaxxIT, ZaxxGO
+	incSWF	KcTom, KcSnare, KcTamb, Kc87, KcCrash, KcCymbal
+	incSWF	KaikuL1, KaikuL2, KaikuL3, Kaiku1, Kaiku2, Kaiku3, Kaiku4, Kaiku5
+	incSWF	Meow, Lazer, Sarobasso
+	even
 	opt ae+				; enable automatic evens
 	list				; continue source listing
 ; ===========================================================================

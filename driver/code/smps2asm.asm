@@ -422,7 +422,7 @@ sModOff		macro
 ; F4xxxx - Keep looping back to xxxx each time the SFX is being played (CONT_SFX)
 sCont		macro loc
 	dc.b $F4
-	dc.w \loc-offset(*)-1
+	dc.w \loc-*-1
     endm
 
 ; F5 - End of channel (TRK_END - TEND_STD)
@@ -433,20 +433,20 @@ sStop		macro
 ; F6xxxx - Jump to xxxx (GOTO)
 sJump		macro loc
 	dc.b $F6
-	dc.w \loc-offset(*)-2
+	dc.w \loc-*-2
     endm
 
 ; F7xxyyzzzz - Loop back to zzzz yy times, xx being the loop index for loop recursion fixing (LOOP)
 sLoop		macro index,loops,loc
 	dc.b $F7, \index
-	dc.w \loc-offset(*)-2
+	dc.w \loc-*-2
 	dc.b \loops
     endm
 
 ; F8xxxx - Call pattern at xxxx, saving return point (GOSUB)
 sCall		macro loc
 	dc.b $F8
-	dc.w \loc-offset(*)-2
+	dc.w \loc-*-2
     endm
 
 ; F9 - Return (RETURN)
