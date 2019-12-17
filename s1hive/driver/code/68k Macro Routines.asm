@@ -353,25 +353,23 @@ dProcNote	macro sfx, chan
 ; Macro for processing a note in DAC channel
 ; ---------------------------------------------------------------------------
 
-dTrackNoteDAC	macro
-		btst	#cfbMode,(a1)		; check if we are on pitch mode
-		bne.s	.pitch			; if so, load pitch
-		move.b	d1,cSample(a1)		; else, save as a sample
-		bra.s	.cont
+dTrackNoteDAC   macro
+        	btst     #cfbMode,(a1)        	; check if we are on pitch mode
+        	bne.s    .pitch            	; if so, load pitch
+        	move.b   d1,cSample(a1)        	; else, save as a sample
+        	bra.s    .cont
 
 .pitch
-		subi.b	#$80,d1			; sub $80 from the note (notes start at $80)
-		bne.s	.noprest		; branch if note wasnt $80 (rest)
-		moveq	#0,d3			; play stop sample
-		bsr.w	dNoteOnDAC2		; ''
-		moveq	#-$80,d6		; tell the code we are resting
-		bra.s	.cont
+        	subi.b   #$80,d1            	; sub $80 from the note (notes start at $80)
+        	bne.s    .noprest        	; branch if note wasnt $80 (rest)
+        	moveq    #-$80,d6        	; tell the code we are resting
+        	bra.s    .cont
 
 .noprest
-		add.b	cPitch(a1),d1		; add pitch offset to note
-		add.w	d1,d1			; double offset (each entry is a word)
-		lea	dFreqDAC(pc),a4		; load DAC frequency table to a1
-		move.w	(a4,d1.w),cFreq(a1)	; load and save the requested frequency
+        	add.b   cPitch(a1),d1        	; add pitch offset to note
+        	add.w   d1,d1             	; double offset (each entry is a word)
+        	lea     dFreqDAC(pc),a4        	; load DAC frequency table to a1
+        	move.w  (a4,d1.w),cFreq(a1)    	; load and save the requested frequency
 
 .cont
     endm
