@@ -69,17 +69,6 @@ sHeaderTempo	macro tmul,tempo
 	dc.b \tmul-1,\tempo
     endm
 
-; Convert S1 tempo to S3 tempo
-sConvS1Tempo    macro tempo
-s2tempo = ((((((((tempo=0)&1)<<8)|tempo)-1)<<8)+(((((tempo=0)&1)<<8)|tempo)>>1))/((((tempo=0)&1)<<8)|tempo))&$FF
-s3tempo = ($100-(((s2tempo=0)&1)|s2tempo))&$FF
-    endm
-
-sHeaderTempoS1    macro tmul,tempo
-    sConvS1Tempo \tempo
-    dc.b \tmul-1,s3tempo
-    endm
-
 ; Header - Set priority leve
 sHeaderPrio	macro prio
 	dc.b \prio
@@ -409,13 +398,6 @@ ssLFO		macro reg, ams, fms, pan
 ssMod68k	macro wait, speed, step, count
 	dc.b $F0
 	sModData \wait,\speed,\step,\count
-    endm
-
-ssModZ80    macro wait, speed, step, count
-speedconv    = ((((\speed)=0)&1)<<8)|(\speed)
-countconv    = ((((\count)=0)&1)<<8)|(\count)
-    dc.b $F0
-    sModData (\wait)-1,\speed,\step,countconv/speedconv-1
     endm
 
 sModData	macro wait, speed, step, count
