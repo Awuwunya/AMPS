@@ -167,7 +167,7 @@ dCommands:
 dcSpRev:
 		move.b	mSpindash.w,d3		; load spindash rev counter to d0
 		addq.b	#1,mSpindash.w		; increment spindash rev counter
-		add.b	d3,cPitch(a2)		; add d0 to channel pitch offset
+		add.b	d3,cPitch(a1)		; add d0 to channel pitch offset
 
 		cmp.b	#$C-1,d3		; check if this is the max pitch offset
 		blo.s	.rts			; if not, skip
@@ -326,7 +326,7 @@ dcaTransp:
 		rts
 
 dcsTransp:
-		move.b	(a2)+,cPitch(a2)	; load pitch offset from tracker to channel
+		move.b	(a2)+,cPitch(a1)	; load pitch offset from tracker to channel
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
