@@ -437,7 +437,7 @@ Beach_FM1:
 	sJump		.loop
 
 Beach_FM1_00:
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b nG5, $0C, $06, nE5, nG5, $0C, $06, nE5
 	dc.b nG5, nF5, $0C, $1E, $0C, $06, nD5, nF5
 	dc.b $0C, $06, nD5, nF5, nE5, $0C, $1E, nG5
@@ -451,7 +451,7 @@ Beach_FM1_00:
 
 Beach_FM1_01:
 	saTranspose	$0C
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b nE4, $0C, $06, $0C, $06, nE4, nE4, nF4
 	dc.b $0C, nD4, $18, nG3, $0C, nD4, nD4, $06
 	dc.b $0C, $06, nD4, nD4, nE4, $0C, nC4, $18
@@ -463,7 +463,7 @@ Beach_FM1_01:
 	sRet
 
 Beach_FM1_02:
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b $06, nA4, $0C, nG4, $06, nC5, $0C, nC5
 	dc.b nA4, $06, nB4, $0C, nA4, $06, nD4, $0C
 	dc.b nA4
@@ -499,7 +499,7 @@ Beach_FM1_06:
 
 Beach_FM1_07:
 	saTranspose	$0C
-	sNoteTimeOut	$06
+	sGate		$06
 	dc.b nE4, nG4, nC5, nE5, nE4, nG4, nC5, nE5
 	dc.b nF4, nA4, nD5, nF5, nF4, nA4, nD5, nF5
 	dc.b nD4, nF4, nG4, nB4, nD4, nF4, nG4, nB4
@@ -526,24 +526,24 @@ Beach_Jump2:
 	sVoice		$07
 ;	ssVolQuick	$05
 	ssVol		$05+$0F+$10
-	sNoteTimeOut	$08
+	sGate		$08
 	sCall		Beach_FM2_00
-;	sNoteTimeOut	$00
+;	sGate		$00
 	sVoice		$03
 ;	ssVolQuick	$05
-	sNoteTimeOut	$08
+	sGate		$08
 	sCall		Beach_FM2_00
-;	sNoteTimeOut	$00
+;	sGate		$00
 	sVoice		$0D
 ;	ssVolQuick	$05
-	sNoteTimeOut	$08
+	sGate		$08
 	sCall		Beach_FM2_01
-;	sNoteTimeOut	$00
+;	sGate		$00
 	sVoice		$10
 ;	ssVolQuick	$05
-	sNoteTimeOut	$07
+	sGate		$07
 	sCall		Beach_FM2_01
-;	sNoteTimeOut	$00
+;	sGate		$00
 	sJump		Beach_Jump2
 
 Beach_FM2_00:
@@ -566,22 +566,22 @@ Beach_FM2_01:
 Beach_FM3:
 	sPan		spCenter, $00
 	sVoice		$02
-	sNoteTimeOut	$08
+	sGate		$08
 ;	ssVolQuick	$06
 	ssVol		$06+$12+$10
 	sCall		Beach_FM3_00
-;	sNoteTimeOut	$00
+;	sGate		$00
 
 Beach_Jump3:
 	sVoice		$06
 ;	ssVolQuick	$05
 	ssVol		$05+$0F+$10
-	sNoteTimeOut	$08
+	sGate		$08
 	sCall		Beach_FM3_00
-;	sNoteTimeOut	$00
+;	sGate		$00
 	sVoice		$08
 ;	ssVolQuick	$05
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b nC4, $0C, nC4, $06, nE4, $12, nG4, $0C
 	dc.b nF4, nF4, $06, nD4, $12, nF4, $0C, nG3
 	dc.b nG3, $06, nB3, $12, nF4, $0C, nE4, nE4
@@ -590,28 +590,28 @@ Beach_Jump3:
 	dc.b $12, nF4, $0C, nG4, $06, nG3, $0C, $12
 	dc.b nA3, $06, nB3, nC4, nG4, $0C, nE5, $06
 	dc.b nF5, nE5, nD5, $0C
-;	sNoteTimeOut	$00
+;	sGate		$00
 	sVoice		$0E
 ;	ssVolQuick	$05
 	saTranspose	$E8
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b nC4, $12, nC4, nC4, $0C, nD4, $12, nD4
 	dc.b nD4, $0C, nG3, $12, nG3, nG3, $0C, nG4
 	dc.b $12, nG3, $0C, $06, nA3, nB3, nC4, $12
 	dc.b nC4, nC4, $0C, nD4, $12, nD4, nD4, $0C
 	dc.b nG3, $12, nG4, nG3, $0C, nC4, $30
-;	sNoteTimeOut	$00
+;	sGate		$00
 	saTranspose	$18-$0C
 	sVoice		$0E
 ;	ssVolQuick	$05
 ;	saTranspose	$F4
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b $12, nC4, nC4, $0C, nD4, $12, nD4, nD4
 	dc.b $0C, nG3, $12, nG3, nG3, $0C, nG4, $12
 	dc.b nG3, $0C, $06, nA3, nB3, nC4, $12, nC4
 	dc.b nC4, $0C, nD4, $12, nD4, nD4, $0C, nG3
 	dc.b $12, nG4, nG3, $0C, nC4, $06, nRst, $2A
-;	sNoteTimeOut	$00
+;	sGate		$00
 	saTranspose	$0C
 	sJump		Beach_Jump3
 
@@ -673,17 +673,17 @@ Beach_FM4_02:
 	saTranspose	$F4
 	ssMod68k	$20, $01, $02, $04
 
-.loop	sNoteTimeOut	$08
+.loop	sGate		$08
 	dc.b nE5, $12, nG5, nE5, $0C, nF5, $12, nA5
 	dc.b nF5, $0C, nD5, $12, nF5, nD5, $0C, nC5
 	dc.b $06, nB4, nA4
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nG4, sHold, nG4, $0B, nRst, $0D
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b nE5, $12, nG5, nE5, $0C, nF5, $12, nA5
 	dc.b nF5, $0C, nG5, $12, nF5, nE5, $0C, nD5
 	dc.b $06, nC5, nB4
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nC5, sHold, nC5, $0B, nRst, $0D
 	sLoop		$00, $02, .loop
 	saTranspose	$0C
@@ -692,7 +692,7 @@ Beach_FM4_02:
 Beach_FM5:
 	sPan		spCenter, $00
 	sVoice		$01
-	sNoteTimeOut	$08
+	sGate		$08
 ;	ssVolQuick	$04
 	ssVol		$04+$0C+$10
 
@@ -705,7 +705,7 @@ Beach_FM5:
 	dc.b $0C, nD2, nG2, $06, nG1, $0C, $06, nG2
 	dc.b $0C, nC2, nG2, $06, nG1, $0C, $06, nG2
 	dc.b $0C
-;	sNoteTimeOut	$00
+;	sGate		$00
 	sJump		.loop
 
 ;Beach_FM6:

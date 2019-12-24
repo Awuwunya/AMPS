@@ -4,9 +4,9 @@
 ; ---------------------------------------------------------------------------
 
 dNoteToutHandler	macro
-		tst.b	cNoteTimeCur(a1)	; check if timer is 0
+		tst.b	cGateCur(a1)		; check if timer is 0
 		beq.s	.endt			; if is, do not timeout
-		subq.b	#1,cNoteTimeCur(a1)	; decrease delay by 1
+		subq.b	#1,cGateCur(a1)		; decrease delay by 1
 		bne.s	.endt			; if still not 0, branch
     endm
 ; ===========================================================================
@@ -76,12 +76,12 @@ dModPorta	macro jump,loop,type
 dPortamento	macro jump,loop,type
 	if FEATURE_PORTAMENTO
 		if FEATURE_MODULATION=0
-			tst.b	cPortaSpeed(a1)		; check if portamento is active
-			bne.s	.doporta		; if not, branch
+			tst.b	cPortaSpeed(a1)	; check if portamento is active
+			bne.s	.doporta	; if not, branch
 
 			if FEATURE_MODENV
-				tst.b	cModEnv(a1)	; check if modulation envelope ID is not 0
-				bne.s	.nowrap		; if so, update frequency nonetheless
+				tst.b	cModEnv(a1); check if modulation envelope ID is not 0
+				bne.s	.nowrap	; if so, update frequency nonetheless
 			endif
 
 			dGenLoops 1, \jump,\loop,\type
@@ -112,8 +112,8 @@ dPortamento	macro jump,loop,type
 			sub.w	#$25D,d5	; sub the lower bound
 			cmp.w	#$4C0-$25D,d5	; check if out of range of safe frequencies
 			bls.s	.nowrap		; branch if not
-
 			bpl.s	.pos		; branch if negative
+
 			sub.w	d4,d2		; add frequency offset to d4
 			sub.w	d4,cPortaFreq(a1); fix portamento frequency also
 			bpl.s	.nowrap		; branch if overflow did not occur
@@ -130,7 +130,7 @@ dPortamento	macro jump,loop,type
 			clr.w	cPortaFreq(a1)	; reset portamento frequency
 		endif
 
-	.nowrap:
+.nowrap
 	endif
     endm
 ; ===========================================================================
@@ -189,24 +189,24 @@ dModulate	macro jump,loop,type
 dGenLoops macro	mode,jump,loop,type
 	if \type>=0
 		if FEATURE_DACFMVOLENV=0
-			bclr	#cfbVol,(a1)		; check if volume update is needed and clear bit
-			beq.s	.noupdatevol		; if not, skip
+			bclr	#cfbVol,(a1)	; check if volume update is needed and clear bit
+			beq.s	.noupdatevol	; if not, skip
 		endif
 
 		if \type<2
-			jsr	dUpdateVolFM(pc)	; update FM volume
+			jsr	dUpdateVolFM(pc); update FM volume
 		endif
 
 		if \type>=4
-			jsr	dUpdateVolDAC(pc)	; update DAC volume
+			jsr	dUpdateVolDAC(pc); update DAC volume
 		endif
 
 		.noupdatevol:
 		if \type<>5
-			dbf	d0,\loop		; loop for all channels
+			dbf	d0,\loop	; loop for all channels
 		endif
 	endif
-	bra.w	\jump			; jump to next routine
+	bra.w	\jump				; jump to next routine
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -319,7 +319,7 @@ dProcNote	macro sfx, chan
 	endif
 
 	if \sfx=0
-		move.b	cNoteTimeMain(a1),cNoteTimeCur(a1); copy note timeout value
+		move.b	cGateMain(a1),cGateCur(a1); copy note timeout value
 	endif
 
 	if FEATURE_DACFMVOLENV|(\chan=1)

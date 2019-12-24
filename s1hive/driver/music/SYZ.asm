@@ -341,7 +341,7 @@ SpringYard_Jump4:
 
 SpringYard_PSG3:
 	sNoisePSG	$E7
-	sNoteTimeOut	$01
+	sGate		$01
 	saVol		$08
 
 SpringYard_Loop2:

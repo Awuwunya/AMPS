@@ -265,7 +265,7 @@ Pray_FM1:
 ;	saTempoPAL	$1B-$15
 	;sNoteTimeIn	$00
 	ssMod68k	$01, $01, $00, $00
-	sNoteTimeOut	$03
+	sGate		$03
 	sVoice		$04
 
 Pray_Loop22:
@@ -276,7 +276,7 @@ Pray_Loop22:
 	dc.b nRst, $30, nRst
 
 Pray_Cond8:
-	sNoteTimeOut	$03
+	sGate		$03
 	sVoice		$04
 	;sPanAni		$01, $02, $03, $06, $03
 
@@ -289,7 +289,7 @@ Pray_FM2:
 	ssMod68k	$01, $01, $00, $00
 	sPan		spCenter, $00
 	sVoice		$04
-	sNoteTimeOut	$03
+	sGate		$03
 
 Pray_Loop20:
 	sCall		Pray_Call5
@@ -301,7 +301,7 @@ Pray_Loop20:
 Pray_Cond7:
 	;sPanAni		$01, $02, $01, $06, $03
 	sVoice		$04
-	sNoteTimeOut	$03
+	sGate		$03
 
 Pray_Jump7:
 	sCall		Pray_Call5
@@ -313,7 +313,7 @@ Pray_FM3:
 ;	saVol		$04
 ;	sPan		spCenter, $00
 	sVoice		$04
-	sNoteTimeOut	$03
+	sGate		$03
 
 	sCall		Pray_Call1
 	dc.b nC3, $0C, nC4, nG3, nE3, nEb4, $0C, nEb3
@@ -321,7 +321,7 @@ Pray_FM3:
 	dc.b $04, nC3, $0C, nC4, $08, nC3, $0C, nC4
 	dc.b $04, nC3, $0C, nEb4, $08, nEb3, $0C, nEb5
 	dc.b $04
-	sNoteTimeOut	$00
+	sGate		$00
 	sVoice		$05
 	ssMod68k	$0F, $01, $07, $03
 	sPan		spLeft, $00
@@ -353,7 +353,7 @@ Pray_FM4:
 	sPan		spCentre, $00
 ;	saVol		$08
 	;sPanAni		$00
-	sNoteTimeOut	$03
+	sGate		$03
 	sVoice		$04
 	sPan		spLeft, $00
 	saVol		$0C
@@ -361,7 +361,7 @@ Pray_FM4:
 	sCall		Pray_Call7
 	sCall		Pray_Call7
 	saVol		$F4
-	sNoteTimeOut	$00
+	sGate		$00
 	sPan		spCenter, $00
 	sVoice		$03
 	dc.b nRst, $03
@@ -396,7 +396,7 @@ Pray_Jump5:
 	;sNoteTimeIn	$01
 	dc.b nE5, $08, nF5, $04, nG5, $08, nF5, $04
 	;sNoteTimeIn	$00
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nBb5, $2F, nRst, $01, nA5, $05, nRst, $06
 	saVol		$0A
 	sPan		spRight, $00
@@ -422,7 +422,7 @@ Pray_Jump5:
 Pray_FM5:
 	sPan		spCenter, $00
 	;sPanAni		$00
-	sNoteTimeOut	$03
+	sGate		$03
 	sVoice		$04
 	sPan		spRight, $00
 	dc.b nRst, $09
@@ -430,7 +430,7 @@ Pray_FM5:
 	sCall		Pray_Call5
 	sPan		spCenter, $00
 	saVol		$F4
-	sNoteTimeOut	$00
+	sGate		$00
 	sVoice		$03
 	dc.b nRst, $03
 	sCall		Pray_Call6
@@ -479,7 +479,7 @@ Pray_Jump4:
 	;sNoteTimeIn	$00
 	saVol		$F6
 	sPan		spCenter, $00
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nF5, $2F, nRst, $01, nF5, $05, nRst, $06
 	saVol		$0A
 	sPan		spRight, $00
@@ -717,11 +717,11 @@ Pray_Call6:
 	sRet
 
 Pray_Call9:
-	sNoteTimeOut	$06
+	sGate		$06
 	dc.b nC3, $0C, nC3, nC3, nC3, $08
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b nC3, $04, nRst, $08, nC3, $04
-	sNoteTimeOut	$0B
+	sGate		$0B
 	dc.b nC3, $0C
 	sRet
 

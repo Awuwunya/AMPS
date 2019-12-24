@@ -189,9 +189,9 @@ Labyrinth_Jump1:
 
 Labyrinth_Call4:
 	sVoice		$03
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b nA6, $06, nF6, nD6
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nG6, $0A, nRst, $02, nG6, $03, nRst, nG6
 	dc.b nRst, $09
 	sRet
@@ -205,9 +205,9 @@ Labyrinth_FM4:
 
 Labyrinth_FM5:
 	sVoice		$02
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b nC5, $06, nA4, nF4
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nC5, $09, nRst, $03, nC5, nRst, nC5, nRst
 	dc.b $09
 	saVol		$03
@@ -220,26 +220,26 @@ Labyrinth_Jump2:
 	dc.b nRst, $51, nA5, $03, nF5, nC5, nRst, nF5
 	dc.b nRst, $39, nG4, $06, nRst, nA4, nRst, nBb4
 	dc.b $03, nRst, nBb4, nRst, nCs5, nRst
-	sNoteTimeOut	$0A
+	sGate		$0A
 	sCall		Labyrinth_Call5
 	dc.b nRst, $06, nA4, nRst, nB4, nRst, nCs5, nCs5
 	dc.b nE5
 	sCall		Labyrinth_Call5
-	sNoteTimeOut	$05
+	sGate		$05
 	dc.b nRst, $06, nG4, $03, nA4
 
 Labyrinth_Loop4:
 	dc.b nC5, nC5, nA4, nG4
 	sLoop		$00, $03, Labyrinth_Loop4
-	sNoteTimeOut	$00
+	sGate		$00
 	sJump		Labyrinth_Jump2
 
 Labyrinth_Call5:
 	dc.b nE5, $12, $06, nD5, $12, $06, nC5, $12
 	dc.b $06, nB4, nC5
-	sNoteTimeOut	$14
+	sGate		$14
 	dc.b nD5, $0C
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b nE5, $12, $06, nD5, $12, $06
 	sRet
 
@@ -304,18 +304,18 @@ Labyrinth_Call8:
 Labyrinth_PSG3:
 	sNoisePSG	$E7
 	dc.b nRst, $12
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b nHiHat, $0C
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06, $0C
 
 Labyrinth_Jump4:
 	sCall		Labyrinth_Call9
 	sCall		Labyrinth_Call10
 	sCall		Labyrinth_Call9
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $0C
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06, $06, $03, $03, $06, $03, $03, $06
 	sCall		Labyrinth_Call9
 	sCall		Labyrinth_Call10
@@ -325,46 +325,46 @@ Labyrinth_Jump4:
 	sCall		Labyrinth_Call9
 	sCall		Labyrinth_Call11
 	dc.b $03, $03
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $06
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $03, $03
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $06
 	sCall		Labyrinth_Call11
 	saVol		-$08
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $0C, $0C
 	saVol		$08
 	sJump		Labyrinth_Jump4
 
 Labyrinth_Call9:
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $0C
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06, $06, $06, $06, $06, $06
 	sRet
 
 Labyrinth_Call10:
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $0C
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06, $06, $06, $06, $06, $03, $03
 	sRet
 
 Labyrinth_Call11:
 	dc.b nRst, $03
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b nHiHat, $06, $06, $03
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $06
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06, $06, $06, $06, $06, $06, $06, $06
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06, $06, $06
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $06
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06, $06, $06, $06, $06, $06, $06, $06
 	dc.b $06, $06, $06, $06
 	sRet

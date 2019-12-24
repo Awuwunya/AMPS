@@ -45,9 +45,9 @@ dAMPSnextDAC:
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
-		
+
 .pcnote
-		dProcNote 0, -1			; reset necessary channel memory
+	dProcNote 0, -1				; reset necessary channel memory
         	tst.b   d4            		; check if channel was resting
         	bmi.s   .rest            	; if yes, we do not want to note on anymore
         	bsr.s   dNoteOnDAC        	; do hardware note-on behavior
@@ -294,7 +294,7 @@ dUpdateVolDAC:
 		move.b	cVolume(a1),d1		; get channel volume to d3
 		add.b	mMasterVolDAC.w,d1	; add master volume to it
 		bpl.s	dUpdateVolDAC3		; if positive (in range), branch
-		moveq	#$FFFFFF80,d1		; force volume to mute ($80 is the last valid volume)
+		moveq	#-$80,d1		; force volume to mute ($80 is the last valid volume)
 
 dUpdateVolDAC3:
 	if FEATURE_DACFMVOLENV

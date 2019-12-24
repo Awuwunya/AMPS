@@ -566,8 +566,8 @@ GameNo_PSG3:
 	sNoisePSG	$E4
 
 GameNo_Jump8:
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b nC3, $03
-	sNoteTimeOut	$01
+	sGate		$01
 	dc.b $03, $03, $03
 	sJump		GameNo_Jump8

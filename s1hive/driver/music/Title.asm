@@ -128,22 +128,22 @@ TitleScreen_PSG3:
 	dc.b nRst, $30
 
 TitleScreen_Loop1:
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b nHiHat, $0C
-	sNoteTimeOut	$0C
+	sGate		$0C
 	dc.b $0C
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $0C
-	sNoteTimeOut	$0C
+	sGate		$0C
 	dc.b $0C
 	sLoop		$00, $05, TitleScreen_Loop1
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $06
-	sNoteTimeOut	$0E
+	sGate		$0E
 	dc.b $12
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b $0C
-	sNoteTimeOut	$0F
+	sGate		$0F
 	dc.b $0C
 	sStop
 

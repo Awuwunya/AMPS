@@ -75,18 +75,18 @@ ExtraLife_FM1:
 
 ExtraLife_Jump1:
 	sVoice		$00
-	sNoteTimeOut	$06
+	sGate		$06
 	dc.b nE7, $06, $03, $03, $06, $06
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nFs7, $09, nD7, nCs7, $06, nE7, $18
 	sStop
 
 ExtraLife_FM2:
 	sVoice		$01
-	sNoteTimeOut	$06
+	sGate		$06
 	sComm		0, $01
 	dc.b nCs7, $06, $03, $03, $06, $06
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nD7, $09, nB6, nA6, $06, nCs7, $18
 	sComm		0, $00
 	sStop
@@ -106,9 +106,9 @@ ExtraLife_Jump2:
 	sStop
 
 ExtraLife_PSG1:
-	sNoteTimeOut	$06
+	sGate		$06
 	dc.b nCs7, $06, $03, $03, $06, $06
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nD7, $09, nB6, nA6, $06, nCs7, $18
 
 ExtraLife_DAC1:

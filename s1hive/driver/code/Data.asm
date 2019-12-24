@@ -54,13 +54,14 @@ MusicIndex:
 	ptrMusic GameOver, $00, Continue, $00, Ending, $00, Credits, $00, SEGA, $00
 
 SoundIndex:
-	ptrSFX	0, RingRight, RingLeft, RingLoss, Splash, Break
-	ptrSFX	0, Jump, Roll, Skid, Bubble, Drown, SpikeHit, Death
-	ptrSFX	0, AirDing, Register, Bonus, Shield, Dash, Signpost
-	ptrSFX	0, Lamppost, BossHit, Bumper, Spring
-	ptrSFX	0, Collapse, BigRing, Smash, Switch, Explode
-	ptrSFX	0, BuzzExplode, Basaran, Electricity, Flame, LavaBall
-	ptrSFX	0, SpikeMove, Rumble, Door, Stomp, Chain, Saw, Lava
+	ptrSFX	$01, RingRight
+	ptrSFX	0, RingLeft, RingLoss, Splash, Break, Jump, Roll
+	ptrSFX	0, Skid, Bubble, Drown, SpikeHit, Death, AirDing
+	ptrSFX	0, Register, Bonus, Shield, Dash, BossHit, Switch
+	ptrSFX	0, Signpost, Lamppost, BigRing, Bumper, Spring
+	ptrSFX	0, Collapse, Smash, Basaran, BuzzExplode, Explode
+	ptrSFX	0, Electricity, Flame, LavaBall, SpikeMove, Rumble
+	ptrSFX	0, Door, Stomp, Chain, Saw, Lava
 
 	ptrSFX	0, EnterSS, Goal, ActionBlock, Diamonds, Continue
 

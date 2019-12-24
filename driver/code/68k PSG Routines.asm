@@ -82,8 +82,8 @@ dAMPSnextPSG:
 		bsr.w	dUpdateFreqPSG2		; if frequency needs changing, do it
 
 .endm
-		jsr	dEnvelopePSG(pc)		; run envelope program
-		
+		jsr	dEnvelopePSG(pc)	; run envelope program
+
 .next
 		dbf	d0,dAMPSnextPSG		; make sure to run all the channels
 		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
@@ -102,11 +102,11 @@ dAMPSnextPSG:
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
+
 .pcnote
 	dProcNote 0, 1				; reset necessary channel memory
-
 		bsr.s	dUpdateFreqPSG		; update hardware frequency
-		jsr	dEnvelopePSG(pc)		; run envelope program
+		jsr	dEnvelopePSG(pc)	; run envelope program
 		dbf	d0,dAMPSnextPSG		; make sure to run all the channels
 		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
 ; ===========================================================================
@@ -179,8 +179,8 @@ dUpdateFreqPSG3:
 	if FEATURE_SAFE_PSGFREQ
 		andi.b	#$3F,d2			; clear any extra bits that aren't valid
 	endif
-		move.b	d6,dPSG.l			; write frequency low nibble and latch channel
-		move.b	d2,dPSG.l			; write frequency high nibbles to PSG
+		move.b	d6,dPSG			; write frequency low nibble and latch channel
+		move.b	d2,dPSG			; write frequency high nibbles to PSG
 
 locret_UpdateFreqPSG:
 		rts
@@ -249,9 +249,9 @@ dUpdateVolPSG:
 		cmp.w	#mSFXDAC1,a1		; check if this is a SFX channel
 		bhs.s	.send			; if so, update volume
 
-		tst.b	cNoteTimeMain(a1)	; check if note timeout is active
+		tst.b	cGateMain(a1)		; check if note timeout is active
 		beq.s	.send			; if not, update volume
-		tst.b	cNoteTimeCur(a1)	; is note stopped already?
+		tst.b	cGateCur(a1)		; is note stopped already?
 		beq.s	locret_UpdVolPSG	; if is, do not update
 
 .send

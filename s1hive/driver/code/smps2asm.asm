@@ -44,9 +44,12 @@ sPatNum =	0
 
 ; Header - Set up Channel Usage
 sHeaderCh	macro fm,psg
-	dc.b \fm-1
-
 	if narg=2
+		dc.b \psg-1, \fm-1
+		if \psg>3
+			inform 2,"You sure there are \psg PSG channels?"
+		endif
+
 		if FEATURE_FM6
 			if \fm>6
 				inform 2,"You sure there are \fm FM channels?"
@@ -56,17 +59,14 @@ sHeaderCh	macro fm,psg
 				inform 2,"You sure there are \fm FM channels?"
 			endif
 		endif
-
-		dc.b \psg-1
-		if \psg>3
-			inform 2,"You sure there are \psg PSG channels?"
-		endif
+	else
+		dc.b \fm-1
 	endif
     endm
 
 ; Header - Set up Tempo and Tick Multiplier
 sHeaderTempo	macro tmul,tempo
-	dc.b \tmul-1,\tempo
+	dc.b \tempo,\tmul-1
     endm
 
 ; Header - Set priority leve
@@ -440,7 +440,7 @@ sJump		macro loc
 sLoop		macro index,loops,loc
 	dc.b $F7, \index
 	dc.w \loc-offset(*)-2
-	dc.b \loops
+	dc.b \loops-1
     endm
 
 ; F8xxxx - Call pattern at xxxx, saving return point (GOSUB)
@@ -470,7 +470,7 @@ sCondOff	macro
     endm
 
 ; FDxx - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL)
-sNoteTimeOut	macro val
+sGate		macro val
 	dc.b $FD, \val
     endm
 

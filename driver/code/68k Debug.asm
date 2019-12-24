@@ -173,7 +173,7 @@ AMPS_Debug_Console_Channel:
 	Console.Write "%<pal1>Loop: %<pal2>%<.b cLoop(a1)> %<.b cLoop+1(a1)> %<.b cLoop+2(a1)> "
 	cmp.w	#mSFXDAC1,a5
 	bhs.w	.rts
-	Console.WriteLine "%<.b cNoteTimeCur(a1)> %<.b cNoteTimeMain(a1)>"
+	Console.WriteLine "%<.b cGateCur(a1)> %<.b cGateMain(a1)>"
 	Console.WriteLine "%<pal1>Stack: %<pal2>%<.b cStack(a1)>"
 
 	move.w	a1,d1
@@ -496,7 +496,7 @@ AMPS_Debug_dcBackup	macro
 	endif
     endm
 
-	if FEATURE_MODENV=0
+	if FEATURE_BACKUP=0
 	if def(RaiseError)	; check if Vladik's debugger is active
 AMPS_DebugR_dcBackup:
 		RaiseError "Backup feature is disabled. Set FEATURE_BACKUP to 1 to enable.", AMPS_Debug_Console_Channel
@@ -508,9 +508,15 @@ AMPS_DebugR_dcBackup:
 ; ---------------------------------------------------------------------------
 
 AMPS_Debug_dcPan	macro
+	if FEATURE_FM6
+		cmp.w	#mFM6,a1; check if this is FM6
+		beq.s	.fail	; if so, branch
+	endif
+
 	tst.b	cType(a1)	; check for PSG channel
 	bpl.s	.ok		; if no, branch
 
+.fail
 	if def(RaiseError)	; check if Vladik's debugger is active
 		RaiseError "sPan on a PSG channel!", AMPS_Debug_Console_Channel
 	else
@@ -521,15 +527,32 @@ AMPS_Debug_dcPan	macro
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Timeout command on SFX channel handler
+; Gate command on SFX channel handler
 ; ---------------------------------------------------------------------------
 
-AMPS_Debug_dcTimeout	macro
+AMPS_Debug_dcGate	macro
 	cmp.w	#mSFXDAC1,a1	; check for SFX channel
-	blo.s	.ok		; if no, branch
+	blo.s	.ok		; if not, branch
 
 	if def(RaiseError)	; check if Vladik's debugger is active
-		RaiseError "sNoteTimeOut on a SFX channel!", AMPS_Debug_Console_Channel
+		RaiseError "sGate on a SFX channel!", AMPS_Debug_Console_Channel
+	else
+		bra.w	*
+	endif
+
+.ok
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; NoisePSG command on SFX channel handler
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_dcNoisePSG	macro
+	cmp.b	#ctPSG3,cType(a1); check if this is PSG3 or PSG4 channel
+	bhs.s	.ok		; if not, branch
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+		RaiseError "sNoisePSG on an invalid channel!", AMPS_Debug_Console_Channel
 	else
 		bra.w	*
 	endif
@@ -555,7 +578,7 @@ AMPS_Debug_dcCall1	macro
     endm
 
 AMPS_Debug_dcCall2	macro
-	cmp.b	#cNoteTimeCur,d4; check for invalid stack address
+	cmp.b	#cGateCur,d4	; check for invalid stack address
 	bhi.s	.ok2		; if no, branch
 
 	if def(RaiseError)	; check if Vladik's debugger is active
@@ -688,7 +711,7 @@ AMPS_Debug_CuePtr	macro id
 
 .fail\@
 	if def(RaiseError)	; check if Vladik's debugger is active
-		jsr	AMPS_Debug_CuePtr\id
+		jsr	AMPS_DebugR_CuePtr\id
 	else
 		bra.w	*
 	endif
@@ -697,11 +720,11 @@ AMPS_Debug_CuePtr	macro id
     endm
 
 	if def(RaiseError)	; check if Vladik's debugger is active
-AMPS_Debug_CuePtrGen:
+AMPS_DebugR_CuePtrGen:
 		RaiseError2 "CUE invalid at macro: %<.l a0>", AMPS_Debug_Console_Channel
-AMPS_Debug_CuePtr0:
+AMPS_DebugR_CuePtr0:
 		RaiseError2 "CUE invalid at dUpdateVoiceFM: %<.l a0>", AMPS_Debug_Console_Channel
-AMPS_Debug_CuePtr3:
+AMPS_DebugR_CuePtr3:
 		RaiseError2 "CUE invalid at UpdateAMPS: %<.l a0>", AMPS_Debug_Console_Channel
 	endif
 ; ===========================================================================
@@ -743,8 +766,10 @@ AMPS_Debug_PlayTrackMus	macro
     endm
 
 AMPS_Debug_PlayTrackMus2	macro ch
-	move.l	d1,a3		; store this thing away
-	move.l	a2,d1
+	swap	d2		; make some space to store stuff
+	move.w	d1,d2		; store this thing away
+	move.l	a3,d1		; load the target address
+
 	and.l	#$FFFFFF,d1	; remove high byte
 	cmp.l	#musaddr,d1	; check if this is valid tracker
 	blo.s	.fail\@		; if no, branch
@@ -759,7 +784,8 @@ AMPS_Debug_PlayTrackMus2	macro ch
 	endif
 
 .ok\@
-		move.l	a3,d1		; get the value back
+	move.w	d2,d1		; get the value back
+	swap	d2		; also this one as well
     endm
 
 AMPS_Debug_PlayTrackSFX	macro
@@ -780,11 +806,11 @@ AMPS_Debug_PlayTrackSFX	macro
     endm
 
 AMPS_Debug_PlayTrackSFX2	macro
-	move.l	a3,d1
-	and.l	#$FFFFFF,d1	; remove high byte
-	cmp.l	#sfxaddr,d1	; check if this is valid tracker
+	move.l	a3,d2
+	and.l	#$FFFFFF,d2	; remove high byte
+	cmp.l	#sfxaddr,d2	; check if this is valid tracker
 	blo.s	.fail\@		; if no, branch
-	cmp.l	#musaddr,d1	; check if this is valid tracker
+	cmp.l	#musaddr,d2	; check if this is valid tracker
 	blo.s	.ok\@		; if is, branch
 
 .fail\@

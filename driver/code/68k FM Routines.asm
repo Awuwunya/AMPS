@@ -30,7 +30,7 @@ dMuteFM:
 		moveq	#$10-1,d5		; prepare the value for going to next channel to d5
 		moveq	#$40,d6			; YM command: Total Level Operator 1
 		moveq	#$7F,d1			; set total level to $7F (silent)
-		moveq	#$FFFFFF80,d2		; YM address: Release Rate Operator 1
+		moveq	#-$80,d2		; YM address: Release Rate Operator 1
 		moveq	#3-1,d4			; prepare 3 groups of channels to d4
 
 .chloop
@@ -91,7 +91,7 @@ dUpdateVolFM:
 		move.b	cVolume(a1),d1		; load FM channel volume to d1
 		add.b	mMasterVolFM.w,d1	; add master FM volume to d1
 		bpl.s	dUpdateVolFM3		; if we did not overflow, branch
-		moveq	#$7F,d1				; cap to silent volume
+		moveq	#$7F,d1			; cap to silent volume
 
 dUpdateVolFM3:
 	if FEATURE_DACFMVOLENV
@@ -241,6 +241,7 @@ dAMPSnextFMSFX:
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
+
 .pcnote
 	dProcNote 1, 0				; reset necessary channel memory
 		bsr.w	dUpdateFreqFM		; send FM frequency to hardware

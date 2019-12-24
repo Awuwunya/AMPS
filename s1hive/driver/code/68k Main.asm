@@ -134,7 +134,6 @@ dLoadFade:
 dSetFilter:
 		lea	dZ80+SV_VolumeBank.l,a4	; load volume bank instructions address to a1
 		moveq	#$74,d5			; prepare the "ld  (hl),h" instruction to d1
-
 	StopZ80					; wait for Z80 to stop
 ; ---------------------------------------------------------------------------
 ; addx in Motorola 68000 is much like adc in Z80. It allows us to add
@@ -201,7 +200,7 @@ UpdateAMPS:
 		moveq	#$20-1,d0		; loop for $20 times
 		dbf	d0,offset(*)		; in place, to wait for Dual PCM maybe! =I
 		dbf	d1,.recheck		; if we still have cycles to check, do it
-		bclr	#mfbExec,mFlags.w	; set AMPS as finished running
+		bclr	#mfbExec,mFlags.w	; set AMPS as not running
 
 .rts
 		rts				; fuck it, Dual PCM does not want to cooperate
@@ -222,7 +221,7 @@ UpdateAMPS:
 	StopZ80					; wait for Z80 to stop
 		st	(a0)			; make sure cue is marked as completed
 	StartZ80				; enable Z80 execution
-		bclr	#mfbExec,mFlags.w	; set AMPS as finished running
+		bclr	#mfbExec,mFlags.w	; set AMPS as not running
 
 dPaused:
 		rts
@@ -244,7 +243,8 @@ dUpdateAllAMPS:
 ; appear before ROM offset $10000, or else it will never be executed.
 ; ---------------------------------------------------------------------------
 
-.notempo	tst.b	mFadeAddr+1.w		; check if a fade program is already executing
+.notempo
+		tst.b	mFadeAddr+1.w		; check if a fade program is already executing
 	if safe=1
 		beq.w	.chkregion		; branch if not
 	else
@@ -254,7 +254,7 @@ dUpdateAllAMPS:
 		move.l	mFadeAddr.w,a4		; get the fade porogram address to a4
 		addq.l	#3,mFadeAddr.w		; set the fade address to next group
 
-		moveq	#(1<<cfbVol),d0		; prepare volume update to d1
+		moveq	#1<<cfbVol,d0		; prepare volume update to d0
 		moveq	#0,d2
 		move.b	(a4)+,d2		; get FM/command byte from fade data
 		bpl.s	.nofadeend		; branch if this is not a command

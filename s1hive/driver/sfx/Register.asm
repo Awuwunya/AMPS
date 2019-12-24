@@ -1,5 +1,5 @@
 	sHeaderInit
-	sHeaderPrio	$70
+	sHeaderPrio	$81
 	sHeaderCh	$03
 	sHeaderSFX	$80, ctFM5, .FM5, $00, $00
 	sHeaderSFX	$80, ctFM4, .FM4, $00, $00

@@ -178,9 +178,9 @@ ScrabBrain_Loop1:
 ScrabBrain_FM2:
 	sVoice		$00
 	saVol		$FD
-	sNoteTimeOut	$06
+	sGate		$06
 	dc.b nA3, $03, nB3, nRst, nC4, nRst, nD4, nE4
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nG4, $09
 
 ScrabBrain_Loop2:
@@ -188,7 +188,7 @@ ScrabBrain_Loop2:
 	sLoop		$00, $05, ScrabBrain_Loop2
 	dc.b nG3
 	saVol		$03
-	sNoteTimeOut	$06
+	sGate		$06
 
 ScrabBrain_Loop5:
 	sCall		ScrabBrain_Call5
@@ -223,7 +223,7 @@ ScrabBrain_Loop9:
 	dc.b nG4, nG4, nD4, nD4, nE4, nE4, nD4, nD4
 	sLoop		$00, $02, ScrabBrain_Loop9
 	sLoop		$01, $04, ScrabBrain_Loop6
-	sNoteTimeOut	$00
+	sGate		$00
 	sJump		ScrabBrain_FM2
 
 ScrabBrain_Call5:
@@ -234,9 +234,9 @@ ScrabBrain_Call5:
 
 ScrabBrain_FM3:
 	sVoice		$01
-	sNoteTimeOut	$06
+	sGate		$06
 	dc.b nA4, $03, nB4, nRst, nC5, nRst, nD5, nE5
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nG5, $4B
 	sVoice		$03
 	ssDetune	$03
@@ -244,11 +244,11 @@ ScrabBrain_FM3:
 	sCall		ScrabBrain_Call1
 	sVoice		$00
 	sPan		spRight, $00
-	sNoteTimeOut	$06
+	sGate		$06
 	sCall		ScrabBrain_Call2
 	sPan		spCenter, $00
 	sVoice		$03
-	sNoteTimeOut	$00
+	sGate		$00
 	saVol		$FE
 
 ScrabBrain_Loop10:
@@ -261,7 +261,7 @@ ScrabBrain_FM4:
 	sVoice		$04
 	sPan		spLeft, $00
 	ssMod68k	$5C, $01, $05, $04
-	sNoteTimeOut	$06
+	sGate		$06
 	sCall		ScrabBrain_Call6
 	ssDetune	$04
 	sCall		ScrabBrain_Call7
@@ -301,7 +301,7 @@ ScrabBrain_Loop12:
 
 ScrabBrain_Call6:
 	dc.b nE5, $03, nE5, nRst, nE5, nRst, nE5, nE5
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nD5, $4B
 	sRet
 
@@ -339,9 +339,9 @@ ScrabBrain_FM5:
 	sVoice		$04
 	sPan		spRight, $00
 	ssMod68k	$5C, $01, $05, $04
-	sNoteTimeOut	$06
+	sGate		$06
 	dc.b nC5, $03, nC5, nRst, nC5, nRst, nC5, nC5
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nB4, $4B
 	sCall		ScrabBrain_Call7
 	saVol		$06
@@ -404,13 +404,13 @@ ScrabBrain_PSG2:
 	sVolEnv		v00
 	saVol		$08
 	dc.b nC5, $03, nC5, nRst, nC5, nRst, nC5, nC5
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b nB4, $4B
 	saVol		-$08
 
 ScrabBrain_Loop18:
 	sVolEnv		v05
-	sNoteTimeOut	$03
+	sGate		$03
 	sCall		ScrabBrain_Call11
 
 ScrabBrain_Loop16:
@@ -449,7 +449,7 @@ ScrabBrain_Call11:
 
 ScrabBrain_PSG3:
 	sNoisePSG	$E7
-	sNoteTimeOut	$03
+	sGate		$03
 	dc.b nHiHat, $03, $06, nRst, nHiHat, $06, $0F, $0C
 	dc.b $0C, $0C, $18
 
@@ -457,10 +457,10 @@ ScrabBrain_Loop22:
 	dc.b nHiHat, $03, $03
 	saVol		$10
 	sVolEnv		v08
-	sNoteTimeOut	$08
+	sGate		$08
 	dc.b $06
 	sVolEnv		v04
-	sNoteTimeOut	$03
+	sGate		$03
 	saVol		-$10
 	sLoop		$00, $88, ScrabBrain_Loop22
 	sJump		ScrabBrain_PSG3

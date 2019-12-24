@@ -50,7 +50,7 @@ dCommands:
 	bra.w	dcsComm		; FA - Set communications byte yy to xx (SET_COMM - SPECIAL)
 	bra.w	dcCond		; FB - Get comms byte y, and compare zz using condition x (COMM_CONDITION)
 	bra.w	dcResetCond	; FC - Reset condition (COMM_RESET)
-	bra.w	dcTimeout	; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL)
+	bra.w	dcGate		; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL)
 	bra.w	dcYM		; FE - YM command (YMCMD)
 				; FF - META
 ; ===========================================================================
@@ -96,65 +96,47 @@ dCommands:
 ; Command handlers for false condition execution
 ; ---------------------------------------------------------------------------
 
+.skip	macro amount
+	if \amount=0
+		rts
+	else
+		addq.w	#\amount,a2
+	endif
+	rts
+   endm
+
 .false
-	addq.w	#1,a2
-	rts			; E0 - Panning, AMS, FMS (PANAFMS - PAFMS_PAN)
-	addq.w	#1,a2
-	rts			; E1 - Add xx to channel frequency displacement (DETUNE)
-	addq.w	#1,a2
-	rts			; E2 - Add xx to channel frequency displacement (DETUNE)
-	addq.w	#1,a2
-	rts			; E3 - Set channel pitch to xx (TRANSPOSE - TRNSP_SET)
-	addq.w	#1,a2
-	rts			; E4 - Add xx to channel pitch (TRANSPOSE - TRNSP_ADD)
-	addq.w	#1,a2
-	rts			; E5 - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
-	addq.w	#1,a2
-	rts			; E6 - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
+	.skip	1		; E0 - Panning, AMS, FMS (PANAFMS - PAFMS_PAN)
+	.skip	1		; E1 - Add xx to channel frequency displacement (DETUNE)
+	.skip	1		; E2 - Add xx to channel frequency displacement (DETUNE)
+	.skip	1		; E3 - Set channel pitch to xx (TRANSPOSE - TRNSP_SET)
+	.skip	1		; E4 - Add xx to channel pitch (TRANSPOSE - TRNSP_ADD)
+	.skip	1		; E5 - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
+	.skip	1		; E6 - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
 	bra.w	dcHold		; E7 - Do not allow note on/off for next note (HOLD)
-	addq.w	#1,a2
-	rts			; E8 - Add xx to music tempo (TEMPO - TEMPO_ADD)
-	addq.w	#1,a2
-	rts			; E9 - Set music tempo to xx (TEMPO - TEMPO_SET)
-	addq.w	#1,a2
-	rts			; EA - Set Voice/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
-	rts
-	rts			; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
-	rts
-	rts			; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
-	addq.w	#1,a2
-	rts			; ED - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
-	addq.w	#1,a2
-	rts			; EE - Set channel volume to xx (VOLUME - VOL_CN_ABS)
-	addq.w	#1,a2
-	rts			; EF - Set LFO (SET_LFO - LFO_AMSEN)
-	addq.w	#4,a2
-	rts			; F0 - Modulation (MOD_SETUP)
-	addq.w	#1,a2
-	rts			; F1 - Portamento enable/disable flag (PORTAMENTO)
-	addq.w	#1,a2
-	rts			; F2 - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
-	addq.w	#1,a2
-	rts			; F3 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
-	addq.w	#2,a2
-	rts			; F4 - Do a continuous SFX loop (CONT_SFX)
-	rts
-	rts			; F5 - End of channel (TRK_END - TEND_STD)
-	addq.w	#2,a2
-	rts			; F6 - Jump to xxxx (GOTO)
-	addq.w	#4,a2
-	rts			; F7 - Loop back to zzzz yy times, xx being the loop index (LOOP)
-	addq.w	#2,a2
-	rts			; F8 - Call pattern at xxxx, saving return point (GOSUB)
-	rts
-	rts			; F9 - Return (RETURN)
+	.skip	1		; E8 - Add xx to music tempo (TEMPO - TEMPO_ADD)
+	.skip	1		; E9 - Set music tempo to xx (TEMPO - TEMPO_SET)
+	.skip	1		; EA - Set Voice/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
+	.skip	0		; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
+	.skip	0		; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+	.skip	1		; ED - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
+	.skip	1		; EE - Set channel volume to xx (VOLUME - VOL_CN_ABS)
+	.skip	1		; EF - Set LFO (SET_LFO - LFO_AMSEN)
+	.skip	4		; F0 - Modulation (MOD_SETUP)
+	.skip	1		; F1 - Portamento enable/disable flag (PORTAMENTO)
+	.skip	1		; F2 - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
+	.skip	1		; F3 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
+	.skip	0		; F4 - Do a continuous SFX loop (CONT_SFX)
+	.skip	0		; F5 - End of channel (TRK_END - TEND_STD)
+	.skip	2		; F6 - Jump to xxxx (GOTO)
+	.skip	4		; F7 - Loop back to zzzz yy times, xx being the loop index (LOOP)
+	.skip	2		; F8 - Call pattern at xxxx, saving return point (GOSUB)
+	.skip	0		; F9 - Return (RETURN)
 	bra.w	dcsComm		; FA - Set communications byte yy to xx (SET_COMM - SPECIAL)
 	bra.w	dcCond		; FB - Get comms byte y, and compare zz using condition x (COMM_CONDITION)
 	bra.w	dcResetCond	; FC - Reset condition (COND_RESET)
-	addq.w	#1,a2
-	rts			; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL
-	addq.w	#1,a2
-	rts			; FE - YM command (YMCMD)
+	.skip	1		; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL
+	.skip	1		; FE - YM command (YMCMD)
 	bra.w	.metacall	; FF - META
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -304,16 +286,16 @@ dcHold:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Tracker command for enabling or disabling note timeout
+; Tracker command for enabling or disabling note gate
 ; ---------------------------------------------------------------------------
 
-dcTimeout:
+dcGate:
 	if safe=1
-		AMPS_Debug_dcTimeout		; check if this channel has timeout support
+		AMPS_Debug_dcGate		; check if this channel has gate support
 	endif
 
-		move.b	(a2),cNoteTimeMain(a1)	; load note timeout from tracker to channel
-		move.b	(a2)+,cNoteTimeCur(a1)	; ''
+		move.b	(a2),cGateMain(a1)	; load note timeout from tracker to channel
+		move.b	(a2)+,cGateCur(a1)	; ''
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -374,16 +356,20 @@ dcaTempoCur:
 ; ---------------------------------------------------------------------------
 
 dcNoisePSG:
-		move.b	(a2),cStatPSG4(a1)	; load PSG4 status command from tracker to channel
+	if safe=1
+		AMPS_Debug_dcNoisePSG		; check if this is a PSG3 channel
+	endif
+
+		move.b	(a2)+,d3		; load PSG4 status to d3
+		move.b	d3,cStatPSG4(a1)	; save status
 		beq.s	.psg3			; if disabling PSG4 mode, branch
 		move.b	#ctPSG4,cType(a1)	; make PSG3 act on behalf of PSG4
-		move.b	(a2)+,dPSG		; send command to PSG port
+		move.b	d3,dPSG			; send command to PSG port
 		rts
 
 .psg3
 		move.b	#ctPSG3,cType(a1)	; make PSG3 not act on behalf of PSG4
 		move.b	#ctPSG4|$1F,dPSG	; send PSG4 mute command to PSG
-		addq.w	#1,a2			; skip param
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -446,9 +432,9 @@ dcsFreq:
 		move.b	(a2)+,cFreq(a1)		; load base frequency from tracker to channel
 		move.b	(a2)+,cFreq+1(a1)	; ''
 
-	if safe=1		; NOTE: You can remove this check, but its unsafe to do so!
+	if safe=1
 		btst	#ctbDAC,cType(a1)	; check if this is a DAC channel
-		bne.s	.rts			; if so, bránch
+		bne.s	.rts			; if so, branch
 		AMPS_Debug_dcInvalid		; this command should be only used with DAC channels
 	endif
 .rts
@@ -467,7 +453,7 @@ dcsFreqNote:
 		lea	dFreqDAC(pc),a4		; load DAC frequency table to a4
 		move.w	(a4,d4.w),cFreq(a1)	; load and save the requested frequency
 
-	if safe=1		; NOTE: You can remove this check, but its unsafe to do so!
+	if safe=1
 		btst	#ctbDAC,cType(a1)	; check if this is a DAC channel
 		bne.s	.rts			; if so, branch
 		AMPS_Debug_dcInvalid		; this command should be only used with DAC channels
@@ -494,7 +480,6 @@ dcCall:
 	if safe=1
 		AMPS_Debug_dcCall1		; check if this channel supports the stack
 	endif
-
 		moveq	#0,d4
 		move.b	cStack(a1),d4		; get channel stack pointer
 		subq.b	#4,d4			; allocate space for another routine
@@ -528,6 +513,7 @@ dcLoop:
 		tst.b	cLoop(a1,d4.w)		; check the loop counter
 		bne.s	.loopok			; if nonzero, branch
 		move.b	2(a2),cLoop(a1,d4.w)	; reload loop counter
+		bra.s	dcJump			; jump to routine
 
 .loopok
 		subq.b	#1,cLoop(a1,d4.w)	; decrease loop counter
@@ -544,7 +530,9 @@ dcPortamento:
 		move.b	(a2)+,cPortaSpeed(a1)	; load the portamento speed value
 		bne.s	.rts			; if non-zero, branch
 		clr.w	cPortaFreq(a1)		; clear portamento frequency
-.rts		rts
+
+.rts
+		rts
 
 	elseif safe=1
 		AMPS_Debug_dcPortamento		; display an error if disabled
@@ -620,7 +608,7 @@ dcReturn:
 ; ---------------------------------------------------------------------------
 
 dcSpecFM3:
-	if safe=1		; NOTE: You can remove this check, but its unsafe to do so!
+	if safe=1
 		AMPS_Debug_dcInvalid		; this is an invalid command
 	endif
 		rts
@@ -630,7 +618,7 @@ dcSpecFM3:
 ; ---------------------------------------------------------------------------
 
 dcFreqOn:
-	if safe=1		; NOTE: You can remove this check, but its unsafe to do so!
+	if safe=1
 		AMPS_Debug_dcInvalid		; this is an invalid command
 	endif
 		rts
@@ -640,7 +628,7 @@ dcFreqOn:
 ; ---------------------------------------------------------------------------
 
 dcFreqOff:
-	if safe=1		; NOTE: You can remove this check, but its unsafe to do so!
+	if safe=1
 		AMPS_Debug_dcInvalid		; this is an invalid command
 	endif
 
@@ -652,10 +640,8 @@ locret_FreqOff:
 ; ---------------------------------------------------------------------------
 
 dcVolEnv:
-	if FEATURE_DACFMVOLENV=0
-	if safe=1
+	if (FEATURE_DACFMVOLENV=0)&(safe=1)
 		AMPS_Debug_dcVolEnv		; display an error if an invalid channel attempts to load a volume envelope
-	endif
 	endif
 
 		move.b	(a2)+,cVolEnv(a1)	; load the volume envelope ID
@@ -813,33 +799,34 @@ dcVoice:
 ;   d6 - Used for modulator offset
 ; ---------------------------------------------------------------------------
 
-WriteReg    macro    offset, reg
-.offs =    \offset
+WriteReg	macro	offset, reg
+.offs =	\offset
 
-    rept narg-1
-        move.b    (a4)+,(a5)+        ; write value to buffer
-        if \reg<$80
-            moveq    #\reg,d3    ; load register to d3
-        else
-            moveq    #$FFFFFF00|\reg,d3; load register to d3
-        endif
+	rept narg-1
+		move.b	(a4)+,(a5)+		; write value to buffer
 
-        if .offs>1
-            addq.w    #.offs-1,a4    ; offset a4 by specific amount
-        endif
-        or.b    d2,d3            ; add channel offset to register
-        move.b    d3,(a5)+        ; write register to buffer
-    shift
-    endr
+		if \reg<$80
+			moveq	#\reg,d3	; load register to d3
+		else
+			moveq	#$FFFFFF00|\reg,d3; load register to d3
+		endif
+
+		if .offs>1
+			addq.w	#.offs-1,a4	; offset a4 by specific amount
+		endif
+			or.b	d2,d3		; add channel offset to register
+			move.b	d3,(a5)+	; write register to buffer
+		shift
+	endr
     endm
 
 dUpdateVoiceFM:
-			move.l	a2,-(sp)		; save the tracker address to stack
+		move.l	a2,-(sp)		; save the tracker address to stack
 	dCALC_BANK	0			; get the voice table address to a4
 	dCALC_VOICE				; get address of the specific voice to a4
+
 		sub.w	#(VoiceRegs+1)*2,sp	; prepapre space in the stack
 		move.l	sp,a5			; copy pointer to the free space to a5
-
 		move.b	cType(a1),d2		; load channel type to d2
 		and.b	#3,d2			; keep in range
 
@@ -954,7 +941,7 @@ dUpdateVoiceFM:
 ; ---------------------------------------------------------------------------
 
 dcStop:
-		and.b	#$FF-(1<<cfbHold)-(1<<cfbRun),(a1); clear hold and running tracker flags
+		and.b	#~((1<<cfbHold)-(1<<cfbRun)),(a1); clear hold and running tracker flags
 	dStopChannel	0			; stop channel operation
 
 		cmpa.w	#mSFXFM3,a1		; check if this is a SFX channel
@@ -987,6 +974,7 @@ dcStop:
 
 .fixch
 		move.w	(sp)+,a1		; pop the current channel
+
 .exit
 		addq.l	#2,(sp)			; go to next channel immediately
 		rts
@@ -1028,15 +1016,16 @@ dcsLFO:
 		moveq	#0,d4
 		move.b	cVoice(a1),d4		; load FM voice ID of the channel to d4
 	dCALC_BANK 9				; get the voice table address to a4
-	dCALC_VOICE					; get address of the specific voice to a4
+	dCALC_VOICE				; get address of the specific voice to a4
 
 		move.b	(a2),d3			; load LFO enable operators to d3
 		lea	dAMSEn_Ops(pc),a5	; load Decay 1 Rate address table to a5
 		moveq	#4-1,d2			; prepare 4 operators to d2
-	CheckCue				; check that cue is valid
 
+	CheckCue				; check that cue is valid
 	InitChYM				; prepare to write Channel-specific YM registers
 	stopZ80
+
 		btst	#cfbInt,(a1)		; check if channel is interrupted
 		bne.s	.skipLFO		; if so, skip loading LFO
 

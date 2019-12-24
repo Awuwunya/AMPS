@@ -693,29 +693,29 @@ SmoothCriminal_Loop21:
 
 SmoothCriminal_PSG3:
 	sNoisePSG	$E7
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b nRst, $06, nHiHat
 	saVol		-$10
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		$10
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06
 
 SmoothCriminal_Loop22:
 	dc.b $06, $06
 	saVol		-$10
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		$10
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06
 	sLoop		$00, $02, SmoothCriminal_Loop22
 	dc.b $06, $06
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		-$10
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b $06
 	saVol		$10
 
@@ -733,63 +733,63 @@ SmoothCriminal_Loop27:
 	sLoop		$01, $02, SmoothCriminal_Loop27
 	sCall		SmoothCriminal_Call11
 	saVol		$10
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06, $06
 	saVol		-$18
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		$18
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06
 	saVol		-$18
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06, $06, $06
 	saVol		$18
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06, $06, $06
 	saVol		-$18
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		$18
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06, $06, $06
 	saVol		-$10
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06, $06
 	sCall		SmoothCriminal_Call10
 	sJump		SmoothCriminal_Loop24
 
 SmoothCriminal_Call10:
-	sNoteTimeOut	$02
+	sGate		$02
 
 SmoothCriminal_Loop23:
 	dc.b $06, $06
 	saVol		-$10
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		$10
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06
 	sLoop		$00, $03, SmoothCriminal_Loop23
 	dc.b $06, $06
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		-$10
-	sNoteTimeOut	$00
+	sGate		$00
 	dc.b $06
 	saVol		$10
 	sRet
 
 SmoothCriminal_Call11:
-	sNoteTimeOut	$02
+	sGate		$02
 
 SmoothCriminal_Loop25:
 	dc.b $06, $06
 	saVol		-$10
-	sNoteTimeOut	$0A
+	sGate		$0A
 	dc.b $06
 	saVol		$10
-	sNoteTimeOut	$02
+	sGate		$02
 	dc.b $06
 	sLoop		$00, $04, SmoothCriminal_Loop25
 	sRet

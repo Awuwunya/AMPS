@@ -1765,53 +1765,53 @@ TowerPuppet_PSG3:
 	sNoisePSG	$E7
 
 TowerPuppet_Loop20:
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat, $03, nHiHat
-	sNoteTimeOut	$03
+	sGate		$03
 	sVolEnv		vDyHe05
 	dc.b nHiHat
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat, nHiHat, nHiHat
-	sNoteTimeOut	$03
+	sGate		$03
 	sVolEnv		vDyHe05
 	dc.b nHiHat
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat, nHiHat, nHiHat
-	sNoteTimeOut	$03
+	sGate		$03
 	sVolEnv		vDyHe05
 	dc.b nHiHat
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat, nHiHat
-	sNoteTimeOut	$03
+	sGate		$03
 	sVolEnv		vDyHe05
 	dc.b nHiHat
-	sNoteTimeOut	$04
+	sGate		$04
 	sVolEnv		vDyHe05
 	dc.b nHiHat
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat
-	sNoteTimeOut	$05
+	sGate		$05
 	sVolEnv		vDyHe03
 	dc.b nHiHat, $0C, nHiHat, nHiHat, nHiHat
 	sLoop		$00, $12, TowerPuppet_Loop20
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat, $03, nHiHat
-	sNoteTimeOut	$03
+	sGate		$03
 	sVolEnv		vDyHe05
 	dc.b nHiHat
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat, nHiHat, nHiHat
-	sNoteTimeOut	$03
+	sGate		$03
 	sVolEnv		vDyHe05
 	dc.b nHiHat
-	sNoteTimeOut	$01
+	sGate		$01
 	sVolEnv		vDyHe03
 	dc.b nHiHat
 	sJump		TowerPuppet_PSG3

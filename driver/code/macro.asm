@@ -100,8 +100,8 @@ cStatPSG4 =	cPanning	; PSG4 type value. PSG3 only
 cStatPSG4 =	__rs-2		; PSG4 type value. PSG3 only
 	endif
 
-cNoteTimeCur	rs.b 1		; frame counter to note off. Music only
-cNoteTimeMain	rs.b 1		; copy of frame counter to note off. Music only
+cGateCur	rs.b 1		; frame counter to note off. Music only
+cGateMain	rs.b 1		; copy of frame counter to note off. Music only
 cStack		rs.b 1		; channel stack pointer. Music only
 		rs.b 1		; unused. Music only
 		rs.l 3		; channel stack data. Music only
@@ -262,7 +262,7 @@ mSize		rs.w 0		; end of the driver RAM
 ; ---------------------------------------------------------------------------
 
 	rsset 0
-mfbRing		rs.b 1		; if set, change speaker (play different sfx)
+mfbSwap		rs.b 1		; if set, change speaker (play different sfx)
 mfbSpeed	rs.b 1		; if set, speed shoes are active
 mfbWater	rs.b 1		; if set, underwater mode is active
 mfbNoPAL	rs.b 1		; if set, play songs slowly in PAL region
@@ -284,7 +284,7 @@ Mus_ToWater	rs.b 1		; enable underwater mode
 Mus_OutWater	rs.b 1		; disable underwater mode
 Mus_Pause	rs.b 1		; pause the music
 Mus_Unpause	rs.b 1		; unpause the music
-Mus_StopSFX	ds.b 1		; stop all sfx
+Mus_StopSFX	rs.b 1		; stop all sfx
 MusOff		rs.b 0		; first music ID
 
 MusCount =	$70		; number of installed music tracks
@@ -341,6 +341,53 @@ fStop		rs.l 1		; 84 - Stop all music
 fResVol		rs.l 1		; 88 - Reset volume and update
 fReset		rs.l 1		; 8C - Stop music playing and reset volume
 fLast		rs.l 0		; safe mode equate
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Enable multiple flags in target ea mode
+; ---------------------------------------------------------------------------
+
+mvbit		macro bits
+	local res			; local variable to hold result in
+res =	0
+
+	rept narg-1			; repeat for all bits
+res =		res|(1<<\bits)		; or the value of the bit
+	shift
+	endr
+
+	if ("\0"<>"q")&("\0"<>"Q")	; check for moveq
+		move.\0	#res,\bits	; save instruction
+	else
+		if res>$80		; fix for moveq bug
+res =			res|$FFFFFF00	; must be negative value
+		endif
+
+		moveq	#res,\bits	; moveq version
+	endif
+    endm
+
+mvnbt		macro bits
+	local res			; local variable to hold result in
+res =	0
+
+	rept narg-1			; repeat for all bits
+res =		res|(1<<\bits)		; or the value of the bit
+	shift
+	endr
+
+	if ("\0"<>"q")&("\0"<>"Q")	; check for moveq
+		move.\0	#~res,\bits	; save instruction
+	else
+res =		(~res)&$FF		; not result but keep it in 8bits
+
+		if res>$80		; fix for moveq bug
+res =			res|$FFFFFF00	; must be negative value
+		endif
+
+		moveq	#res,\bits	; moveq version
+	endif
+    endm
+
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Quickly clear some memory in certain block sizes

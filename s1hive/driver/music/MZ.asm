@@ -330,14 +330,14 @@ Marble_Jump7:
 	sJump		Marble_Jump7
 
 Marble_Call4:
-	sNoteTimeOut	$06
+	sGate		$06
 
 Marble_Loop4:
 	dc.b nRst, $06, nE7, nC7, nA6, $0C, nD7, $06
 	dc.b nB6, nG6, nRst, nC7, nA6, nF6, $0C, nD7
 	dc.b $06, nB6, nG6
 	sLoop		$00, $02, Marble_Loop4
-	sNoteTimeOut	$00
+	sGate		$00
 	sRet
 
 Marble_DAC2:

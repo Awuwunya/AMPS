@@ -207,7 +207,7 @@ SpecialStage_Call6:
 	sRet
 
 SpecialStage_PSG1:
-	sNoteTimeOut	$06
+	sGate		$06
 
 SpecialStage_Loop7:
 	sCall		SpecialStage_Call7
