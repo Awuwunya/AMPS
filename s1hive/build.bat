@@ -9,6 +9,8 @@ fixheadr.exe s1built.md
 del driver\.Data
 del driver\z80.bat
 del driver\merge.asm
+del driver\fix.asm
 del driver\.z80
+del driver\._z80
 del driver\.z80.kos
 del s1built.dat

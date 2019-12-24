@@ -1,15 +1,15 @@
 Beach_Header:
 	sHeaderInit						; Z80 offset is $94E3
 	sHeaderTempo	$01, $40
-	sHeaderCh	$05, $03
-	sHeaderDAC	Beach_DAC1, $18
-	sHeaderDAC	Beach_DAC2, $18, dSnare
+	sHeaderCh	$06, $03
+	sHeaderDAC	Beach_DAC1
+	sHeaderDAC	Beach_DAC2
 	sHeaderFM	Beach_FM1, $F4, $06
 	sHeaderFM	Beach_FM2, $00, $00
 	sHeaderFM	Beach_FM3, $00, $00
 	sHeaderFM	Beach_FM4, $00, $00
 	sHeaderFM	Beach_FM5, $00, $05
-;	sHeaderFM	Beach_FM6, $00, $18
+	sHeaderFM	Beach_FM6, $00, $18
 	sHeaderPSG	Beach_PSG1, $E8, $10, $00, v00
 	sHeaderPSG	Beach_PSG2, $F4, $10, $00, v00
 	sHeaderPSG	Beach_PSG3, $F4, $10, $00, v00
@@ -355,6 +355,12 @@ Beach_Header:
 	spReleaseRt	$0E, $06, $0C, $0F
 	spSSGEG		$00, $00, $00, $00
 	spTotalLv2	$C2, $0C, $06, $BF
+
+Beach_DAC1:
+	sPan		spCenter, $00
+
+Beach_DAC2:
+	sStop
 
 Beach_PSG2:
 	dc.b nRst, $01
@@ -708,15 +714,12 @@ Beach_FM5:
 ;	sGate		$00
 	sJump		.loop
 
-;Beach_FM6:
+Beach_FM6:
 ;	sPan		spCenter, $00
-;	sVoice		$04
+	sVoice		$04
 
-Beach_DAC2:
+.loop
 	dc.b nRst, $0C, nG4, $06, $06, nRst, $0C, nG4
 	dc.b $0C, nD4, $06, nG4, nG4, nG4, nRst, $0C
 	dc.b nG4
-	sJump		Beach_DAC2
-
-Beach_DAC1:
-	sStop
+	sJump		.loop

@@ -516,9 +516,15 @@ AMPS_Debug_dcPan	macro
 	tst.b	cType(a1)	; check for PSG channel
 	bpl.s	.ok		; if no, branch
 
-.fail
 	if def(RaiseError)	; check if Vladik's debugger is active
 		RaiseError "sPan on a PSG channel!", AMPS_Debug_Console_Channel
+	else
+		bra.w	*
+	endif
+
+.fail
+	if def(RaiseError)	; check if Vladik's debugger is active
+		RaiseError "sPan on FM6 channel!", AMPS_Debug_Console_Channel
 	else
 		bra.w	*
 	endif

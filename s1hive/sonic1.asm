@@ -4,12 +4,29 @@ z80_ram:	equ $A00000
 z80_bus_request	equ $A11100
 z80_reset:	equ $A11200
 ConsoleRegion	equ $FFFFFFF8
+
 		include "driver/lang.asm"
 		include "driver/code/macro.asm"
 		include "error/debugger.asm"
-align macro
+
+align		macro
 	cnop 0,\1
-	endm
+    endm
+
+; Macro for playing a command
+command		macro id
+	move.b #id,mQueue.w
+    endm
+
+; Macro for playing music
+music		macro id
+	move.b #id,mQueue+1.w
+    endm
+
+; Macro for playing sound effect
+sfx		macro id
+	move.b #id,mQueue+2.w
+    endm
 		opt w-
 ; ===========================================================================
 StartOfRom:
@@ -38143,7 +38160,10 @@ batcode		SECTION	file("driver/z80.bat"), org(0)	; create a new section for a bat
 dpcm equ	offset(DualPCM)
 
 	dc.b "@echo off", $0A
-	dc.b "_dlls\koscmp.exe driver/.z80 driver/.z80.kos", $0A				; compress Z80 driver
+	if zchkoffs
+		dc.b "asm68k /p driver/fix.asm, driver/._z80", $0A				; fix the z80 code (since we can't use org, lets fire another assembler... Fuck)
+	endif
+	dc.b "_dlls\koscmp.exe driver/._z80 driver/.z80.kos", $0A				; compress Z80 driver
 	dc.b "call :setsize ""driver/.z80.kos""", $0A						; get size of the compressed file
 	dc.b "if %size% GTR \#Z80_Space (", $0A							; check if file will fit
 	dc.b "echo Not enough space reserved for Z80 file! Please increase it to %size%!",$0A	; warn user about file size
@@ -38153,8 +38173,28 @@ dpcm equ	offset(DualPCM)
 	dc.b "echo 	incbin s1built.dat, \#dpcm+\#Z80_Space >>driver/merge.asm",$0A		; include second part of s1built.md
 	dc.b "asm68k /p driver/merge.asm, s1built.md", $0A					; finally, merge the files. Why do I keep doing things like this =(
 	dc.b ":setsize", $0A
-	dc.b "set size=%~z1 & goto :eof"							; grav the file size
+	dc.b "set size=%~z1 & goto :eof"							; grab the file size
 		POPS					; go back to Main section
+
+	if zchkoffs
+		PUSHS					; store section information for Main
+mergecode	SECTION	file("driver/fix.asm"), org(0)	; create a new section for a batch file, that will insert compressed Dual PCM
+		dc.b "	org 0", $0A			; this makes sure the assembler works
+		dc.b "	incbin ""driver/.z80""", $0A	; include the uncompressed z80 data here
+
+		rept zfuturec
+			popp zoff			; grab the location of the include
+			popp zbyte			; grab the included byte
+
+zderp = zoff
+zherp = zbyte
+			dc.b "	org \#zderp", $0A	; write the org statement
+			dc.b "	dc.b \#zherp", $0A	; dc.b the fixed byte in
+		endr
+
+		dc.b "	END"				; end the assembly
+		POPS					; go back to Main section
+	endif
 
 	ds.b Z80_Space					; reserve space for the Z80 driver
 	even

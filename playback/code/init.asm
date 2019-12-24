@@ -135,6 +135,11 @@ Textinit:
 	asc.w 0," FM3"
 	asc.w 0," FM4"
 	asc.w 0," FM5"
+
+	if FEATURE_FM6
+		asc.w 0," FM6"
+	endif
+
 	asc.w 0,"PSG1"
 	asc.w 0,"PSG2"
 	asc.w 0,"PSG3"
@@ -259,6 +264,12 @@ GameProgram:
 	vdpCoord 1,14,WRITE
 		move.l	(a0)+,(a5)
 		move.l	(a0)+,(a5)
+
+	if FEATURE_FM6
+		vdpCoord 1,15,WRITE
+		move.l	(a0)+,(a5)
+		move.l	(a0)+,(a5)
+	endif
 
 	vdpCoord 1,24,WRITE
 		move.l	(a0)+,(a5)

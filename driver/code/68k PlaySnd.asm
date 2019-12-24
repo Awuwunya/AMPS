@@ -495,7 +495,8 @@ dPlaySnd_SFX:
 		beq.s	.noswap			; if not, skip
 		bchg	#mfbSwap,mFlags.w	; swap th flag and check if it was set
 		beq.s	.noswap			; if was not, do not swap sound effect
-		movea.l	4(a1,d1.w),a2		; get the next SFX pointer from the table
+		addq.w	#4,d1			; go to next SFX
+		movea.l	(a1,d1.w),a2		; get the next SFX pointer from the table
 
 .noswap
 	if safe=1
@@ -530,6 +531,7 @@ dPlaySnd_SFX:
 		bpl.s	.nocont			; if not, skip
 		clr.b	mContCtr.w		; reset continous sfx counter
 
+		lsr.w	#2,d1			; get actual SFX ID
 		cmp.b	mContLast.w,d1		; check if the last continous SFX had the same ID
 		bne.s	.setcont		; if not, play as a new sound effect anyway
 		move.b	1(a2),mContCtr.w	; copy the number of channels as the new continous loop counter

@@ -422,7 +422,7 @@ sModOff		macro
 ; F4xxxx - Keep looping back to xxxx each time the SFX is being played (CONT_SFX)
 sCont		macro loc
 	dc.b $F4
-	dc.w \loc-*-1
+	dc.w \loc-*-2
     endm
 
 ; F5 - End of channel (TRK_END - TEND_STD)

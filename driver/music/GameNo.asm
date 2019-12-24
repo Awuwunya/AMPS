@@ -1,14 +1,14 @@
 GameNo_Header:
 	sHeaderInit						; Z80 offset is $1153
 	sHeaderTempo	$01, $80
-	sHeaderCh	$05, $03
-	sHeaderDAC	GameNo_DAC1, $08
-	sHeaderDAC	GameNo_DAC2, $08
+	sHeaderCh	$06, $03
+	sHeaderDAC	GameNo_DAC1
+	sHeaderDAC	GameNo_DAC2
 	sHeaderFM	GameNo_FM1, $00, $0C
 	sHeaderFM	GameNo_FM2, $00, $1A
 	sHeaderFM	GameNo_FM3, $00, $1A
 	sHeaderFM	GameNo_FM4, $0C, $14
-;	sHeaderFM	GameNo_FM5, $00, $08
+	sHeaderFM	GameNo_FM5, $00, $08
 	sHeaderFM	GameNo_FM6, $00, $12
 	sHeaderPSG	GameNo_PSG1, $E8, $30, $00, v00
 	sHeaderPSG	GameNo_PSG2, $E8, $30, $00, v00
@@ -146,6 +146,10 @@ GameNo_Header:
 	spReleaseRt	$07, $07, $07, $07
 	spSSGEG		$00, $00, $00, $00
 	spTotalLv	$1E, $02, $00, $00
+
+GameNo_DAC1:
+GameNo_DAC2:
+	sStop
 
 GameNo_FM1:
 ;	;sRawFreq	$00
@@ -454,48 +458,6 @@ GameNo_Loop2:
 	sLoop		$01, $02, GameNo_Call11
 	sRet
 
-GameNo_DAC1:
-	sStop
-
-GameNo_DAC2:
-	sCall		GameNo_Call20
-	sCall		GameNo_Call23
-	sCall		GameNo_Call20
-	sCall		GameNo_Call24
-	sJump		GameNo_DAC2
-
-GameNo_Call20:
-	sCall		GameNo_Call21
-	sCall		GameNo_Call22
-	sLoop		$00, $06, GameNo_Call20
-	sRet
-
-GameNo_Call23:
-	sCall		GameNo_Call21
-	sCall		GameNo_Call22
-
-	dc.b dSnare, $0C, $03, $03, $03, $03
-	sRet
-
-GameNo_Call21:
-	dc.b dLowKick, $06
-	saVol	$04
-	dc.b dLowTom
-	saVol	-$04
-	sRet
-
-GameNo_Call22:
-	dc.b dSnare, $06
-	saVol	$04
-	dc.b dLowTom
-	saVol	-$04
-	sRet
-
-GameNo_Call24:
-	dc.b dSnare, $03, $03, $03, $03
-	sLoop		$02, $04, GameNo_Call24
-	sRet
-
 GameNo_FM5:
 	;sRawFreq	$00
 	;sPitchSlide	$00
@@ -520,19 +482,22 @@ GameNo_Call13:
 	sPan		spCenter, $00
 	sVoice		$00
 	dc.b nA2, $06
-	;sModEnv		$E0
-;	dc.b $40
+;	sModEnv		m00
+	sModOff
+	sPan		spRight
 	sVoice		$01
 	dc.b nD6
 	sRet
 
 GameNo_Call14:
-	;sModEnv		$E0
-;	dc.b nEb5
+;	sModEnv		m00
+	sModOff
+	sPan		spCenter
 	sVoice		$02
 	dc.b nE2, $06
-	;sModEnv		$E0
-;	dc.b nRst
+;	sModEnv		m00
+	sModOff
+	sPan		spLeft
 	sVoice		$01
 	dc.b nD6
 	sRet
@@ -540,8 +505,9 @@ GameNo_Call14:
 GameNo_Call15:
 	sCall		GameNo_Call13
 	sCall		GameNo_Call14
-	;sModEnv		$E0
-;	dc.b nEb5
+;	sModEnv		m00
+	sModOff
+	sPan		spCenter
 	sVoice		$02
 	dc.b nE2, $0C, $03
 	saVol		$04
@@ -550,8 +516,9 @@ GameNo_Call15:
 	sRet
 
 GameNo_Call16:
-	;sModEnv		$E0
-;	dc.b nEb5
+;	sModEnv		m00
+	sModOff
+	sPan		spCenter
 	sVoice		$02
 	dc.b nE2, $03
 	saVol		$04
