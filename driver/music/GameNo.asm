@@ -296,9 +296,9 @@ GameNo_Call9:
 GameNo_FM6:
 	;sRawFreq	$00
 	;sPitchSlide	$00
+	dc.b nRst, $08
 	ssMod68k	$0C, $01, $03, $02
 	sVoice		$05
-	dc.b nRst, $08
 	ssDetune	$FD
 	sJump		GameNo_Jump1
 

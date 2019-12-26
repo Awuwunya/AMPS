@@ -156,8 +156,9 @@ Dis_Loop4:
 	sJump		Dis_Loop2
 
 Dis_FM2:	; Fuse FM2 and FM6
+	dc.b nRst, $0C			; FM6
 	sVoice		$01
-	dc.b nRst, $0C, nE3-7-$0C, $06	; FM6
+	dc.b nE3-7-$0C, $06		; FM6
 	saVol		$0F
 	dc.b $06			; FM6
 	saVol		-$0F

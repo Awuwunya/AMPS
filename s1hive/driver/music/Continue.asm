@@ -86,8 +86,8 @@ Continue_Header:
 	spTotalLv	$18, $26, $0D, $00
 
 Continue_FM1:
-	sVoice		$00
 	dc.b nRst, $30
+	sVoice		$00
 
 Continue_Loop1:
 	saTranspose	$01
@@ -119,8 +119,8 @@ Continue_Loop2:
 	sStop
 
 Continue_FM3:
-	sVoice		$03
 	dc.b nRst, $30
+	sVoice		$03
 
 Continue_Loop3:
 	dc.b nE6, $06, nRst, nE6, nRst, nCs6, nRst, nCs6

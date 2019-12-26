@@ -1,6 +1,6 @@
 TitleScreen_Header:
 	sHeaderInit
-	sHeaderTempo	$01, $33
+	sHeaderTempo	$81, $33		; that $8X means that the 50hz "fix" is not applied to this song.
 	sHeaderCh	$05, $03
 	sHeaderDAC	TitleScreen_DAC1
 	sHeaderDAC	TitleScreen_DAC2
@@ -74,8 +74,9 @@ TitleScreen_FM5:
 	ssDetune	$03
 
 TitleScreen_FM1:
+	dc.b nRst, $3C
 	sVoice		$00
-	dc.b nRst, $3C, nCs6, $15, nRst, $03, nCs6, $06
+	dc.b nCs6, $15, nRst, $03, nCs6, $06
 	dc.b nRst, nD6, $0F, nRst, $03, nB5, $18, nRst
 	dc.b $06, nCs6, nRst, nCs6, nRst, nCs6, nRst, nA5
 	dc.b nRst, nG5, $0F, nRst, $03, nB5, $0C, nRst
@@ -85,8 +86,9 @@ TitleScreen_FM1:
 	sStop
 
 TitleScreen_FM2:
+	dc.b nRst, $30
 	sVoice		$01
-	dc.b nRst, $30, nA3, $06, nRst, nA3, nRst, nE3
+	dc.b nA3, $06, nRst, nA3, nRst, nE3
 	dc.b nRst, nE3, nRst, nG3, $12, nFs3, $0C, nG3
 	dc.b $06, nFs3, $0C, nA3, $06, nRst, nA3, nRst
 	dc.b nE3, nRst, nE3, nRst, nD4, $12, nCs4, $0C
@@ -96,8 +98,9 @@ TitleScreen_FM2:
 	sStop
 
 TitleScreen_FM3:
+	dc.b nRst, $30
 	sVoice		$02
-	dc.b nRst, $30, nE6, $06, nRst, nE6, nRst, nCs6
+	dc.b nE6, $06, nRst, nE6, nRst, nCs6
 	dc.b nRst, nCs6, nRst, nD6, $0F, nRst, $03, nD6
 	dc.b $18, nRst, $06, nE6, nRst, nE6, nRst, nCs6
 	dc.b nRst, nCs6, nRst, nG6, $0F, nRst, $03, nG6

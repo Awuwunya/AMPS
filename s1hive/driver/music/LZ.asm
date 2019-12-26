@@ -109,8 +109,8 @@ Labyrinth_Header:
 	spTotalLv	$1A, $16, $00, $00
 
 Labyrinth_FM1:
-	sVoice		$00
 	dc.b nRst, $30
+	sVoice		$00
 
 Labyrinth_Loop1:
 	dc.b nRst, $06, nE5, nG5, nE5, nG5, $09, nA5
@@ -142,8 +142,9 @@ Labyrinth_Call2:
 	sRet
 
 Labyrinth_FM2:
+	dc.b nRst, $12
 	sVoice		$01
-	dc.b nRst, $12, nD4, $0C, nG4, $03, nRst, nG4
+	dc.b nD4, $0C, nG4, $03, nRst, nG4
 	dc.b nRst, $09
 
 Labyrinth_Loop2:

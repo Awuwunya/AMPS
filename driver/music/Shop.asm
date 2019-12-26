@@ -189,8 +189,9 @@ Shop_Call4:
 	sRet
 
 Shop_FM4:
+	dc.b nRst, $0C
 	sVoice		$01
-	dc.b nRst, $0C, nA2, nRst, nA2, nRst, nA2, nRst
+	dc.b nA2, nRst, nA2, nRst, nA2, nRst
 	dc.b nA2, nRst, nB2, nRst, nB2, nRst, nB2, nRst
 	dc.b nB2, nRst, nBb2, nRst, nBb2, nRst, nBb2, nRst
 	dc.b nBb2, nRst, nA2, nRst, nA2, nRst, nA2, nRst
@@ -210,8 +211,9 @@ Shop_Call5:
 	sRet
 
 Shop_FM5:
+	dc.b nRst, $0C
 	sVoice		$01
-	dc.b nRst, $0C, nFs2, nRst, nFs2, nRst, nFs2, nRst
+	dc.b nFs2, nRst, nFs2, nRst, nFs2, nRst
 	dc.b nFs2, nRst, nAb2, nRst, nAb2, nRst, nAb2, nRst
 	dc.b nAb2, nRst, nG2, nRst, nG2, nRst, nG2, nRst
 	dc.b nG2, nRst, nFs2, nRst, nFs2, nRst, nFs2, nRst

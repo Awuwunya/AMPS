@@ -350,6 +350,7 @@ Pray_Jump6:
 	sJump		Pray_Jump6
 
 Pray_FM4:
+	dc.b nRst, $09
 	sPan		spCentre, $00
 ;	saVol		$08
 	;sPanAni		$00
@@ -357,7 +358,6 @@ Pray_FM4:
 	sVoice		$04
 	sPan		spLeft, $00
 	saVol		$0C
-	dc.b nRst, $09
 	sCall		Pray_Call7
 	sCall		Pray_Call7
 	saVol		$F4
@@ -420,12 +420,12 @@ Pray_Jump5:
 	sJump		Pray_Jump5
 
 Pray_FM5:
+	dc.b nRst, $09
 	sPan		spCenter, $00
 	;sPanAni		$00
 	sGate		$03
 	sVoice		$04
 	sPan		spRight, $00
-	dc.b nRst, $09
 	sCall		Pray_Call5
 	sCall		Pray_Call5
 	sPan		spCenter, $00

@@ -90,8 +90,8 @@ Ending_Header:
 	spTotalLv	$18, $22, $24, $01
 
 Ending_FM1:
-	sVoice		$03
 	dc.b nRst, $60
+	sVoice		$03
 	sCall		Ending_Call1
 	dc.b nRst, $60
 	saVol		$FB
@@ -115,8 +115,8 @@ Ending_Call1:
 	sRet
 
 Ending_FM2:
-	sVoice		$01
 	dc.b nRst, $60
+	sVoice		$01
 
 Ending_Loop1:
 	dc.b nA3, $06, nRst, nA3, nRst, nE3, nRst, nE3
@@ -185,8 +185,8 @@ Ending_Call2:
 Ending_FM5:
 	sVoice		$03
 	ssDetune	$03
-	saVol		$F7
 	dc.b nRst, $60
+	saVol		$F7
 	sCall		Ending_Call1
 	saVol		$09
 	ssMod68k	$00, $01, $06, $04

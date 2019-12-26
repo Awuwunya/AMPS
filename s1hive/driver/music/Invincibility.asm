@@ -55,8 +55,8 @@ Invincibility_FM5:
 	ssDetune	$03
 
 Invincibility_FM1:
-	sVoice		$00
 	dc.b nRst, $30
+	sVoice		$00
 
 Invincibility_Jump1:
 	dc.b nRst, $0C, nCs6, $15, nRst, $03, nCs6, $06
@@ -113,8 +113,8 @@ Invincibility_Loop4:
 	sJump		Invincibility_Loop3
 
 Invincibility_FM4:
-	sVoice		$00
 	dc.b nRst, $30
+	sVoice		$00
 
 Invincibility_Loop5:
 	dc.b nCs6, $06, nRst, nCs6, nRst, nA5, nRst, nA5

@@ -715,11 +715,12 @@ Beach_FM5:
 	sJump		.loop
 
 Beach_FM6:
+	dc.b nRst, $0C
 ;	sPan		spCenter, $00
 	sVoice		$04
 
 .loop
-	dc.b nRst, $0C, nG4, $06, $06, nRst, $0C, nG4
+	dc.b nG4, $06, $06, nRst, $0C, nG4
 	dc.b $0C, nD4, $06, nG4, nG4, nG4, nRst, $0C
-	dc.b nG4
+	dc.b nG4, nRst, $0C
 	sJump		.loop

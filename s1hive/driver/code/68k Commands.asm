@@ -857,8 +857,10 @@ dUpdateVoiceFM:
 
 .noover
 	if FEATURE_UNDERWATER
+		moveq	#0,d6			; no underwater 4 u
+
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
-		beq.s	.nouw			; if not, skip
+		beq.s	.uwdone			; if not, skip
 		lea	dUnderwaterTbl(pc),a2	; get underwater table to a2
 
 		and.w	#7,d4			; mask out everything but the algorithm
@@ -869,10 +871,6 @@ dUpdateVoiceFM:
 		add.b	d4,d3			; add algorithm to Total Level carrier offset
 		bpl.s	.uwdone			; if volume did not overflow, skip
 		moveq	#$7F,d3			; force FM volume to silence
-		bra.s	.uwdone
-
-.nouw
-		moveq	#0,d6			; no underwater 4 u
 
 .uwdone
 	endif

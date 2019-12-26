@@ -961,6 +961,7 @@ HCZ2_Jump6:
 
 HCZ2_FM3:
 	dc.b nRst, $07
+
 HCZ2_Jump5:
 	sVoice		$03
 	ssDetune	$02

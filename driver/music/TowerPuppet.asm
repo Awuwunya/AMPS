@@ -640,6 +640,9 @@ TowerPuppet_Header:
 	spSSGEG		$00, $00, $00, $00
 	spTotalLv	$1D, $18, $26, $00
 
+TowerPuppet_FM5:
+	dc.b nRst, $0C
+
 TowerPuppet_FM1:
 	saVol		$02
 	sVoice		$1B
@@ -1607,10 +1610,6 @@ TowerPuppet_Loop16:
 	saVol		$FF
 	saTranspose	$E8
 	sJump		TowerPuppet_FM4
-
-TowerPuppet_FM5:
-	dc.b nRst, $0C
-	sJump		TowerPuppet_FM1
 
 TowerPuppet_PSG1:
 	dc.b nRst, $30, nRst, nRst

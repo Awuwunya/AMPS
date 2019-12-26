@@ -44,10 +44,7 @@
 		nolist			; if in safe mode, list data section.
 	endif
 
-__sfx =		SFXoff
 __mus =		MusOff
-SoundIndex:
-	ptrSFX	0, RingRight, RingLeft
 
 MusicIndex:
 	ptrMusic Test, $00
@@ -55,6 +52,16 @@ MusicIndex:
 	ptrMusic ColumnDive, $3C, Pray, $0B, HydroCity, $1E, GameNo, $74
 	ptrMusic TowerPuppet, $00, ChoosePath, $0E, Shop, $74, Beach, $32
 	ptrMusic SmoothCriminal, $2A
+
+MusCount =	__mus-MusOff		; number of installed music tracks
+SFXoff =	__mus			; first SFX ID
+__sfx =		SFXoff
+
+SoundIndex:
+	ptrSFX	0, RingRight, RingLeft
+
+SFXcount =	__sfx-SFXoff		; number of intalled sound effects
+SFXlast =	__sfx
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define samples

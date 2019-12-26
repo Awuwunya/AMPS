@@ -147,9 +147,10 @@ ScrabBrain_Header:
 	spTotalLv	$17, $0C, $0D, $0C
 
 ScrabBrain_FM1:
+	dc.b nRst, $24
 	sVoice		$02
 	saVol		$08
-	dc.b nRst, $24, nE6, $03, nD6, nC6, nB5, nF6
+	dc.b nE6, $03, nD6, nC6, nB5, nF6
 	dc.b nE6, nD6, nC6, nG6, nF6, nE6, nD6, nA6
 	dc.b nG6, nF6, nE6, nB6, nA6, nG6, nF6
 	saVol		$F8

@@ -596,10 +596,10 @@ Zaxx_FM24_Lite1:
 
 Zaxx_FM4:
 	;sJump		.out1
+	dc.b nRst, $60, $60, $60, $60
 	ssMod68k	$03, $01, $0A, $08
 	sVoice		$03
 	ssDetune	$FB
-	dc.b nRst, $60, $60, $60, $60
 ; ---------------------------------------------------------------------------
 ; Main loop point
 

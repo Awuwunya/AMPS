@@ -206,7 +206,7 @@ mContLast	rs.b 1		; last continous sfx played
 mLastCue	rs.b 1		; last YM Cue the sound driver was accessing
 		rs.w 0		; align channel data
 
-mBackUpArea rs.b 0		; this is where backup stuff starts
+mBackUpArea	rs.b 0		; this is where backup stuff starts
 mDAC1		rs.b cSize	; DAC 1 data
 mDAC2		rs.b cSize	; DAC 2 data
 mFM1		rs.b cSize	; FM 1 data
@@ -230,7 +230,7 @@ mSFXPSG3	rs.b cSizeSFX	; SFX PSG 3 data
 mChannelEnd	rs.w 0		; used to determine where channel RAM ends
 
 	if FEATURE_BACKUP
-mBackUpLoc  rs.b 0		; this is where backup stuff is loaded
+mBackUpLoc	rs.b 0		; this is where backup stuff is loaded
 mBackDAC1	rs.b cSize	; back-up DAC 1 data
 mBackDAC2	rs.b cSize	; back-up DAC 2 data
 mBackFM1	rs.b cSize	; back-up FM 1 data
@@ -286,10 +286,6 @@ Mus_Pause	rs.b 1		; pause the music
 Mus_Unpause	rs.b 1		; unpause the music
 Mus_StopSFX	rs.b 1		; stop all sfx
 MusOff		rs.b 0		; first music ID
-
-MusCount =	$70		; number of installed music tracks
-SFXoff =	MusCount+MusOff	; first SFX ID
-SFXcount =	$08		; number of intalled sound effects
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

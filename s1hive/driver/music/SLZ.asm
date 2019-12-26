@@ -128,8 +128,9 @@ StarLight_Header:
 	spTotalLv	$15, $02, $05, $0A
 
 StarLight_FM1:
+	dc.b nRst, $0C
 	sVoice		$00
-	dc.b nRst, $0C, nG5, nA5, nG6
+	dc.b nG5, nA5, nG6
 
 StarLight_Jump1:
 	sCall		StarLight_Call1
@@ -157,8 +158,8 @@ StarLight_Call2:
 	sRet
 
 StarLight_FM2:
-	sVoice		$01
 	dc.b nRst, $30
+	sVoice		$01
 
 StarLight_Jump2:
 	sCall		StarLight_Call3
@@ -312,8 +313,9 @@ StarLight_Call8:
 	sRet
 
 StarLight_FM5:
+	dc.b nRst, $0C
 	sVoice		$04
-	dc.b nRst, $0C, nG5, nA5, nG6
+	dc.b nG5, nA5, nG6
 
 StarLight_Jump5:
 	sVoice		$04

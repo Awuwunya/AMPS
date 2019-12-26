@@ -87,9 +87,10 @@ GameOver_Header:
 	spTotalLv	$0C, $0A, $0D, $0B
 
 GameOver_FM1:
+	dc.b nRst, $0C
 	sVoice		$00
 	ssMod68k	$20, $01, $04, $05
-	dc.b nRst, $0C, nCs6, $12, nRst, $06, nCs6, nRst
+	dc.b nCs6, $12, nRst, $06, nCs6, nRst
 	dc.b nD6, $12, nB5, $1E, nCs6, $06, nRst, nCs6
 	dc.b nRst, nCs6, nRst, nA5, nRst, nG5, $12, nB5
 	dc.b $0C, nRst, $12, nC6, $04, nRst, nC6, nB5
@@ -99,8 +100,9 @@ GameOver_FM1:
 	sStop
 
 GameOver_FM2:
+	dc.b nRst, $01
 	sVoice		$01
-	dc.b nRst, $01, nE7, $06, nRst, nE7, nRst, nCs7
+	dc.b nE7, $06, nRst, nE7, nRst, nCs7
 	dc.b nRst, nCs7, nRst, nD7, $15, nD7, $1B, nE7
 	dc.b $06, nRst, nE7, nRst, nCs7, nRst, nCs7, nRst
 	dc.b nG7, $15, nG7, $1B
@@ -124,8 +126,9 @@ GameOver_FM4:
 	sStop
 
 GameOver_FM5:
+	dc.b nRst, $30
 	sVoice		$03
-	dc.b nRst, $30, nD7, $12, nRst, $03, nD7, $1B
+	dc.b nD7, $12, nRst, $03, nD7, $1B
 	dc.b nRst, $30, nG7, $12, nRst, $03, nG7, $1B
 
 GameOver_DAC2:

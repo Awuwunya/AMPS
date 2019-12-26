@@ -124,7 +124,7 @@ dUpdateVolFM2:
 
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
 		beq.s	.uwdone			; if not, skip
-		move.b	(a1),d4			; load algorithm and feedback to d4
+		move.b	(a4),d4			; load algorithm and feedback to d4
 		and.w	#7,d4			; mask out everything but the algorithm
 
 		lea	dUnderwaterTbl(pc),a5	; get underwater table to a5
@@ -149,7 +149,7 @@ dUpdateVolFM2:
 		bpl.s	.noslot			; if slot operator bit was not set, branch
 
 		add.b	d1,d5			; add carrier offset to loaded value
-		bmi.s	.noslot			; if we did not overflow, branch
+		bmi.s	.slot			; if we did not overflow, branch
 		moveq	#-1,d5			; cap to silent volume
 	if FEATURE_UNDERWATER
 		bra.s	.slot

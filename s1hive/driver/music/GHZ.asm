@@ -248,9 +248,10 @@ GreenHill_Call2:
 	sRet
 
 GreenHill_FM2:
+	dc.b nRst, $08
 	sVoice		$00
 	sPan		spCenter
-	dc.b nRst, $08, nA2, nA3, nA2, nBb2, nBb3, nB2
+	dc.b nA2, nA3, nA2, nBb2, nBb3, nB2
 	dc.b nB3
 	sGate		$04
 	sVoice		$01
@@ -460,8 +461,8 @@ GreenHill_Call6:
 	sRet
 
 GreenHill_FM4:
-	sVoice		$08
 	dc.b nRst, $20, nRst
+	sVoice		$08
 	sPan		spLeft
 	saTranspose	$E8
 	saVol		$0A
@@ -532,10 +533,10 @@ GreenHill_Call7:
 	sRet
 
 GreenHill_FM5:
-	sVoice		$03
-	dc.b nRst, $20, nRst
+	dc.b nRst, $20
 	sVoice		$08
 	sPan		spRight
+	dc.b nRst
 	saTranspose	$E8
 	saVol		$F2
 

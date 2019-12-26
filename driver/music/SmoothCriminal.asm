@@ -140,10 +140,9 @@ SmoothCriminal_Header:
 	spTotalLv	$00, $00, $00, $00
 
 SmoothCriminal_FM1:
-	sVoice		$00
-
 SmoothCriminal_Jump1:
 	dc.b nRst, $60, nRst
+	sVoice		$00
 
 SmoothCriminal_Loop1:
 	sCall		SmoothCriminal_Call1

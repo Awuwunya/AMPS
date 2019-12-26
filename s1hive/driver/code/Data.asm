@@ -44,7 +44,6 @@
 		nolist			; if in safe mode, list data section.
 	endif
 
-__sfx =		SFXoff
 __mus =		MusOff
 
 MusicIndex:
@@ -52,6 +51,10 @@ MusicIndex:
 	ptrMusic Boss, $2E, SS, $00, Invincibility, $01, Drowning, $80
 	ptrMusic Title, $00, GotThroughAct, $00, Emerald, $00, ExtraLife, $33
 	ptrMusic GameOver, $00, Continue, $00, Ending, $00, Credits, $00, SEGA, $00
+
+MusCount =	__mus-MusOff		; number of installed music tracks
+SFXoff =	__mus			; first SFX ID
+__sfx =		SFXoff
 
 SoundIndex:
 	ptrSFX	$01, RingRight
@@ -70,6 +73,9 @@ SoundIndex:
 
 ; unused SFX
 	ptrSFX	0, UnkA2, UnkAB, UnkB8
+
+SFXcount =	__sfx-SFXoff		; number of intalled sound effects
+SFXlast =	__sfx
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define samples

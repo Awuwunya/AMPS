@@ -223,11 +223,10 @@ ChoosePath_Header:
 	spTotalLv	$60, $60, $60, $60
 
 ChoosePath_FM1:
-	sVoice		$0A
-	dc.b nRst, $06
 	ssMod68k	$01, $01, $E5, $FF
 	saVol		$03
 	sVoice		$04
+	dc.b nRst, $06
 	dc.b nC3, $0C
 	ssMod68k	$27, $01, $10, $03
 	dc.b nAb2, $24, nRst, $04, nAb2, nAb2, nBb2, $24
@@ -260,13 +259,11 @@ ChoosePath_Loop3:
 	sJump		ChoosePath_Jump1
 
 ChoosePath_FM2:
-	sVoice		$0A
-	dc.b nRst, $06
+	dc.b nRst, $09
 	sPan		spRight, $00
 	ssMod68k	$01, $01, $E5, $FF
 	ssDetune	$02
 	sVoice		$08
-	dc.b nRst, $03
 	saVol		$04
 	dc.b nC2, $09
 	saVol		$FC
@@ -305,7 +302,6 @@ ChoosePath_Call1:
 	sRet
 
 ChoosePath_FM3:
-	sVoice		$0A
 	dc.b nRst, $06
 	sPan		spCenter, $00
 	ssMod68k	$01, $01, $E5, $FF
@@ -340,10 +336,8 @@ ChoosePath_Jump3:
 	sJump		ChoosePath_Jump3
 
 ChoosePath_FM4:
-	sVoice		$0A
-	dc.b nRst, $06, nRst, $0C
+	dc.b nRst, $14
 	ssMod68k	$27, $01, $10, $03
-	dc.b nRst, $02
 	ssDetune	$02
 	sVoice		$03
 	;sPanAni		$03, $03, $03, $03, $02
@@ -369,13 +363,12 @@ ChoosePath_Jump4:
 	sJump		ChoosePath_Jump4
 
 ChoosePath_FM5:
-	sVoice		$0A
-	dc.b nRst, $06
+	dc.b nRst, $09
 	ssMod68k	$01, $01, $E5, $FF
 	sPan		spLeft, $00
 	ssDetune	$01
 	sVoice		$04
-	dc.b nRst, $03, nC3, $09
+	dc.b nC3, $09
 	ssMod68k	$27, $01, $10, $03
 	sVoice		$02
 	saTranspose	$E8

@@ -177,9 +177,9 @@ MysticCave_Call4:
 	sRet
 
 MysticCave_FM5:
+	dc.b nRst, $01
 	sVoice		$01
 	sPan		spLeft, $00
-	dc.b nRst, $01
 	sCall		MysticCave_Call5
 
 MysticCave_Jump3:
@@ -250,9 +250,9 @@ MysticCave_Call2:
 	sRet
 
 MysticCave_FM1:
+	dc.b nRst, $60
 	sVoice		$02
 	ssMod68k	$18, $01, $0A, $04
-	dc.b nRst, $60
 
 MysticCave_Jump1:
 	sCall		MysticCave_Call1
@@ -392,8 +392,9 @@ MysticCave_Loop4:
 	sJump		MysticCave_Loop3
 
 MysticCave_FM2:
+	dc.b nRst, $30
 	sVoice		$05
-	dc.b nRst, $30, nRst
+	dc.b nRst
 
 MysticCave_Loop2:
 	dc.b nA2, $0C, nA3, nG3, $08, nA3, $04, nG3

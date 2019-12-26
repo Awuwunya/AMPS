@@ -112,8 +112,8 @@ Marble_FM3:
 	ssDetune	$02
 
 Marble_FM1:
-	sVoice		$00
 	dc.b nRst, $24
+	sVoice		$00
 
 Marble_Jump1:
 	sCall		Marble_Call1
@@ -136,9 +136,10 @@ Marble_Call1:
 	sRet
 
 Marble_FM4:
+	dc.b nRst, $06
 	sVoice		$03
 	saVol		$F7
-	dc.b nRst, $06, nE5, $03, $03, $06, nRst, nE4
+	dc.b nE5, $03, $03, $06, nRst, nE4
 	dc.b $1E
 	sVoice		$02
 	saVol		$09
@@ -210,8 +211,9 @@ Marble_Call5:
 	sRet
 
 Marble_FM2:
+	dc.b nRst, $06
 	sVoice		$01
-	dc.b nRst, $06, nE4, $03, nE4
+	dc.b nE4, $03, nE4
 	dc.b nE4, $06, nRst, nE3, $24
 
 Marble_Jump2:
