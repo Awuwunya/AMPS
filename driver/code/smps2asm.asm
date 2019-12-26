@@ -356,12 +356,12 @@ saTempo		macro tempo
 	dc.b $FF,$1C, \tempo
     endm
 
-; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
+; EB - Use sample DAC mode, where each note is a different sample (DAC_MODE - DACM_SAMP)
 sModeSampDAC	macro
 	dc.b $EB
     endm
 
-; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+; EC - Use pitch DAC mode, where each note is a different pitch (DAC_MODE - DACM_NOTE)
 sModePitchDAC	macro
 	dc.b $EC
     endm
@@ -441,6 +441,10 @@ sLoop		macro index,loops,loc
 	dc.b $F7, \index
 	dc.w \loc-*-2
 	dc.b \loops-1
+
+	if \loops<2
+		inform 3,"Invalid number of loops! Must be 2 or more!"
+	endif
     endm
 
 ; F8xxxx - Call pattern at xxxx, saving return point (GOSUB)

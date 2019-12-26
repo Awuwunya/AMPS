@@ -683,7 +683,7 @@ dcBackup:
 
 		lea	mBackUpLoc.w,a4		; load source address to a4
 		lea	mBackUpArea.w,a3	; load destination address to a3
-		move.w	#(mSFXDAC1-mDAC1)/4-1,d4; load backup size to d4
+		move.w	#(mSFXDAC1-mBackUpArea)/4-1,d4; load backup size to d4
 
 .backup
 		move.l	(a4),(a3)+		; restore data for each channel

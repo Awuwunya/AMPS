@@ -346,10 +346,7 @@ ScrabBrain_FM5:
 	dc.b nB4, $4B
 	sCall		ScrabBrain_Call7
 	saVol		$06
-
-ScrabBrain_Loop13:
 	dc.b nRst, $60
-	sLoop		$00, $01, ScrabBrain_Loop13
 	sVoice		$06
 	saVol		$EB
 	saTranspose	$0C

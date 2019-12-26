@@ -140,6 +140,8 @@ SpringYard_Jump1:
 	dc.b $04, nG6, $04, nF6, $02, nG6, $04, nRst
 	dc.b $02, nA6, $06
 ;	sMuteFM1
+	sCmdYM		$88, $0F
+	sCmdYM		$8C, $0F
 	dc.b nRst, $12
 	sVoice		$04
 	sModOff
