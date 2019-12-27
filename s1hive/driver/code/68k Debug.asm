@@ -550,7 +550,7 @@ AMPS_Debug_dcGate	macro
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; NoisePSG command on SFX channel handler
+; NoisePSG command on an invalid channel handler
 ; ---------------------------------------------------------------------------
 
 AMPS_Debug_dcNoisePSG	macro
@@ -821,7 +821,7 @@ AMPS_Debug_PlayTrackSFX2	macro
 
 .fail\@
 	if def(RaiseError)	; check if Vladik's debugger is active
-		RaiseError "Invalid tracker at SFX ch: %<.l d1>%<endl>%<.l d1 sym>", AMPS_Debug_Console_Main
+		RaiseError "Invalid tracker at SFX ch: %<.l d2>%<endl>%<.l d2 sym>", AMPS_Debug_Console_Main
 	else
 		bra.w	*
 	endif

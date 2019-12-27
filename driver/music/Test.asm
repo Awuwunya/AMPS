@@ -1,8 +1,8 @@
 	sHeaderInit
 	sHeaderTempo	$41, $00
 	sHeaderCh	$01, $00
-	sHeaderDAC	Test_DAC
-	sHeaderDAC	Test_DAC
+	sHeaderDAC	Test_DAC1
+	sHeaderDAC	Test_DAC2
 	sHeaderFM	Test_FM1, $00, $0C
 
 	spAlgorithm	$04, Jousi
@@ -41,7 +41,6 @@ Test_FM1:
 ;	dc.b nB2, $16
 ;	ssPortamento	$04
 ;	dc.b nB3, nB4
-	sBackup
 	sJump		.loop
 
 ; ===========================================================================
@@ -49,5 +48,14 @@ Test_FM1:
 ; DAC2 data
 ; ---------------------------------------------------------------------------
 
-Test_DAC:
+Test_DAC1:
+	sVoice		dMeow
+	sModePitchDAC
+	dc.b $B1, $60
+
+.loop
+	dc.b sHold, $60
+	sJump	.loop
+
+Test_DAC2:
 	sStop

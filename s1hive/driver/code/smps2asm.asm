@@ -76,7 +76,7 @@ sHeaderPrio	macro prio
 
 ; Header - Set up DAC Channel
 sHeaderDAC	macro loc,vol,samp
-	dc.w \loc-*
+	dc.w \loc-offset(*)
 
 	if narg>=2
 		dc.b \vol
@@ -92,20 +92,20 @@ sHeaderDAC	macro loc,vol,samp
 
 ; Header - Set up FM Channel
 sHeaderFM	macro loc,pitch,vol
-	dc.w \loc-*
+	dc.w \loc-offset(*)
 	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 
 ; Header - Set up PSG Channel
 sHeaderPSG	macro loc,pitch,vol,detune,volenv
-	dc.w \loc-*
+	dc.w \loc-offset(*)
 	dc.b (\pitch)&$FF,(\vol)&$FF,(\detune)&$FF,\volenv
     endm
 
 ; Header - Set up SFX Channel
 sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.b \flags,\type
-	dc.w \loc-*
+	dc.w \loc-offset(*)
 	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 ; ---------------------------------------------------------------------------------------------
@@ -126,9 +126,9 @@ spCenter set $C0
 spAlgorithm macro val, name
 	if (sPatNum<>0)&(safe=0)
 		; align the patch
-		dc.b (*^(sPatNum*spTL4))&$FF
-		dc.b ((*>>8)+(spDe3*spDR3))&$FF
-		dc.b ((*>>16)-(spTL1*spRR3))&$FF
+		dc.b (offset(*)^(sPatNum*spTL4))&$FF
+		dc.b ((offset(*)>>8)+(spDe3*spDR3))&$FF
+		dc.b ((offset(*)>>16)-(spTL1*spRR3))&$FF
 	endif
 
 	if narg>1

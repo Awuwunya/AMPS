@@ -977,9 +977,6 @@ dcStop:
 		addq.l	#2,(sp)			; go to next channel immediately
 		rts
 ; ---------------------------------------------------------------------------
-; There is nothing that would break even if the channel is not
-; running a tracker, so we do not bother checking
-; ---------------------------------------------------------------------------
 
 .psg
 		lsr.b	#4,d3			; make it easier to reference the right offset in the table

@@ -262,7 +262,7 @@ mSize		rs.w 0		; end of the driver RAM
 ; ---------------------------------------------------------------------------
 
 	rsset 0
-mfbSwap		rs.b 1		; if set, change speaker (play different sfx)
+mfbSwap		rs.b 1		; if set, swap the sfx
 mfbSpeed	rs.b 1		; if set, speed shoes are active
 mfbWater	rs.b 1		; if set, underwater mode is active
 mfbNoPAL	rs.b 1		; if set, play songs slowly in PAL region
@@ -286,7 +286,6 @@ Mus_Pause	rs.b 1		; pause the music
 Mus_Unpause	rs.b 1		; unpause the music
 Mus_StopSFX	rs.b 1		; stop all sfx
 MusOff		rs.b 0		; first music ID
-
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Condition modes
@@ -383,7 +382,6 @@ res =			res|$FFFFFF00	; must be negative value
 		moveq	#res,\bits	; moveq version
 	endif
     endm
-
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Quickly clear some memory in certain block sizes
@@ -440,7 +438,7 @@ dCALC_VOICE	macro off
 	endif
 
 	add.w	d4,a4			; add offset to voice table address
-		endm
+    endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Used to calculate the address of the right FM voice bank
@@ -457,7 +455,7 @@ dCALC_BANK	macro off
 	bhs.s	.bank			; if so, branch
 	move.l	mVctMus.w,a4		; load music voice table into a1
 
-	if narg>0
+	if \off<>0
 		add.w	#off,a4		; add offset into a1
 	endif
 .bank

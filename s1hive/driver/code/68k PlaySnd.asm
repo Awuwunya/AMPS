@@ -576,7 +576,7 @@ dPlaySnd_SFX:
 
 		move.w	(a5,d3.w),a3		; get the music channel we should override
 		bset	#cfbInt,(a3)		; override music channel with sound effect
-		moveq	#1,d2			; prepare duration of 0 frames to d5
+		moveq	#1,d2			; prepare duration of 0 frames to d2
 		bra.s	.clearCh
 ; ---------------------------------------------------------------------------
 
