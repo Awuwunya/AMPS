@@ -1,0 +1,788 @@
+<html>
+<head>
+	<title>AMPS v2.0 TECHNICAL DOCUMENTATION</title>
+	<link href="https://fonts.googleapis.com/css?family=Noto+Sans&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Overpass:400,700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
+	<style>
+		html {
+			background: black;
+			color: #C2C2C2;
+			padding: 1vh 2vw;
+		}
+
+		body {
+			background: #232323;
+			border: .16vw solid gray;
+			border-radius: 2vw;
+			margin: auto;
+			padding: 2vw;
+		}
+
+		h1 {
+			font: 2.8vw 'Noto Sans', sans-serif;
+			margin: 1.2vw 0;
+		}
+
+		h3 {
+			font: 2vw 'Noto Sans', sans-serif;
+			margin: 1vw 0;
+		}
+
+		h4 {
+			font: 1.4vw 'Noto Sans', sans-serif;
+			margin: 1vw 0;
+			font-weight: bold;
+		}
+
+		p {
+			font: 1vw 'Rubik', sans-serif;
+			margin: .3vw 1.2vw .8vw 0;
+		}
+
+		p > a, li > a {
+			color: #cbacb0;
+			text-decoration: none;
+		}
+
+		tblcnt {
+			font: 1.1vw 'Rubik', sans-serif;
+			display: block;
+			white-space: pre;
+		}
+
+		tblcnt > a {
+			color: #C2C2C2;
+			text-decoration: none;
+		}
+
+		tblcnt > a:focus, tblcnt > a:hover, p > a:focus, p > a:hover, li > a:focus, li > a:hover {
+			text-decoration: underline;
+		}
+
+		tblcnt > a:active {
+			color: #ffffff;
+			text-decoration: underline;
+		}
+
+		p > a:active, li > a:active {
+			color: #b57e79;
+			text-decoration: underline;
+		}
+
+		li {
+			font: 1.1vw 'Overpass', sans-serif;
+			margin: 0 1.5vw 0 0;
+		}
+
+		li > b {
+			color: #c67431;
+		}
+
+		table {
+			font: .95vw 'Roboto Mono', sans-serif;
+			margin: 0 .5vw;
+			border: .1vw solid whitesmoke;
+			border-collapse: collapse;
+			text-align: center;
+		}
+
+		td {
+			padding: .24vw .24vw;
+		}
+
+		smps2asm {
+			display: block;
+			tab-size: 8;
+			white-space: pre;
+			background: #272823;
+			font: .9vw 'Roboto Mono', monospace;
+			border: .1vw solid rgba(255,255,255,.3);
+			margin: .1vw .4vw;
+			padding: .4vw .5vw;
+		}
+
+		smps2asm::-moz-selection, smps2asm > *::-moz-selection {
+			background: #606080CF;
+		}
+
+		smps2asm::selection, smps2asm > *::selection {
+			background: #606080CF;
+		}
+
+		smps2asm > lbl {
+			color: #D4D4D4;
+		}
+
+		smps2asm > mac {
+			color: #4CBD00;
+		}
+
+		smps2asm > val {
+			color: #FF7575;
+		}
+
+		smps2asm > equ {
+			color: #AA7FFF;
+		}
+
+		smps2asm > cmt {
+			color: #8F8F8F;
+		}
+
+		smps2asm > opc {
+			color: #9fb6f2;
+		}
+	</style>
+</head>
+<body>
+	<h3 style='text-decoration: underline;'>AMPS v2.0 technical manual</h3>
+	<h1>Table of contents</h1>
+	<tblcnt><a href="#part1">1 — Introduction</a></tblcnt>
+	<tblcnt><a href="#part2">2 — AMPS Overview</a></tblcnt>
+	<tblcnt><a href="#part3">3 — Sound System</a></tblcnt>
+	<tblcnt><a href="#part3_1">   3.1 — Music Files</a></tblcnt>
+	<tblcnt><a href="#part3_2">   3.2 — Sound Effect Files</a></tblcnt>
+	<tblcnt><a href="#part4">4 — Trackers</a></tblcnt>
+	<tblcnt><a href="#part4_1">	4.1 — Trackers Overview</a></tblcnt>
+	<tblcnt><a href="#part4_2">	4.2 — Tracker Commands</a></tblcnt>
+	<tblcnt><a href="#part4_21">		4.2.1 — Modulation</a></tblcnt>
+	<tblcnt><a href="#part4_3">	4.3 — SN76496</a></tblcnt>
+	<tblcnt><a href="#part4_4">	4.4 — YM2612</a></tblcnt>
+	<tblcnt><a href="#part4_5">	4.5 — Dual PCM</a></tblcnt>
+	<tblcnt><a href="#part5">5 — Communication Bytes</a></tblcnt>
+	<tblcnt><a href="#part6">6 — Volume Control</a></tblcnt>
+	<tblcnt><a href="#part6_1">	6.1 — Channel Volumes</a></tblcnt>
+	<tblcnt><a href="#part6_2">	6.2 — Volume Fading</a></tblcnt>
+	<tblcnt><a href="#part7">7 — Memory Map</a></tblcnt>
+	<tblcnt><a href="#part8">8 — Creating Custom Music</a></tblcnt>
+	<tblcnt><a href="#part9">9 — Porting Music</a></tblcnt>
+	<tblcnt><a href="#part10">10 — Installing AMPS</a></tblcnt>
+
+	<h1 id="part1">1 — Introduction</h1>
+	<p>
+		AMPS is a 68k-based, SMPS-like sound driver, designed to be used with ROM hacks and Sega Mega Drive software.
+		Although similar to SMPS, AMPS is fundamentally different in many aspects. It is also heavily customized, RAM-efficient
+		and cycle-efficient. AMPS is additionally powered by Dual PCM FlexEd, meaning that you can use 2 DAC sample channels
+		with pitch and volume control. AMPS was designed to be a well-documented driver with a lot of capabilities so that
+		the music created for the sound driver can sound better, and the music and game program can interact with each other.
+		To ensure this, AMPS has a very robust codebase built to allow future expansion and customized programming for
+		game-specific circumstances.
+	</p>
+	<p>
+		AMPS is open source and free to use, given that you follow the license. You can easily make your own modifications, do feature
+		requests, and make some great music. Currently, there is a limited number of options to create music, but using tools designed
+		for other sound drivers, you can convert the files into AMPS format. More on that in <a href="#part9">part 9</a>.
+	</p>
+
+	<h1 id="part2">2 — AMPS overview</h1>
+	<p>
+		AMPS is based on sound data files, perhaps erroneously referred to as tracker files. These files define each song and sound effect
+		you may hear in a game. They do not specify samples themselves, as those are handled by a different system. They are
+		the backbone of AMPS and without them no sound would be generated. Tracker files tell AMPS what notes to play, how long to
+		play them, and can also tell AMPS about other aspects of how hardware should act. For example, you can manipulate
+		<a href="#part4_4">YM2612</a> registers or tell <a href="#part4_5">Dual PCM</a> how to play samples. Additionally, AMPS has
+		a long list of built-in features that help the programmer to make cool effects without needing to have in-depth programming
+		ability.
+	</p>
+	<p>
+		AMPS includes a number of customizable flags, that allow the programmer to decide which features they are going to need for
+		their project. The more flags are enabled, generally, the more system RAM and processor cycles are required to execute AMPS,
+		though there are also exceptions. Here is a list of currently available flags:
+	</p>
+	<ul>
+		<li><b>FEATURE_SAFE_PSGFREQ</b> — When enabled, the PSG frequency behaviour is set to safe mode. When disabled,
+			it is possible that a PSG frequency overflows and messes with other PSG channels. This behaviour, for whatever reason,
+			is required to make the insta-shield sound effect from Sonic 3 & Knuckles work correctly.</li>
+		<li><b>FEATURE_SFX_MASTERVOL</b> — When enabled, SFX channels will be affected by <a href="#part6">master volume.</a></li>
+		<li><b>FEATURE_MODULATION</b> — When enabled, <a href="#part4_21">software modulation</a> can be used. This allows
+			the programmer to define a linear change for frequency over time, which can also go back and forth between
+			rising and falling.</li>
+		<li><b>FEATURE_PORTAMENTO</b> — When enabled, <a href="#part4_21">the portamento command</a> can be used. Portamento
+			makes the notes smoothly change over specified number of frames (or 0 frames which disables this effect).</li>
+		<li><b>FEATURE_MODENV</b> — When enabled, <a href="#part4_21">modulation envelopes</a> can be used. Similarly to
+			volume envelopes (also known as PSG instruments or PSG tones), they can be used to create more complex patterns
+			for changing channel frequency. Every frame a value is read from a list specified by the modulation envelope ID,
+			and that is used to calculate the frequency displacement.</li>
+		<li><b>FEATURE_DACFMVOLENV</b> — When enabled, <a href="#part6_1">volume envelopes</a> can be used in DAC and FM
+			channels along with PSG channels. They can be used to create more complex patterns for changing channel volume.
+			Every frame a value is read from a list specified by the volume envelope ID, which is then used to calculate the
+			volume displacement.</li>
+		<li><b>FEATURE_UNDERWATER</b> — When enabled, <a href="#part6_1">underwater mode</a> is enabled. This makes it so that
+			68k can request underwater mode to be activated, and when it is, all FM voices will sound slightly muffled. This is intended
+			to emulate how music would sound if it were played underwater. Although the effect is not perfect, it creates an
+			additional "depth" to how your game will sound when implemented right.</li>
+		<li><b>FEATURE_BACKUP</b> — When enabled, music can be <a href="#part4_2">"backed up"</a> so it can be later started from
+			the same place. This is useful if you have a temporary song you want to play for a small moment, but don't want the
+			previous song to start from the beginning again. In Sonic games this is commonly used for the 1-UP sound. The one big downside of
+			this flag is that it requires nearly double the amount of RAM as the driver regularly needs.</li>
+		<li><b>FEATURE_BACKUPNOSFX</b> — When enabled, this prevents sound effects from playing when a song is backed up.</li>
+		<li><b>FEATURE_FM6</b> — When enabled, FM6 can be used as a music channel in addition to DAC1 and DAC2 as sample channels.
+			Because FM6 and DAC cannot play at the same time, whenever <b>any</b> DAC is playing in any channel, FM6 is temporarily
+			disabled. FM6 keeps playing as normal in the background, but no sound is output. This feature is useful when you want
+			to use FM6 for any song, but still want to have access to DAC channels too.</li>
+	</ul>
+	<p>
+		AMPS also uses additional data, such as volume and modulation envelope data, sample tables, and other miscellaneous
+		include files. This data is all defined in the <b>code/Data.asm</b> file, which is the file you will be editing most.
+		Additionally, <b>AMPS Includer.exe</b> is used to pre-process this file so it works correctly in both ASM68K and AS. There
+		are also a number of customizable things, such as volume fades, frequency tables, and PCM volume filters.
+	</p>
+
+	<h1 id="part3">3 — Sound system</h1>
+	<p>
+		AMPS uses sound IDs to differentiate each sound. There can be at most 255 sounds (from $01 to $FF), and they are split into 3 main
+		groups: Commands, music, and sound effects. All of these have different behaviors, for a very specific reason: sound effect
+		channels override music channels, due to a lack of hardware channels. Effectively, sound effects have to correctly inform music that a channel is
+		in use, and therefore has to be differentiated. By default, commands come first, then music, and finally sound effects. There is no specific
+		reason for this, other than making the organisation easier. Below is a list of sound commands:
+	</p>
+	<ul>
+		<li><b>mus_Reset</b> — Resets various things about AMPS: the underwater mode, speed shoes mode, and any backed-up song status.</li>
+		<li><b>mus_FadeOut</b> — Fades out the current song.</li>
+		<li><b>mus_Stop</b> — Stops the current song and sfx immediately. Also clears sound driver memory and mutes hardware.</li>
+		<li><b>mus_ShoesOn</b> — Enables the speed shoes mode. This changes the tempo from using normal tempo, to the speed up tempo defined for the song.</li>
+		<li><b>mus_ShoesOff</b> — Disables the speed shoes mode. This changes the tempo from using speed up tempo, to the normal tempo defined for the song.</li>
+		<li><b>mus_ToWater</b> — Enables <a href="#part6_1">underwater mode</a>.</li>
+		<li><b>mus_OutWater</b> — Disables <a href="#part6_1">underwater mode</a>.</li>
+		<li><b>mus_Pause</b> — Pauses the execution of AMPS and mutes hardware. AMPS will ignore everything except sound commands at this point.</li>
+		<li><b>mus_Unpause</b> — Unpauses the execution of AMPS. Some notes will not play for a moment after the unpause, due to limitations with the hardware.</li>
+		<li><b>mus_StopSFX</b> — Safely stops every sound effect. This will correctly release all hardware channels back to music.</li>
+	</ul>
+	<p>
+		AMPS uses a sound queue for playing different sounds. The sound queue has 3 bytes and they can be used for any sound. <b>mQueue</b>
+		is the equate name for this RAM space, and slots can be referred by <b>mQueue</b>, <b>mQueue+1</b> and <b>mQueue+2</b>. Only a single slot can be loaded per frame,
+		and the earlier slots have priority over later slots. It is recommended that sound commands go to slot 0, music in slot 1 and sound effects in slot 2, though the
+		programmer may choose to configure this differently depending on their needs. When there is no sound queued, the slots will be set to $00. This can be used to check
+		if slot already contains a queued sound.
+	</p>
+
+	<h3 id="part3_1">3.1 — Music files</h3>
+	<p>
+		Music is mainly used as background music or as a jingle. Generally, whenever you want to make something that can be overridden by
+		sound effects or be the main focus, music is a good choice. Music has access to all the features in AMPS and is generally more versatile than
+		sound effects. Music is affected by the current tempo. There are 2 tempos: Speed shoes tempo and normal tempo. Speed shoes tempo is activated
+		with a sound command (explained just above), and by default the normal tempo is used. There are 2 tempo modes, overflow and counter. Overflow tempo
+		delays music by a single frame each time the tempo accumulator overflows (becomes >$FF). Each frame, the tempo value is added to the accumulator.
+		Counter tempo instead holds a counter value, and it is counted down each frame. When it becomes 0, a single frame of delay is added.
+		Then the counter value is also read back into the accumulator. You can change the tempo algorithm in <b>code/macro.asm</b>.
+		You can see a visualization of the two methods in the below image (thanks to MarkeyJester!)
+	</p>
+	<p>
+		Music also has an additional variable: Tick multiplier. For sound effects and often music, this value is set to $01, but you can use other values if
+		you want to. When a delay is read from the tracker, that value is multiplied by the tick multiplier amount. Tick multiplier of $01 means it
+		is the same as read, but $02 means it's twice as long, etc. There is a small issue though. If the total amount overflows the 8-bit range, you start getting
+		smaller values again. As a special case, a delay of $00 is considered undefined, though in most cases it will act as if the delay was $100 frames.
+		This is a limitation with the engine.
+	</p>
+	<p>
+		Additionally, the tick multiplier field may contain extra flags. These flags tell AMPS to treat the music in special ways. They are mostly just for extra features.
+		Here is a list of the special modes. I've listed the bit it detects along with the value that bit represents:
+	</p>
+	<ul>
+		<li><b>bit 6, $40</b> — Tells AMPS that the previous song should be <a href="#part4_2">backed up</a>. This is useful for temporary sounds that
+			should not restart the previous song from the beginning.</li>
+		<li><b>bit 7, $80</b> — In PAL regions, Mega Drives run at 50hz as opposed to 60hz. The driver combats this by running twice every 6th frame. This causes timing
+			issues with things that run for a specific amount of time. This flag disables that behavior, meaning the music runs slower, but takes the correct amount of time.</li>
+	</ul>
+	<p>
+		The header also defines the channels that should be used for music. Currently, DAC1 and DAC2 must always be defined, even if they go unused. After DAC channels,
+		FM channels and finally PSG channels are defined. FM and PSG channels always go in order and no channel can be skipped. This works differently to sound effects,
+		which can be defined in any order the programmer wants. This is by design however, to reduce the size of tracker files and load times. Finally, the FM voice list comes
+		right after the last channel. It does not necessarily have to contain any voices, but if some were needed that is where they should be placed. The inflexibility of
+		this system is unfortunate and there are future plans to mitigate it.
+	</p>
+	<p>Here is an example music header:</p>
+	<smps2asm><lbl>Example_Header:</lbl>
+	<mac>sHeaderInit</mac>						<cmt>; this line initializes some variables required to make songs work</cmt>
+	<mac>sHeaderTempo</mac>	<val>$81</val>, <val>$33</val>				<cmt>; that $8X means that the 50hz "fix" is not applied to this song.</cmt>
+	<mac>sHeaderCh</mac>	<val>$03</val>, <val>$02</val>				<cmt>; first param is number of FM channels, second is PSG channels.</cmt>
+	<mac>sHeaderDAC</mac>	<lbl>Example_DAC1</lbl>, <val>$08</val>, <equ>dKick</equ>		<cmt>; first param is tracker data location, second is volume, third is sample to use.</cmt>
+	<mac>sHeaderDAC</mac>	<lbl>Example_DAC2</lbl>				<cmt>; you can also omit these fields and they default to $00.</cmt>
+	<mac>sHeaderFM</mac>	<lbl>Example_FM1</lbl>, <val>$00</val>, <val>$00</val>			<cmt>; first param is tracker data location, second is pitch offset, third is volume.</cmt>
+	<mac>sHeaderFM</mac>	<lbl>Example_FM2</lbl>, <val>$F4</val>, <val>$09</val>			<cmt>; all these channels have slightly different headers. You should use the right one.</cmt>
+	<mac>sHeaderFM</mac>	<lbl>Example_FM3</lbl>, <val>$F4</val>, <val>$0D</val>			<cmt>; if you have a wrong num of channels, it will lead to an error. Double check if unsure.</cmt>
+	<mac>sHeaderPSG</mac>	<lbl>Example_PSG1</lbl>, <val>$D0</val>, <val>$18</val>, <val>$00</val>, <equ>v05</equ>	<cmt>; first param is tracker data location, second is pitch offset, third is volume</cmt>
+	<mac>sHeaderPSG</mac>	<lbl>Example_PSG1</lbl>, <val>$00</val>, <val>$30</val>, <val>$00</val>, <equ>v00</equ>	<cmt>; (volume is multiplied by $08), fourth is detune, and fifth is volume envelope ID</cmt>
+
+	<cmt>; this is where the FM voices go.</cmt></smps2asm>
+	<p>
+		Including your music is also pretty easy. Music file names must not contain spaces or other special characters. The only valid characters are A-Z, a-z, 0-9 and _.
+		Music files will be assigned an ID, and in program code, you can refer to this specific id with a special equate, named the music file name, prefixed with <b>mus_</b>.
+		For example, you may have <b>mus_Something</b>. To include your music, simply open <b>code/Data.asm</b>, and locate <b>MusicIndex</b>. You will see lines starting with
+		<b>ptrMusic</b>, with a name and a number. The name should simply be the file name of your music file, while the number is the speed shoes tempo value. Speed shoes tempo
+		should always come right after the music file name. Here is an example:
+	</p>
+	<smps2asm>	<mac>ptrMusic</mac>	<lbl>Something</lbl>, <val>$10</val></smps2asm>
+
+	<h3 id="part3_2">3.2 — Sound Effect files</h3>
+	<p>
+		Sound effects are useful when you want to play a small sound or a short jingle. They are most commonly used as feedback for the player or for enemy sounds.
+		Sound effects are not affected by current tempo or by the 50hz "fix", and generally do not use the tick multiplier. Additionally, sound effects can not use
+		the channel stack or gate command. These were deemed unnecessary for sound effects and are therefore not available. Sound effects share a voice bank, so the
+		voices are not located after the header. Instead, they are loaded from <b>Voices.asm</b>.
+	</p>
+	<p>
+		Sound effects have a priority system, which allows some sound effects to override others, or not, depending on the priority setting. Priorities go from
+		$00 to $FF, with a higher priority being more likely to have the sound effect override others. The programmer can decide which priority
+		values to give to each sound effect, but it is recommended to use $80 as the midway point, with priority values fairly close to it. In AMPS, priority values are
+		stored per channel and therefore stick for the duration the channel exists. This means that priority values are computed per channel and stick for
+		longer than a frame. Compared to SMPS drivers, this will make sound effects sound different and they can not override each other at a later time.
+	</p>
+	<p>
+		Sound effects can define channels in any order, and with a standardized set of parameters. The first parameter is a set of flags that should always be the same
+		according to channel type (other values have undefined behaviour). The second parameter is the actual channel type. It is preferred you use the equates provided in <b>code/macro.asm</b>
+		to keep consistency. third parameter is the tracker data location, fourth parameter is pitch offset, and finally, fifth parameter is the channel volume.
+		Here is an example of a sound effect header:
+	</p>
+	<smps2asm>	<mac>sHeaderInit</mac>						<cmt>; this line initializes some variables required to make sound effects work</cmt>
+	<mac>sHeaderPrio</mac>	<val>$80</val>					<cmt>; this is the priority for all sound effect channels</cmt>
+	<mac>sHeaderCh</mac>	<val>$03</val>					<cmt>; this must match the actual number of sound effect channels</cmt>
+	<mac>sHeaderSFX</mac>	<val>$80</val>, <equ>ctFM5</equ>, <lbl>.FM5</lbl>, <val>$00</val>, <val>$00</val>		<cmt>; FM channels must all use $80 for the flags value</cmt>
+	<mac>sHeaderSFX</mac>	<val>$A1</val>, <equ>ctPSG3</equ>, <lbl>.PSG3</lbl>, <val>$0C</val>, <val>$02</val>		<cmt>; PSG channels must all use $A1 for the flags value</cmt>
+	<mac>sHeaderSFX</mac>	<val>$A0</val>, <equ>ctDAC1</equ>, <lbl>.DAC1</lbl>, <val>$00</val>, <val>$00</val>		<cmt>; DAC channels must all use $A0 or $A1 for the flags value</cmt></smps2asm>
+	<p>
+		Currently, sound effects may use the following channels: FM3, FM4, FM5, PSG1, PSG2, PSG3, and DAC1. FM3 may be later changed to FM2. Including sound effect files is pretty easy:
+		each sound effect file name must not contain spaces or other special characters. The only valid characters are A-Z, a-z, 0-9 and _. Sound effect files will be assigned an ID, and
+		in program code, you can refer to this specific ID with a special equate, named the sound effect file name, prefixed with <b>sfx_</b>. For example, you may have <b>sfx_Example</b>.
+		To include your sound effects, simply open <b>code/Data.asm</b>, and locate <b>SoundIndex</b>. You will see lines starting with <b>ptrSFX</b> and a number, then a list of names. The name should
+		simply be the file name of your sound effect file, while the number is a bit-field of flags. Each different set of flags should be on its own <b>ptrSFX</b> line. Here is a list of the flags.
+		I've listed the bit it detects along with the value that bit represents:
+	</p>
+	<ul>
+		<li><b>bit 1, $01</b> — Tells AMPS this sound effect should switch to the next ID every other time it is played. This is used to implement the ring speaker switching
+			behaviour from Sonic games, although it could be used for any number of sound effect behaviours.</li>
+		<li><b>bit 7, $80</b> — Tells AMPS this sound effect is continuous. These sound effects do not restart each time they are played. Instead, they continue in a loop inside of
+			the tracker file. They are stopped only when either the sound effect is no longer being played, or some other sound effect overrides it. This effect was particularly popular
+			in Sonic 3 & Knuckles, but individual sound effects in Sonic 1 and Sonic 2 use similar behaviours.</li>
+	</ul>
+	<p>
+		Here is an example of including your sound effect:
+	</p>
+	<smps2asm>	<mac>ptrSFX</mac>		<val>$01</val>, <lbl>Example</lbl></smps2asm>
+
+	<h1 id="part4">4 — Trackers</h1>
+	<p>
+		In <a href="#part3">part 3</a>, <a href="#part3_1">3.1</a> and <a href="#part3_2">3.2</a> we talked about the specific differences between sound commands, music, and sound effects.
+		In this part, we'll instead talk about the similarities, and dive deeper into how trackers work.
+	</p>
+
+	<h3 id="part4_1">4.1 — Trackers overview</h3>
+	<p>
+		In AMPS, a tracker is channel-specific data that tells AMPS what to do. AMPS will interpret this data and perform the actions requested by the programmer. Trackers in concept are quite
+		simple, but internally are not very simple. AMPS aims to abstract much of this complexity, so the programmer has to worry about it as little as possible. Trackers are split into 3 types
+		of data: Tracker commands, notes, and delays. For this section, we will focus on notes and delays, and we'll dive deeper into tracker commands in <a href="#part4_2">the next part</a>.
+	</p>
+	<p>
+		AMPS uses delays to know for how long to not read from the tracker. Each channel has a stored note duration and active note duration. Together with delays, tick multipliers, and tempo
+		(sound effects ignore tempo), the note duration is calculated. Every frame, channels will decrease this timer, and if it reaches 0, the tracker is processed again. To make FM, DAC, and PSG compatible,
+		different initial values are loaded into the delay when channels are started (such as when a new music or sound effect is loaded). A delay of $00 frames is considered undefined behaviour, but the
+		engine properly supports any delays between $01 and $7F frames. Most songs will use $0C frames per beat and multiples or divisions of $0C for other delays, but any other value can also be used.
+		It is important to remember that if the tick multiplier is high and the delay value is also high, an overflow may happen, where the delay would be >$FF frames. This, in reality, will lead to a delay
+		less than the intended amount. This is considered bad practice and should be avoided.
+	</p>
+	<p>
+		AMPS uses notes as a means of representing frequency values. PSG, FM, and DAC all have different tables for defining the intended frequency based on the note, but that is rarely something the programmer
+		has to worry about. Instead, it's common to use the provided equates in <b>code/smps2asm.asm</b> as guidelines for note values. There are 12 notes per octave for each type of hardware, and they should
+		roughly sound accurate to real instruments, although it can also depend on the instrument and what kind of hardware voice is used. The programmer can decide to create their own pitch tables or even use
+		a different number of notes per octave, but this is not officially supported with AMPS. Notes go from $80 to $DF, and $80 always represents a rest, where no note will be played, but instead, the note is set
+		to decay (when applicable). Playing notes is affected by the transposition of the channel. Transposition will be added to the note value read from the tracker, so another note may actually be played. This is
+		very useful when multiple channels may share routines, or the same routine is used multiple times at different keys. It is important to keep this fact in mind, as it can be both useful and confusing.
+	</p>
+	<p>
+		There is a very specific order of operations when it comes to trackers in AMPS. First off, all commands are executed in order. Few commands will stop the tracker completely, in which case the rest of the
+		process is abandoned. However, if that does not happen, AMPS expects either a note or a delay to happen at some point. If a delay is read, the last note is used to play again. If no note was played yet,
+		the result is undefined behaviour. AMPS will also correctly remember if a rest was played. AMPS will stop reading the tracker, process the delay, and continue to do standard note-on behaviour unless a
+		hold command was played. However, if a note is played instead, AMPS will read its frequency from the appropriate table, and then check the next byte. If this byte is a delay, the delay is also read and processed.
+		There must be no other commands or notes before the delay for this to happen. Again, if no delay was ever played, this is considered undefined behaviour. AMPS will stop reading the tracker, process the delay,
+		and continue to do standard note-on behaviour unless a hold command was played. Although these three approaches may seem confusing and unnecessary, it actually helps to avoid repeating yourself and save some ROM
+		space. It may not be necessary, but it will help those who want it. More about frequencies can be read from <a href="#part4_21">part 4.2.1</a>. Below, you can see a demonstration of how this works:
+	</p>
+	<smps2asm>	<opc>dc.b</opc> <equ>nRst</equ>, <val>$0C</val>			<cmt>; play a rest note for $0C frames</cmt>
+	<opc>dc.b</opc> <equ>nE4</equ>			<cmt>; play E4 note for $0C frames</cmt>
+	<mac>saVol</mac>		<val>$04</val>		<cmt>; increase channel volume by $04</cmt>
+	<opc>dc.b</opc> <val>$06</val>			<cmt>; play E4 note for $06 frames</cmt>
+	<opc>dc.b</opc> <equ>nF4</equ>			<cmt>; play F4 note for $06 frames</cmt>
+	<mac>saVol</mac>		<val>-$04</val>		<cmt>; decrease channel volume by $04</cmt>
+	<opc>dc.b</opc> <equ>nA4</equ>, <val>$0C</val>			<cmt>; play A4 note for $0C frames</cmt></smps2asm>
+	<p>
+		A small note here is that when a DAC channel is in sample mode, instead of using the note to read from the frequency table, it instead reads the note as a sample to play. This is very useful when the channel does not
+		need to change the frequency often, and is instead primarily used to play different samples. By default, DAC channels use this mode, but the user can change it depending on preference. More about this is is explained in
+		<a href="#part4_2">the next section</a>.
+	</p>
+
+	<h3 id="part4_2">4.2 — Tracker commands</h3>
+	<p>
+		AMPS has a large variety of tracker commands. Although not all of them will be useful for every person, but they exist nonetheless to help people make music in their way. Tracker commands go from $E0 to $FF. $FF is a
+		special command, so called "meta command". This command reads another byte from tracker, to act as an extra routine. This way, there is more space for commands, at the cost of extra ROM space required. Below, I will list
+		all the tracker commands in AMPS, their numerical codes, and the parameters they use. All parameters enclosed &lt;like this&gt; are required, while parameters enclosed [like this] are optional.
+		I will also explain how each tracker command works:
+	</p>
+	<h4>$E0 — ssPan &lt;pan&gt;, [ams], [fms]</h4>
+	<p>
+		This command is used to set the YM2612 panning for the current channel. This command only works for FM and DAC channels. YM2612 uses channel panning to determine which speaker to play audio on for
+		different sound channels. There is a flaw however: Since both DAC channels and FM6 are technically the same channel for YM2612, they can only pan together. This is why, both active DAC channels or
+		their panning value together. If DAC1's panning is set to $80, and DAC 2's $40, the resulting panning value is $C0. DAC1 sound effects override the panning value for DAC1 music. Currently, panning on
+		FM6 when any DAC channel is running, is considered undefined behaviour, and is therefore disabled in safe mode.
+	</p>
+	<p>
+		The three arguments for ssPan all are used to set the panning value. Since the <a href="https://www.smspower.org/maxim/Documents/YM2612#regb4">panning register is shared with the AMS/FMS data</a> for LFO,
+		you can set both using this command. However, if LFO is not enabled by the tracker, setting AMS/FMS values is considered undefined behaviour. The <b>&lt;pan&gt;</b> parameter can be used to either only set
+		the panning values, or the entire byte. <b>[ams]</b> and <b>[fms]</b> can also be used to set the AMS/FMS values too. They're shifted in place correctly. Below is a table of pre-defined equates for panning values:
+	</p>
+	<ul>
+		<li><b>$00, spNone</b> — Sets panning to neither speaker. This effectively mutes the channel. However, setting DAC2 music channel to panned to neither is actually recommended. Using DAC1, it is then possible to
+			pan the channel in the appropriate speaker at any time.</li>
+		<li><b>$40, spRight</b> — Sets panning to the right speaker.</li>
+		<li><b>$80, spLeft</b> — Sets panning to the left speaker.</li>
+		<li><b>$C0, spCentre</b> — Sets panning to both of the speakers, effectively making it centered.</li>
+		<li><b>$C0, spCenter</b> — Silly americans =U</li>
+	</ul>
+	<h4>$E1 — ssDetune &lt;val&gt;</h4>
+	<p>
+		Sets the channel detune to <b>&lt;val&gt;</b>. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a>
+	</p>
+	<h4>$E2 — saDetune &lt;val&gt;</h4>
+	<p>
+		Adds <b>&lt;val&gt;</b> to the channel detune. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a>
+	</p>
+	<h4>$E3 — ssTranspose &lt;val&gt;</h4>
+	<p>
+		Sets the channel pitch to <b>&lt;val&gt;</b>. Pitch is used to change which votes are played, adding channel pitch to the note being played. This is very useful when you want to share routines
+		between FM, PSG and DAC, or for reusing the routine but just transposed.
+	</p>
+	<h4>$E4 — saTranspose &lt;val&gt;</h4>
+	<p>
+		Adds <b>&lt;val&gt;</b> to the channel pitch. Pitch is used to change which votes are played, adding channel pitch to the note being played. This is very useful when you want to share routines
+		between FM, PSG and DAC, or for reusing the routine but just transposed.
+	</p>
+	<h4>$E5 — ssTickMulCh &lt;val&gt;</h4>
+	<p>
+		Sets channel tick multiplier to <b>&lt;val&gt;</b>. Tick multiplier is used to multiply the delay read from tracker by the tick multiplier value. This is used for some songs.
+		<a href="#part4_1">See the previous part for more details</a>.
+	</p>
+	<h4>$E6 — ssTickMul &lt;val&gt;</h4>
+	<p>
+		Sets tick multiplier for every channel to <b>&lt;val&gt;</b>. Tick multiplier is used to multiply the delay read from tracker by the tick multiplier value. This is used for some songs.
+		<a href="#part4_1">See the previous part for more details</a>.
+	</p>
+	<h4>$E7 — sHold</h4>
+	<p>
+		Toggles the channels hold flag. The hold flag prevents AMPS from processing the normal note on/note off behaviour and resetting internal flags, for example, modulation.
+		The result is that the sound will continue uninterrupted, but you can also add extra tracker commands or delay to your notes. This allows delays longer than $100 frames to be set in
+		the tracker as if it was a continuous note. If you play another note the frequency will be updated but note will not be restarted.
+	</p>
+	<h4>$E8 — sVoice &lt;val&gt;</h4>
+	<p>
+		Sets FM voice to &lt;val&gt; or DAC sample to &lt;val&gt;. Using this command on a PSG channel is considered undefined behaviour. Additionally, using this command on a DAC channel when
+		pitch mode is enabled is considered undefined behaviour. Read more about how FM voices work at <a href="#part4_4">part 4.4.</a>
+	</p>
+	<h4>$E9 — ssTempoShoes &lt;tempo&gt;</h4>
+	<p>
+		Sets the speed shoes tempo to <b>&lt;tempo&gt;</b>. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>.
+	</p>
+	<h4>$EA — ssTempo &lt;tempo&gt;</h4>
+	<p>
+		Sets the normal tempo to <b>&lt;tempo&gt;</b>. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>.
+	</p>
+	<h4>$EB — sModeSampDAC</h4>
+	<p>
+		Sets the channel mode to sample mode. Using this command on a FM or PSG channel is considered undefined behaviour. Sample mode makes it so that each note read is treated as a sample
+		instead of a note. This way, you can easily play different samples in quick succession. This mode is most useful when you want to play multiple different samples at the same pitch.
+		You can use <b>ssFreq</b> and <b>ssFreqNote</b> to change the pitch of samples.
+	</p>
+	<h4>$EC — sModePitchDAC</h4>
+	<p>
+		Sets the channel mode to pitch mode. Using this command on a FM or PSG channel is considered undefined behaviour. Pitch mode makes it so that each note read is treated as a note
+		instead of a sample. This way, you can easily play different samples at different pitches. This mode is most useful when you want to play samples many times at different pitches,
+		or you want to play most of your samples at varying pitches. You can use <b>sVoice</b> to change the samples you are playing.
+	</p>
+	<h4>$ED — saVol &lt;vol&gt;</h4>
+	<p>
+		Adds <b>&lt;vol&gt;</b> to the channel volume. AMPS will update the channel volume at the end of the channel update process. <a href="#part6">You can read more about how volume works here.</a>
+	</p>
+	<h4>$EE — ssVol &lt;vol&gt;</h4>
+	<p>
+		Sets the channel volume to <b>&lt;vol&gt;</b>. AMPS will update the channel volume at the end of the channel update process. <a href="#part6">You can read more about how volume works here.</a>
+	</p>
+	<h4>$EF — ssLFO &lt;reg&gt; &lt;ams&gt; [fms] [pan]</h4>
+	<p>
+		Enables LFO and sets up AMS, FMS and enable bits for the channel. LFO is a YM2612 effect that changes the volume and frequency of the sound being generated. Unlike software effects, LFO
+		can change volume and frequency many times a frame, with some values sounding much like shouting into a spinning fan. LFO speed settings are global for each channel, but every channel can
+		define how strongly they are affected. Changing the global settings while multiple channels have LFO enabled affects each channel. The &lt;reg&gt; parameter is used to control which operators
+		to enable AMS for, <a href="https://www.smspower.org/maxim/Documents/YM2612#reg22">and the LFO frequency</a>. See the table below:
+	</p>
+	<table border="1">
+		<tr><td>bit</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+		<tr><td>val</td><td>$80</td><td>$40</td><td>$20</td><td>$10</td><td>$08</td><td>$04</td><td>$02</td><td>$01</td></tr>
+		<tr><td>use</td><td>Enable op 1</td><td>Enable op 3</td><td>Enable op 2</td><td>Enable op 4</td><td>Enable LFO</td><td colspan="4">LFO Frequency</td></tr>
+	</table>
+	<p>
+		The &lt;ams&gt;, [fms] and [pan] parameters can be used together to define the <a href="https://www.smspower.org/maxim/Documents/YM2612#regb4">AMS and FMS sensitivity, and channel panning</a>.
+		The &lt;ams&gt; parameter can be used to set the entire byte value, or only the AMS sensitivity. &lt;ams&gt; [fms] are shifted in the correct places when the &lt;ams&gt; parameter is not used alone,
+		and [pan] parameter expects normal values for it. Below is a table of pre-defined equate values for panning:
+	</p>
+	<ul>
+		<li><b>$00, spNone</b> — Sets panning to neither speaker. This effectively mutes the channel. However, setting DAC2 music channel to panned to neither is actually recommended. Using DAC1, it is then possible to
+			pan the channel in the appropriate speaker at any time.</li>
+		<li><b>$40, spRight</b> — Sets panning to the right speaker.</li>
+		<li><b>$80, spLeft</b> — Sets panning to the left speaker.</li>
+		<li><b>$C0, spCentre</b> — Sets panning to both of the speakers, effectively making it centered.</li>
+		<li><b>$C0, spCenter</b> — Silly americans =U</li>
+	</ul>
+	<h4>$F0 — ssMod68k &lt;wait&gt; &lt;speed&gt; &lt;step&gt; &lt;count&gt;</h4>
+	<p>
+		Initializes software frequency modulation. Modulation is useful for creating an effect where frequency moves up and/or down repeatedly, which can be used either for detuning on instruments or for
+		custom effects. They are often used for sound effects to make them sound interesting, realistic or fun. They are also use in music to create bigger immersion. Modulation in AMPS is slightly different
+		from SMPS games, but in general it works similarly. The &lt;wait&gt; parameter delays the start of the modulation by that number of frames, where 0 frames means it starts immediately. &lt;speed&gt; is
+		the number of frames to delay until the next step is executed. 0 frames is considered undefined behaviour. &lt;step&gt; is the frequency offset per step. Values are sign extended, so anything above $7F
+		is a negative value. The resulting frequency offset is 16-bit and can also be negative. &lt;count&gt; is the number of steps to perform before negating the &lt;step&gt; parameter. 0 steps will behave as
+		$100 steps. For a more in-depth explanation of the algorithm, <a href="#part4_21">see the next part</a>.
+	</p>
+	<h4>$F1 — ssPortamento &lt;speed&gt;</h4>
+	<p>
+		Sets the portamento speed to <b>&lt;speed&gt;</b> frames, where 0 frames disables the effect. Portamento is an effect where the frequency of the previous note is blended smoothly with the current note. This makes
+		the note rise or fall smoothly until the frequency of the next note is met. The <b>&lt;speed&gt;</b> parameter is used to control how long this transition takes. A speed of $01 means there is 1 frame where the
+		note is transitioning to the next. In that example, the frequency will be in the middle of the 2 notes. Portamento only occurs when the next note is played, and therefore will delay the notes slightly. This also
+		affects note on/off behaviour, which will happen whenever the note is played rather than when it transitions. This can be worked around with the sHold tracker command or by creating complex tracker code to execute
+		the note-on when you want it to happen. This is usually not noticeable enough to matter however. Additionally, since FM frequency ranges overlap somewhat, AMPS accounts for this by skipping them.
+	</p>
+	<h4>$F2 — sVolEnv &lt;env&gt;</h4>
+	<p>
+		Sets the channel volume envelope to <b>&lt;env&gt;</b>. Volume envelopes are used to change the volume of a channel per frame, reading from a list. This is particularly useful for PSG channels, since they do not
+		inherently have any capability to change the volume in a meaningful way otherwise. However, if FEATURE_DACFMVOLENV is enabled, DAC and FM channels can also use this functionality. More about volume envelopes in
+		<a href="#part6_1">part 6.1</a>.
+	</p>
+	<h4>$F3 — sModEnv &lt;env&gt;</h4>
+	<p>
+		Sets the channel modulation envelope to <b>&lt;env&gt;</b>. Modulation envelopes are used to change the frequency of a channel per frame, reading from a list. This works similarly to volume enveloes, but has some
+		differences as well. SMPS games have used this feature to create more dynamic sounding instruments. HThis feature is only available when FEATURE_MODENV is enabled. More about modulation envelopes in
+		<a href="#part4_21">part 4.2.1</a>.
+	</p>
+	<h4>$F4 — sCont &lt;loc&gt;</h4>
+	<p>
+		Is used to make continuous sound effects work. Playing a continuous sound effect multiple times does not restart the sound effect, but instead make it continue for longer time. This makes it so that the
+		sound effect can loop smoothly, and yet can be extended as necessary. This command allows continuous sound effects to check if the sound effect was played again, and if so, jump back to <b>&lt;loc&gt;</b>
+		in tracker code. AMPS assumes that every sound effect channel will loop, so not looping every sound effect channel is considered undefined behaviour, though most of the time some channels will loop more times
+		than others. If you do not wish a channel to play any sound after some time, loop them inside a bunch of rest notes. Additionally, all the channels should loop at the exact same tick.
+	</p>
+	<h4>$F5 — sStop</h4>
+	<p>
+		Will stop the current tracker from running, and release all the resources needed by the channel. Additionally, when sound effect channels are stopped, the music channels they were interrupting are correct restored.
+		After this command, no tracker code will be executed.
+	</p>
+	<h4>$F6 — sJump &lt;loc&gt;</h4>
+	<p>
+		Sets the tracker address to be at <b>&lt;loc&gt;</b>. After this command, all tracker code is read starting from <b>&lt;loc&gt;</b>.
+	</p>
+	<h4>$F7 — sLoop &lt;index&gt; &lt;loops&gt; &lt;loc&gt;</h4>
+	<p>
+		Creates a loop between the command and the address at <b>&lt;loc&gt;</b>. This loop will be executed for <b>&lt;loops&gt;</b> times. Due to technical reasons, <b>&lt;loops&gt;</b> must be 2 or greater.
+		Finally, the <b>&lt;index&gt;</b> parameter is used to identify which loop is being used. AMPS supports 3 different loop indexes, primarily used for multiple loops inside of each other. Here is a list of
+		how the loop indexes are available for different channels:
+	</p>
+	<ul>
+		<li><b>$00</b> — Always available.</li>
+		<li><b>$01</b> — Available for every channel except PSG3, if FEATURE_DACFMVOLENV is disabled.</li>
+		<li><b>$02</b> — Available only for music channels.</li>
+	</ul>
+	<h4>$F8 — sCall &lt;loc&gt;</h4>
+	<p>
+		Is used to temporarily run another routine, while remembering the last location we were in. The tracker address at <b>&lt;loc&gt;</b> is jumped to, while the location of the next tracker command at the previous
+		address is saved to a stack. This allows us to run another routine, or even multiple other routines, before eventually returning back to the original routine. The sRet command is used to return back a level in the stack.
+		This command is very useful for general routines that you may want to reuse multiple times, or even between multiple different trackers. By default, 3 different routines can be called before the stack runs out of space.
+		This command is not available for sound effect channels, and attempting to use it will result in undefined behaviour.
+	</p>
+	<h4>$F9 — sRet</h4>
+	<p>
+		Is used to return from a routine called by sCall. This immediately returns to the next tracker code after the corresponding sCall command. If there are no calls present in the stack, the operation is invalid and results
+		in undefined behaviour. This command is not available for sound effect channels, and attempting to use it will result in undefined behaviour.
+	</p>
+	<h4>$FA — sComm &lt;index&gt; &lt;val&gt;</h4>
+	<p>
+		Sets the communications byte <b>&lt;index&gt;</b> to <b>&lt;val&gt;</b>. Since by default AMPS only supports 8 communications bytes, using indexes higher than that will result in undefined behaviour.
+		If you extend the number of available communications bytes, then they may be used. Read more about communications bytes in <a href="#part5">part 5</a>.
+	</p>
+	<h4>$FB — sCond &lt;index&gt; &lt;cond&gt; &lt;val&gt;</h4>
+	<p>
+		Checks the value of communications byte <b>&lt;index&gt;</b> against <b>&lt;val&gt;</b>. The command reads the byte at <b>&lt;index&gt;</b>, compares its value to <b>&lt;val&gt;</b>, and then uses
+		<b>&lt;cond&gt;</b> to decide whether to set condition mode to false. When condition is false, execution of some tracker commands is disabled. To read more about this, see <a href="#part5">part 5</a>.
+		Below is a table of all valid conditions:
+	</p>
+	<ul>
+		<li><b>$00, dcoT</b> — Sets condition to true regardless.</li>
+		<li><b>$01, dcoF</b> — Sets condition to false regardless.</li>
+		<li><b>$02, dcoHI</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than the communications value. This is an unsigned comparison.</li>
+		<li><b>$03, dcoLS</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than the communications value. This is an unsigned comparison.</li>
+		<li><b>$04, dcoHS</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than or equal as the communications value. This is an unsigned comparison.</li>
+		<li><b>$04, dcoCC</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in carry being clear.</li>
+		<li><b>$05, dcoLO</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than or equal as the communications value. This is an unsigned comparison.</li>
+		<li><b>$05, dcoCS</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in carry being set.</li>
+		<li><b>$06, dcoNE</b> — Sets condition to true, if <b>&lt;val&gt;</b> does not equal the communications value.</li>
+		<li><b>$07, dcoEQ</b> — Sets condition to true, if <b>&lt;val&gt;</b> does equal the communications value.</li>
+		<li><b>$08, dcoVC</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in overflow being clear.</li>
+		<li><b>$09, dcoVS</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in overflow being set.</li>
+		<li><b>$0A, dcoPL</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in a positive value.</li>
+		<li><b>$0B, dcoMI</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in a negative value.</li>
+		<li><b>$0C, dcoGE</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than or equal as the communications value. This is a signed comparison.</li>
+		<li><b>$0D, dcoLT</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than the communications value. This is a signed comparison.</li>
+		<li><b>$0E, dcoGT</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than the communications value. This is a signed comparison.</li>
+		<li><b>$0F, dcoLE</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than or equal as the communications value. This is a signed comparison.</li>
+	</ul>
+	<h4>$FC — sCondOff</h4>
+	<p>
+		Sets condition to true.
+	</p>
+	<h4>$FD — sGate &lt;frames&gt;</h4>
+	<p>
+		Sets the game timeout to <b>&lt;frames&gt;</b>. Value of 0 disables this effect. Gate cuts the sound out after a specific number of frames (not ticks!), commencing regular note off behaviour for
+		the channel. This is very useful when you have a lot of notes that should stop few frames/ticks before the actual note length. Instead of placing a bunch of notes with delays, and rests with delays,
+		you can optimize it to use sGate instead. Not only is this faster, but also more space-efficient. This command is not available for sound effects, and trying to use it is considered undefined behaviour.
+	</p>
+	<h4>$FE — sCmdYM &lt;reg&gt; &lt;val&gt;</h4>
+	<p>
+		Sends an YM command into YM2612. This command allows you to send any arbitrary YM2612 commands from the tracker. This command is somewhat dangerous as you can accidentally mess up something, so being extra
+		careful is warranted. Additionally, your changes will NOT be saved, so if you use this in a channel that can be interrupted by sound effects, by the time it is no longer interrupted, the changes you've made
+		are lost forever. This is why you should make only non-essential changes for these FM channels. The <b>&lt;reg&gt;</b> parameter is used to choose the YM2612 register to write to, while <b>&lt;val&gt;</b> is
+		loaded into it. For channel-specific registers, the channel type is also added into it, so you can always get the correct register you want. This happens for registers $30 to $A7 and $A8 tp $FF. Attempting to
+		write to another channels registers is considered undefined behaviour. Additionally, using this command from DAC and PSG channels are considered undefined behaviour. For a breakdown of what each registers does,
+		<a href="https://www.smspower.org/maxim/Documents/YM2612">read this page</a>.
+	</p>
+	<h4>$FF — META</h4>
+	<p>
+		Reads the next byte from the tracker, and calls the following list of commands by that byte. The values are always multiples of 4 to make the code faster.
+	</p>
+	<h4>$FF $00 — sModOn</h4>
+	<p>
+		Enables modulation. Unless modulation was initialized before using ssMod68k, using this command is considered undefined behaviour.
+	</p>
+	<h4>$FF $04 — sModOff</h4>
+	<p>
+		Disables modulation. The modulation data is still remembered, but no modulation will take place until it is enabled again.
+	</p>
+	<h4>$FF $08 — ssFreq &lt;freq&gt;</h4>
+	<p>
+		Sets the channel frequency to 16-bit value <b>&lt;freq&gt;</b>. This is only useful when a DAC channel is in sample mode, where you can use this command to set the precise frequency of the channel.
+		In any other case, using this command is considered undefined behaviour.
+	</p>
+	<h4>$FF $0C — ssFreqNote &lt;note&gt;</h4>
+	<p>
+		Sets the channel frequency to the frequency represented by <b>&lt;note&gt;</b>. Channel pitch also is added to <b>&lt;note&gt;</b>. This is only useful when a DAC channel is in sample mode, where you
+		can use this command to set the precise frequency of the channel. In any other case, using this command is considered undefined behaviour.
+	</p>
+	<h4>$FF $10 — sSpinRev</h4>
+	<p>
+		Increases spindash counter by 1, and adds the counter value to the pitch of the channel. Only really useful for making the spindash rev sound effect work.
+	</p>
+	<h4>$FF $14 — sSpinReset</h4>
+	<p>
+		Resets spindash counter. This is used by the spindash sound effect, and various other sound effects to reset the rev counter. This makes it behave like Sonic games.
+		Really useful for making the spindash rev sound effect work.
+	</p>
+	<h4>$FF $18 — saTempoShoes &lt;tempo&gt;</h4>
+	<p>
+		Adds <b>&lt;tempo&gt;</b> the speed shoes tempo. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>.
+	</p>
+	<h4>$FF $1C — saTempo &lt;tempo&gt;</h4>
+	<p>
+		Sets <b>&lt;tempo&gt;</b> to the normal tempo. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>.
+	</p>
+	<h4>$FF $20 — sCondReg &lt;off&gt; &lt;cond&gt; &lt;val&gt;</h4>
+	<p>
+		Checks the value of a RAM address indexed from a table (dcCondRegTable) at <b>&lt;off&gt;</b> against <b>&lt;val&gt;</b>. The command reads the byte at <b>&lt;index&gt;</b>, compares its
+		value to <b>&lt;val&gt;</b>, and then uses <b>&lt;cond&gt;</b> to decide whether to set condition mode to false. When condition is false, execution of some tracker commands is disabled.
+		To read more about this, see <a href="#part5">part 5</a>. Below is a table of all valid conditions:
+	</p>
+	<ul>
+		<li><b>$00, dcoT</b> — Sets condition to true regardless.</li>
+		<li><b>$01, dcoF</b> — Sets condition to false regardless.</li>
+		<li><b>$02, dcoHI</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than the communications value. This is an unsigned comparison.</li>
+		<li><b>$03, dcoLS</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than the communications value. This is an unsigned comparison.</li>
+		<li><b>$04, dcoHS</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than or equal as the communications value. This is an unsigned comparison.</li>
+		<li><b>$04, dcoCC</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in carry being clear.</li>
+		<li><b>$05, dcoLO</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than or equal as the communications value. This is an unsigned comparison.</li>
+		<li><b>$05, dcoCS</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in carry being set.</li>
+		<li><b>$06, dcoNE</b> — Sets condition to true, if <b>&lt;val&gt;</b> does not equal the communications value.</li>
+		<li><b>$07, dcoEQ</b> — Sets condition to true, if <b>&lt;val&gt;</b> does equal the communications value.</li>
+		<li><b>$08, dcoVC</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in overflow being clear.</li>
+		<li><b>$09, dcoVS</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in overflow being set.</li>
+		<li><b>$0A, dcoPL</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in a positive value.</li>
+		<li><b>$0B, dcoMI</b> — Sets condition to true, when subtracting <b>&lt;val&gt;</b> from the communications value results in a negative value.</li>
+		<li><b>$0C, dcoGE</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than or equal as the communications value. This is a signed comparison.</li>
+		<li><b>$0D, dcoLT</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than the communications value. This is a signed comparison.</li>
+		<li><b>$0E, dcoGT</b> — Sets condition to true, if <b>&lt;val&gt;</b> is greater than the communications value. This is a signed comparison.</li>
+		<li><b>$0F, dcoLE</b> — Sets condition to true, if <b>&lt;val&gt;</b> is lower than or equal as the communications value. This is a signed comparison.</li>
+	</ul>
+	<h4>$FF $24 — sPlayMus &lt;id&gt;</h4>
+	<p>
+		Is used to play sound effects from tracker. The sound effect <b>&lt;id&gt;</b> will be placed in the first queue slot. Unless it is overridden before the next frame, it will be played.
+	</p>
+	<h4>$FF $28 — sFreqOn</h4>
+	<p>
+		Not implemented.
+	</p>
+	<h4>$FF $2C — sFreqOff</h4>
+	<p>
+		Not implemented.
+	</p>
+	<h4>$FF $30 — sSpecFM3</h4>
+	<p>
+		Not implemented.
+	</p>
+	<h4>$FF $34 — ssFilter &lt;bank&gt;</h4>
+	<p>
+		Sets the Dual PCM volume filter bank address to <b>&lt;bank&gt;</b>. Volume filters allow PCM to sound different by replacing actual PCM values with values from the volume table. Each volume
+		filter is $8000 bytes, where there are $80 volume levels with $100 possible values for each (for 8-bit PCM audio). By default, AMPS uses the logarithmic volume filter. Warning: AMPS has no logic
+		to change volume filters by itself, and can only do using this command. This means, any sound effects or song changes may break things. Use this command with caution.
+	</p>
+	<h4>$FF $38 — sBackup</h4>
+	<p>
+		Stops the current music from playing, and if a song was backed up, loads it instead and start a fade in. When a song that enables the back-up flag is played, AMPS moves the old song data into
+		another memory location before loading the song in. sBackup does the opposite, loading the song data from the memory location into active channel memory. It also initializes the hardware to continue
+		correctly from where it left off. Fade in is done to make the transition easier, and to hide some of the sound oddities that can happen whenever this is done. Backing up songs is very useful when
+		you have temporary songs that need to play, such as the 1UP music from Sonic games. This is only available if FEATURE_BACKUP is enabled. Otherwise, it is considered undefined behaviour.
+	</p>
+	<h4>$FF $3C — sNoisePSG &lt;val&gt;</h4>
+	<p>
+		Is used to set the PSG4 noise mode. PSG4 noise is useful for creating hi-hat-like effects. There are additional modes that generate different kind of noise. The command sends the PSG command
+		<b>&lt;val&gt;</b> into the PSG, and sets the channel mode to PSG4, muting PSG3. Additionally, using value 0 disables this effect and restores the channel to PSG3. This is only valid for PSG3
+		and PSG3 SFX channels.
+	</p>
+	<h4>$FF $40 — sFreeze</h4>
+	<p>
+		Freezes the 68k whenever this tracker command is read. It will also allow you to step over the instruction into an rts. This is very useful for debugging the 68k code at the specific position.
+		Only available in safe mode, it is ignored in normal mode.
+	</p>
+	<h4>$FF $44 — sCheck</h4>
+	<p>
+		When the entire sound driver has executed, it will bring up the debugger and show various statistics about AMPS. Useful for debugging something possibly going wrong with the sound effects, music, other
+		aspects of AMPS, or the programming itself. Only available in safe mode, it is ignored in normal mode.
+	</p>
+
+	<h3 id="part4_21">4.2.1 — Modulation</h3>
+
+	<h3 id="part4_3">4.3 — SN76496</h3>
+
+	<h3 id="part4_4">4.4 — YM2612</h3>
+
+	<h3 id="part4_5">4.5 — Dual PCM</h3>
+
+	<h1 id="part5">5 — Communication bytes</h1>
+
+	<h1 id="part6">6 — Volume control</h1>
+
+	<h3 id="part6_1">6.1 — Channel volumes</h3>
+
+	<h3 id="part6_2">6.2 — Volume fading</h3>
+
+	<h1 id="part7">7 — Memory map</h1>
+
+	<h1 id="part8">8 — Creating custom music</h1>
+
+	<h1 id="part9">9 — Porting music</h1>
+
+	<h1 id="part10">10 — Installing AMPS</h1>
+
+</body>
+</html>

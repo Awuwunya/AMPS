@@ -275,16 +275,16 @@ mfbPaused =	$07		; if set, sound driver is paused
 ; ---------------------------------------------------------------------------
 
 	rsset 1
-Mus_Reset	rs.b 1		; reset underwater and speed shoes flags, update volume
-Mus_FadeOut	rs.b 1		; initialize a music fade out
-Mus_Stop	rs.b 1		; stop all music
-Mus_ShoesOn	rs.b 1		; enable speed shoes mode
-Mus_ShoesOff	rs.b 1		; disable speed shoes mode
-Mus_ToWater	rs.b 1		; enable underwater mode
-Mus_OutWater	rs.b 1		; disable underwater mode
-Mus_Pause	rs.b 1		; pause the music
-Mus_Unpause	rs.b 1		; unpause the music
-Mus_StopSFX	rs.b 1		; stop all sfx
+mus_Reset	rs.b 1		; reset underwater and speed shoes flags, update volume
+mus_FadeOut	rs.b 1		; initialize a music fade out
+mus_Stop	rs.b 1		; stop all music
+mus_ShoesOn	rs.b 1		; enable speed shoes mode
+mus_ShoesOff	rs.b 1		; disable speed shoes mode
+mus_ToWater	rs.b 1		; enable underwater mode
+mus_OutWater	rs.b 1		; disable underwater mode
+mus_Pause	rs.b 1		; pause the music
+mus_Unpause	rs.b 1		; unpause the music
+mus_StopSFX	rs.b 1		; stop all sfx
 MusOff		rs.b 0		; first music ID
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

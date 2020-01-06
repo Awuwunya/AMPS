@@ -327,23 +327,23 @@ sVoice		macro val
     endm
 
 ; F2xx - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
-sVolEnv		macro val
-	dc.b $F2, \val
+sVolEnv		macro env
+	dc.b $F2, \env
     endm
 
 ; F3xx - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
-sModEnv		macro val
-	dc.b $F3, \val
+sModEnv		macro env
+	dc.b $F3, \env
     endm
 
 ; E9xx - Set music speed shoes tempo to xx (TEMPO - TEMPO_SET_SPEED)
-ssTempoShoes	macro val
-	dc.b $E9, \val
+ssTempoShoes	macro tempo
+	dc.b $E9, \tempo
     endm
 
 ; EAxx - Set music tempo to xx (TEMPO - TEMPO_SET)
-ssTempo		macro val
-	dc.b $EA, \val
+ssTempo		macro tempo
+	dc.b $EA, \tempo
     endm
 
 ; FF18xx - Add xx to music speed tempo (TEMPO - TEMPO_ADD_SPEED)
@@ -459,13 +459,13 @@ sRet		macro
     endm
 
 ; FAyyxx - Set communications byte yy to xx (SET_COMM - SPECIAL)
-sComm		macro num, val
-	dc.b $FA, \num,\val
+sComm		macro index, val
+	dc.b $FA, \index,\val
     endm
 
 ; FBxyzz - Get communications byte y, and compare zz with it using condition x (COMM_CONDITION)
-sCond		macro num, cond, val
-	dc.b $FB, \num|(\cond<<4),\val
+sCond		macro index, cond, val
+	dc.b $FB, \index|(\cond<<4),\val
     endm
 
 ; FC - Reset condition (COMM_RESET)
@@ -474,8 +474,8 @@ sCondOff	macro
     endm
 
 ; FDxx - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL)
-sGate		macro val
-	dc.b $FD, \val
+sGate		macro frames
+	dc.b $FD, \frames
     endm
 
 ; FExxyy - YM command yy on register xx (YMCMD)
@@ -515,19 +515,19 @@ sPlayMus	macro id
     endm
 
 ; FF28 - Enable raw frequency mode (RAW_FREQ)
-sFreqOn		macro freq
+sFreqOn		macro
 	dc.b $FF,$28
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
 ; FF2C - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
-sFreqOff	macro freq
+sFreqOff	macro
 	dc.b $FF,$2C
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
 
 ; FF30 - Enable FM3 special mode (SPC_FM3)
-sSpecFM3	macro freq
+sSpecFM3	macro
 	dc.b $FF,$30
 	inform 3,"Flag is currently not implemented! Please remove."
     endm
@@ -560,3 +560,4 @@ sCheck		macro
 		dc.b $FF,$44
 	endif
     endm
+
