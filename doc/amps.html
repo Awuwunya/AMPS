@@ -1,6 +1,178 @@
 <html>
 <head>
 	<title>AMPS v2.0 TECHNICAL DOCUMENTATION</title>
+	<script>
+		const chantbl = [
+			{ size: 1, align: 1, name: "cFlags", },
+			{ size: 1, align: 1, name: "cType", },
+			{ size: 4, align: 2, name: "cData", },
+			{ size: 0, align: 1, name: "cEnvPos", cno: 0x10, },
+			{ size: 0, align: 1, name: "cStatPSG4", cyes: 0x10, },
+			{ size: 1, align: 1, name: "cPanning", },
+			{ size: 1, align: 1, name: "cDetune", },
+			{ size: 1, align: 1, name: "cPitch", },
+			{ size: 1, align: 1, name: "cVolume", },
+			{ size: 1, align: 1, name: "cTick", },
+			{ size: 0, align: 1, name: "cVolEnv", cno: 0x10, },
+			{ size: 0, align: 1, name: "cSample", },
+			{ size: 1, align: 1, name: "cVoice", },
+			{ size: 1, align: 1, name: "cDuration", },
+			{ size: 1, align: 1, name: "cLastDur", },
+			{ size: 2, align: 2, name: "cFreq", },
+
+			{ size: 0, align: 2, name: "cModDelay", cyes: 0x02, },
+			{ size: 4, align: 2, name: "cMod", cyes: 0x02, },
+			{ size: 2, align: 2, name: "cModFreq", cyes: 0x02, },
+			{ size: 1, align: 1, name: "cModSpeed", cyes: 0x02, },
+			{ size: 1, align: 1, name: "cModStep", cyes: 0x02, },
+			{ size: 1, align: 1, name: "cModCount", cyes: 0x02, },
+
+			{ size: 1, align: 1, name: "cPortaSpeed", cyes: 0x04, },
+			{ size: 2, align: 2, name: "cPortaFreq", cyes: 0x04, },
+			{ size: 2, align: 2, name: "cPortaDisp", cyes: 0x04, },
+
+			{ size: 1, align: 1, name: "cVolEnv", cyes: 0x10, },
+			{ size: 1, align: 1, name: "cEnvPos", cyes: 0x10, },
+
+			{ size: 1, align: 1, name: "cModEnv", cyes: 0x08, },
+			{ size: 1, align: 1, name: "cModEnvPos", cyes: 0x08, },
+			{ size: 1, align: 1, name: "cModEnvSens", cyes: 0x08, },
+
+			{ size: 3, align: 1, name: "cLoop", },
+			{ size: 1, align: 2, name: "cStatPSG4", offset: -2, cno: 0x10, },
+			{ size: 1, align: 2, name: "cPrio", offset: -1, },
+			{ size: 0, align: 2, name: "cSizeSFX", save: -2, },
+
+			{ size: 1, align: 1, name: "cGateCur", },
+			{ size: 1, align: 1, name: "cGateMain", },
+			{ size: 1, align: 1, name: "cStack", },
+			{ size:12, align: 2, name: "", },
+			{ size: 0, align: 2, name: "cSize", save: -1, },
+		];
+
+		const ramtbl = [
+			{ size: 1, align: 1, name: "mFlags", },
+			{ size: 1, align: 1, name: "mCtrPal", },
+			{ size: 8, align: 1, name: "mComm", },
+			{ size: 0, align: 2, name: "mMasterVolFM", },
+			{ size: 4, align: 2, name: "mFadeAddr", },
+			{ size: 1, align: 1, name: "mTempoMain", },
+			{ size: 1, align: 1, name: "mTempoSpeed", },
+			{ size: 1, align: 1, name: "mTempo", },
+			{ size: 1, align: 1, name: "mTempoCur", },
+			{ size: 3, align: 1, name: "mQueue", },
+			{ size: 1, align: 1, name: "mMasterVolPSG", },
+			{ size: 4, align: 2, name: "mVctMus", },
+			{ size: 1, align: 1, name: "mMasterVolDAC", },
+			{ size: 1, align: 1, name: "mSpindash", },
+			{ size: 1, align: 1, name: "mContCtr", },
+			{ size: 1, align: 1, name: "mContLast", },
+			{ size: 1, align: 1, name: "mLastCue", },
+
+			{ size: 0, align: 2, name: "mBackUpArea", },
+			{ size: -1, align: 2, name: "mDAC1", },
+			{ size: -1, align: 2, name: "mDAC2", },
+			{ size: -1, align: 2, name: "mFM1", },
+			{ size: -1, align: 2, name: "mFM2", },
+			{ size: -1, align: 2, name: "mFM3", },
+			{ size: -1, align: 2, name: "mFM4", },
+			{ size: -1, align: 2, name: "mFM5", },
+			{ size: -1, align: 2, name: "mFM6", cyes: 0x40, },
+			{ size: -1, align: 2, name: "mPSG1", },
+			{ size: -1, align: 2, name: "mPSG2", },
+			{ size: -1, align: 2, name: "mPSG3", },
+
+			{ size: -2, align: 2, name: "mSFXDAC1", },
+			{ size: -2, align: 2, name: "mSFXFM3", },
+			{ size: -2, align: 2, name: "mSFXFM4", },
+			{ size: -2, align: 2, name: "mSFXFM5", },
+			{ size: -2, align: 2, name: "mSFXPSG1", },
+			{ size: -2, align: 2, name: "mSFXPSG2", },
+			{ size: -2, align: 2, name: "mSFXPSG3", },
+			{ size: 0, align: 2, name: "mChannelEnd", },
+
+			{ size: 0, align: 2, name: "mBackUpLoc", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackDAC1", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackDAC2", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackFM1", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackFM2", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackFM3", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackFM4", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackFM5", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackFM6", cyes: 0x60, },
+			{ size: -1, align: 2, name: "mBackPSG1", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackPSG2", cyes: 0x20, },
+			{ size: -1, align: 2, name: "mBackPSG3", cyes: 0x20, },
+
+			{ size: 1, align: 1, name: "mBackTempoMain", cyes: 0x20, },
+			{ size: 1, align: 1, name: "mBackTempoSpeed", cyes: 0x20, },
+			{ size: 1, align: 1, name: "mBackTempo", cyes: 0x20, },
+			{ size: 1, align: 1, name: "mBackTempoCur", cyes: 0x20, },
+			{ size: 4, align: 2, name: "mBackVctMus", cyes: 0x20, },
+
+			{ size: 1, align: 1, name: "msChktracker", cyes: 0x01, },
+			{ size: 0, align: 2, name: "mSize", },
+		];
+
+		var sizes = Array(2), mode = 0;
+
+		function refRAM() {
+			mode = document.getElementById("mdsafe").checked * 0x01;
+			mode |= document.getElementById("mdmod").checked * 0x02;
+			mode |= document.getElementById("mdport").checked * 0x04;
+			mode |= document.getElementById("mdmenv").checked * 0x08;
+			mode |= document.getElementById("mdvenvdf").checked * 0x10;
+			mode |= document.getElementById("mdbackup").checked * 0x20;
+			mode |= document.getElementById("mdfm6").checked * 0x40;
+
+			let sizes = Array(2);
+			let def = `
+				<tr>
+					<td>offset</td><td>length</td><td>equate</td>
+				</tr>
+			`;
+
+			document.getElementById("chantable").innerHTML = def + procRAM(chantbl);
+			document.getElementById("ramtable").innerHTML = def + procRAM(ramtbl);
+		}
+
+		function procRAM(tbl) {
+			let data = "", pos = 0;
+
+			for(e of tbl) {
+				if(e.cyes && (mode & e.cyes) != e.cyes)
+					continue;
+
+				if(e.cno && (mode & e.cno) != 0)
+					continue;
+
+				if(e.align && pos % e.align != 0){
+					pos += e.align - (pos % e.align);
+				}
+
+				let s = e.size >= 0 ? e.size : sizes[-1 - e.size];
+
+				if(e.offset){
+					data += "<tr><td>"+ hexstr(pos + e.offset, 4) +"</td><td>"+ hexstr(s, 2) +"</td><td>"+ e.name +"</td>";
+
+				} else {
+					data += "<tr><td>"+ hexstr(pos, 4) +"</td><td>"+ hexstr(s, 2) +"</td><td>"+ e.name +"</td>";
+					pos += s;
+				}
+
+				if(e.save) {
+					sizes[-1 - e.save] = pos;
+				}
+			}
+
+			return data;
+		}
+
+		function hexstr(num, len) {
+			num = num.toString(16).toUpperCase();
+			return "$" + ("0".repeat(len - num.length)) + num;
+		}
+	</script>
 	<link href="https://fonts.googleapis.com/css?family=Noto+Sans&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Overpass:400,700&display=swap" rel="stylesheet">
@@ -18,6 +190,11 @@
 			border-radius: 2vw;
 			margin: auto;
 			padding: 2vw;
+		}
+
+		.bd {
+			border-top: .3vw solid;
+			border-image: linear-gradient(to right, rgba(94,90,133,0.03) 0%, rgba(92,92,104,1) 20%, rgba(92,92,104,1) 80%, rgba(94,90,133,0.03) 100%) 1 round;
 		}
 
 		h1 {
@@ -92,6 +269,56 @@
 			padding: .24vw .24vw;
 		}
 
+		cbox {
+			display: inline-block;
+			margin: .3vw;
+			white-space: nowrap;
+		}
+
+		cbox > input[type=checkbox] {
+			margin: 0;
+			vertical-align: middle;
+			-webkit-appearance: none;
+			width: 1vw;
+			height: 1vw;
+			display: inline-block;
+			position: relative;
+			background: #1e1e1e;
+			border: .1vw solid #545454;
+			padding: .4vw;
+			border-radius: 20%;
+			outline: none !important;
+		}
+
+		cbox > input[type=checkbox]:active, cbox > input[type=checkbox]:checked:active,
+		cbox > input[type=checkbox]:focus, cbox > input[type=checkbox]:checked:focus,
+		cbox > input[type=checkbox]:hover, cbox > input[type=checkbox]:checked:hover {
+			background: #393939;
+		}
+
+		cbox > input[type=checkbox]:checked {
+			background: #000000;
+		}
+
+		cbox > input[type=checkbox]:checked:after {
+			content: '\2714';
+			font: 1vw 'Roboto Mono', sans-serif;
+			position: absolute;
+			top: -.35vw;
+			left: 0;
+			color: #b5bfc6;
+		}
+
+		cbox > input[type=checkbox]::after {
+			outline: none !important;
+		}
+
+		cbox > span {
+			font: 1.2vw 'Overpass', sans-serif;
+			margin-left: .1vw;
+			vertical-align: middle;
+		}
+
 		smps2asm {
 			display: block;
 			tab-size: 8;
@@ -136,7 +363,7 @@
 		}
 	</style>
 </head>
-<body>
+<body onload="refRAM()">
 	<h3 style='text-decoration: underline;'>AMPS v2.0 technical manual</h3>
 	<h1>Table of contents</h1>
 	<tblcnt><a href="#part1">1 — Introduction</a></tblcnt>
@@ -160,7 +387,7 @@
 	<tblcnt><a href="#part9">9 — Porting Music</a></tblcnt>
 	<tblcnt><a href="#part10">10 — Installing AMPS</a></tblcnt>
 
-	<h1 id="part1">1 — Introduction</h1>
+	<h1 id="part1" class="bd">1 — Introduction</h1>
 	<p>
 		AMPS is a 68k-based, SMPS-like sound driver, designed to be used with ROM hacks and Sega Mega Drive software.
 		Although similar to SMPS, AMPS is fundamentally different in many aspects. It is also heavily customized, RAM-efficient
@@ -176,7 +403,7 @@
 		for other sound drivers, you can convert the files into AMPS format. More on that in <a href="#part9">part 9</a>.
 	</p>
 
-	<h1 id="part2">2 — AMPS overview</h1>
+	<h1 id="part2" class="bd">2 — AMPS Overview</h1>
 	<p>
 		AMPS is based on sound data files, perhaps erroneously referred to as tracker files. These files define each song and sound effect
 		you may hear in a game. They do not specify samples themselves, as those are handled by a different system. They are
@@ -230,7 +457,7 @@
 		are also a number of customizable things, such as volume fades, frequency tables, and PCM volume filters.
 	</p>
 
-	<h1 id="part3">3 — Sound system</h1>
+	<h1 id="part3" class="bd">3 — Sound System</h1>
 	<p>
 		AMPS uses sound IDs to differentiate each sound. There can be at most 255 sounds (from $01 to $FF), and they are split into 3 main
 		groups: Commands, music, and sound effects. All of these have different behaviors, for a very specific reason: sound effect
@@ -258,7 +485,7 @@
 		if slot already contains a queued sound.
 	</p>
 
-	<h3 id="part3_1">3.1 — Music files</h3>
+	<h3 id="part3_1" class="bd">3.1 — Music Files</h3>
 	<p>
 		Music is mainly used as background music or as a jingle. Generally, whenever you want to make something that can be overridden by
 		sound effects or be the main focus, music is a good choice. Music has access to all the features in AMPS and is generally more versatile than
@@ -316,7 +543,7 @@
 	</p>
 	<smps2asm>	<mac>ptrMusic</mac>	<lbl>Something</lbl>, <val>$10</val></smps2asm>
 
-	<h3 id="part3_2">3.2 — Sound Effect files</h3>
+	<h3 id="part3_2" class="bd">3.2 — Sound Effect Files</h3>
 	<p>
 		Sound effects are useful when you want to play a small sound or a short jingle. They are most commonly used as feedback for the player or for enemy sounds.
 		Sound effects are not affected by current tempo or by the 50hz "fix", and generally do not use the tick multiplier. Additionally, sound effects can not use
@@ -362,13 +589,13 @@
 	</p>
 	<smps2asm>	<mac>ptrSFX</mac>		<val>$01</val>, <lbl>Example</lbl></smps2asm>
 
-	<h1 id="part4">4 — Trackers</h1>
+	<h1 id="part4" class="bd">4 — Trackers</h1>
 	<p>
 		In <a href="#part3">part 3</a>, <a href="#part3_1">3.1</a> and <a href="#part3_2">3.2</a> we talked about the specific differences between sound commands, music, and sound effects.
 		In this part, we'll instead talk about the similarities, and dive deeper into how trackers work.
 	</p>
 
-	<h3 id="part4_1">4.1 — Trackers overview</h3>
+	<h3 id="part4_1" class="bd">4.1 — Trackers Overview</h3>
 	<p>
 		In AMPS, a tracker is channel-specific data that tells AMPS what to do. AMPS will interpret this data and perform the actions requested by the programmer. Trackers in concept are quite
 		simple, but internally are not very simple. AMPS aims to abstract much of this complexity, so the programmer has to worry about it as little as possible. Trackers are split into 3 types
@@ -412,7 +639,7 @@
 		<a href="#part4_2">the next section</a>.
 	</p>
 
-	<h3 id="part4_2">4.2 — Tracker commands</h3>
+	<h3 id="part4_2" class="bd">4.2 — Tracker Commands</h3>
 	<p>
 		AMPS has a large variety of tracker commands. Although not all of them will be useful for every person, but they exist nonetheless to help people make music in their way. Tracker commands go from $E0 to $FF. $FF is a
 		special command, so called "meta command". This command reads another byte from tracker, to act as an extra routine. This way, there is more space for commands, at the cost of extra ROM space required. Below, I will list
@@ -760,29 +987,45 @@
 		aspects of AMPS, or the programming itself. Only available in safe mode, it is ignored in normal mode.
 	</p>
 
-	<h3 id="part4_21">4.2.1 — Modulation</h3>
+	<h3 id="part4_21" class="bd">4.2.1 — Modulation</h3>
 
-	<h3 id="part4_3">4.3 — SN76496</h3>
+	<h3 id="part4_3" class="bd">4.3 — SN76496</h3>
 
-	<h3 id="part4_4">4.4 — YM2612</h3>
+	<h3 id="part4_4" class="bd">4.4 — YM2612</h3>
 
-	<h3 id="part4_5">4.5 — Dual PCM</h3>
+	<h3 id="part4_5" class="bd">4.5 — Dual PCM</h3>
 
-	<h1 id="part5">5 — Communication bytes</h1>
+	<h1 id="part5" class="bd">5 — Communication Bytes</h1>
 
-	<h1 id="part6">6 — Volume control</h1>
+	<h1 id="part6" class="bd">6 — Volume Control</h1>
 
-	<h3 id="part6_1">6.1 — Channel volumes</h3>
+	<h3 id="part6_1" class="bd">6.1 — Channel Volumes</h3>
 
-	<h3 id="part6_2">6.2 — Volume fading</h3>
+	<h3 id="part6_2" class="bd">6.2 — Volume Fading</h3>
 
-	<h1 id="part7">7 — Memory map</h1>
+	<h1 id="part7" class="bd">7 — Memory Map</h1>
+	<p>
+		Below is the memory map for every individual channel and the entire sound driver. You can select various modes depending on which flags you have enabled, and the correct sequence is computed for you.
+	</p>
+	<cbox><input type="checkbox" onclick="refRAM()" title="mdsafe" id="mdsafe" checked /><span>safe mode</span></cbox>
+	<cbox><input type="checkbox" onclick="refRAM()" title="mdmod" id="mdmod" checked /><span>FEATURE_MODULATION</span></cbox>
+	<cbox><input type="checkbox" onclick="refRAM()" title="mdport" id="mdport" /><span>FEATURE_PORTAMENTO</span></cbox>
+	<cbox><input type="checkbox" onclick="refRAM()" title="mdmenv" id="mdmenv" /><span>FEATURE_MODENV</span></cbox>
+	<cbox><input type="checkbox" onclick="refRAM()" title="mdvenvdf" id="mdvenvdf" /><span>FEATURE_DACFMVOLENV</span></cbox>
+	<cbox><input type="checkbox" onclick="refRAM()" title="mdbackup" id="mdbackup" checked /><span>FEATURE_BACKUP</span></cbox>
+	<cbox><input type="checkbox" onclick="refRAM()" title="mdfm6" id="mdfm6" checked /><span>FEATURE_FM6</span></cbox>
+	<br/>
+	<div style="width: 100%; display: flex; flex-direction: row">
+		<div style="flex: 1 1"><h3>Global</h3><table border="1" id="ramtable"></table></div>
+		<div style="flex: 1 1"><h3>Channel</h3><table border="1" id="chantable"></table></div>
+	</div>
+	<br/>
 
-	<h1 id="part8">8 — Creating custom music</h1>
+	<h1 id="part8" class="bd">8 — Creating Custom Music</h1>
 
-	<h1 id="part9">9 — Porting music</h1>
+	<h1 id="part9" class="bd">9 — Porting Music</h1>
 
-	<h1 id="part10">10 — Installing AMPS</h1>
+	<h1 id="part10" class="bd">10 — Installing AMPS</h1>
 
 </body>
 </html>
