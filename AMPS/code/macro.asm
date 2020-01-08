@@ -599,7 +599,7 @@ __menv =	__menv+1		; increase ID
 
 incSWF		macro file
 	rept narg			; repeat for all arguments
-SWF_\file	incbin	"driver/DAC/incswf/\file\.swf"; include PCM data
+SWF_\file	incbin	"AMPS/DAC/incswf/\file\.swf"; include PCM data
 SWFR_\file 	dcb.b Z80E_Read*(MaxPitch/$100),$00; add end markers (for Dual PCM)
 	shift				; shift next argument into view
 	endr

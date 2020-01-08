@@ -115,7 +115,7 @@ ErrorHandler.__extern__vsync:
 ; ---------------------------------------------------------------
 
 ErrorHandler:
-	incbin	"ErrorDebugger/ErrorHandler.bin"
+	incbin	"error/ErrorHandler.bin"
 
 ; ---------------------------------------------------------------
 ; WARNING!

@@ -1,8 +1,8 @@
-	include	"ErrorDebugger/Debugger.asm"
+	include	"error/Debugger.asm"
 	include "code/macro.asm"
-	include "driver/code/smps2asm.asm"
-	include "driver/code/macro.asm"
-	include "driver/lang.asm"
+	include "AMPS/code/smps2asm.asm"
+	include "AMPS/code/macro.asm"
+	include "AMPS/lang.asm"
 
 ; ===========================================================================
 	org 0
@@ -39,15 +39,15 @@ HConsole:	dc.b 'SEGA SSF        ' ; Hardware system ID
 		dc.b 'OWN MODIFICATIONS. PLEASE CREDIT WHEN USED'
 ; ===========================================================================
 SystemPalette:
-	incbin  'code/main.pal'		; system main palette
+	incbin  "code/main.pal"		; system main palette
 	even
 
 SystemFont:
-	incbin  'code/font.kos'		; System font - made by Bakayote
+	incbin  "code/font.kos"		; System font - made by Bakayote
 	even
 ; ===========================================================================
 
-	include 'Code/init.asm'		; initialization code and main loop
+	include "code/init.asm"		; initialization code and main loop
 	include "code/string.asm"	; string lib
 	include "code/draw.asm"		; rendering and visualisation routines
 	include "code/vint.asm"		; v-int routines
@@ -55,14 +55,14 @@ SystemFont:
 
 ; ===========================================================================
 DualPCM:	z80prog 0
-		include "driver/code/z80.asm"
+		include "AMPS/code/z80.asm"
 DualPCM_sz:	z80prog
 
 	align $10000
-	include "driver/code/68k.asm"
+	include "AMPS/code/68k.asm"
 	opt ae-
 
 ; ===========================================================================
 	opt ae+
-		include	"ErrorDebugger/ErrorHandler.asm"
+		include	"error/ErrorHandler.asm"
 EndOfRom:	END

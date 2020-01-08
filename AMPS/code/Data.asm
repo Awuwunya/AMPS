@@ -268,7 +268,7 @@ mdTest:		dc.b $08, eaSens, $01, eLoop, $00
 ; Include music, sound effects and voice table
 ; ---------------------------------------------------------------------------
 
-	include "driver/Voices.asm"	; include universal Voice bank
+	include "AMPS/Voices.asm"	; include universal Voice bank
 	opt ae-				; disable automatic evens
 
 sfxaddr	incSFX				; include all sfx
@@ -280,8 +280,8 @@ musend
 ; ---------------------------------------------------------------------------
 
 		align	$8000		; must be aligned to bank... By the way, these are also set in Z80.asm. Be sure to check it out also.
-fLog:		incbin "driver/filters/Logarithmic.dat"	; logarithmic filter (no filter)
-;fLinear:	incbin "driver/filters/Linear.dat"	; linear filter (no filter)
+fLog:		incbin "AMPS/filters/Logarithmic.dat"	; logarithmic filter (no filter)
+;fLinear:	incbin "AMPS/filters/Linear.dat"	; linear filter (no filter)
 
 dacaddr		dcb.b	Z80E_Read*(MaxPitch/$100),$00
 SWF_Stop:	dcb.b	$8000-(2*Z80E_Read*(MaxPitch/$100)),$80
