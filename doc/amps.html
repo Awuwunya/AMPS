@@ -1,5 +1,7 @@
+<!DOCTYPE HTML>
 <html>
 <head>
+	<meta charset="UTF-8" />
 	<title>AMPS v2.0 TECHNICAL DOCUMENTATION</title>
 	<script>
 		const chantbl = [
@@ -20,23 +22,23 @@
 			{ size: 1, align: 1, name: "cLastDur", },
 			{ size: 2, align: 2, name: "cFreq", },
 
-			{ size: 0, align: 2, name: "cModDelay", cyes: 0x02, },
-			{ size: 4, align: 2, name: "cMod", cyes: 0x02, },
-			{ size: 2, align: 2, name: "cModFreq", cyes: 0x02, },
-			{ size: 1, align: 1, name: "cModSpeed", cyes: 0x02, },
-			{ size: 1, align: 1, name: "cModStep", cyes: 0x02, },
-			{ size: 1, align: 1, name: "cModCount", cyes: 0x02, },
+			{ size: 0, align: 2, cyes: 0x02, name: "cModDelay", },
+			{ size: 4, align: 2, cyes: 0x02, name: "cMod", },
+			{ size: 2, align: 2, cyes: 0x02, name: "cModFreq", },
+			{ size: 1, align: 1, cyes: 0x02, name: "cModSpeed", },
+			{ size: 1, align: 1, cyes: 0x02, name: "cModStep", },
+			{ size: 1, align: 1, cyes: 0x02, name: "cModCount", },
 
-			{ size: 1, align: 1, name: "cPortaSpeed", cyes: 0x04, },
-			{ size: 2, align: 2, name: "cPortaFreq", cyes: 0x04, },
-			{ size: 2, align: 2, name: "cPortaDisp", cyes: 0x04, },
+			{ size: 1, align: 1, cyes: 0x04, name: "cPortaSpeed", },
+			{ size: 2, align: 2, cyes: 0x04, name: "cPortaFreq", },
+			{ size: 2, align: 2, cyes: 0x04, name: "cPortaDisp", },
 
-			{ size: 1, align: 1, name: "cVolEnv", cyes: 0x10, },
-			{ size: 1, align: 1, name: "cEnvPos", cyes: 0x10, },
+			{ size: 1, align: 1, cyes: 0x10, name: "cVolEnv", },
+			{ size: 1, align: 1, cyes: 0x10, name: "cEnvPos", },
 
-			{ size: 1, align: 1, name: "cModEnv", cyes: 0x08, },
-			{ size: 1, align: 1, name: "cModEnvPos", cyes: 0x08, },
-			{ size: 1, align: 1, name: "cModEnvSens", cyes: 0x08, },
+			{ size: 1, align: 1, cyes: 0x08, name: "cModEnv", },
+			{ size: 1, align: 1, cyes: 0x08, name: "cModEnvPos", },
+			{ size: 1, align: 1, cyes: 0x08, name: "cModEnvSens", },
 
 			{ size: 3, align: 1, name: "cLoop", },
 			{ size: 1, align: 2, name: "cStatPSG4", offset: -2, cno: 0x10, },
@@ -69,7 +71,7 @@
 			{ size: 1, align: 1, name: "mContLast", },
 			{ size: 1, align: 1, name: "mLastCue", },
 
-			{ size: 0, align: 2, name: "mBackUpArea", },
+			{ size: 0,  align: 2, name: "mBackUpArea", },
 			{ size: -1, align: 2, name: "mDAC1", },
 			{ size: -1, align: 2, name: "mDAC2", },
 			{ size: -1, align: 2, name: "mFM1", },
@@ -89,28 +91,28 @@
 			{ size: -2, align: 2, name: "mSFXPSG1", },
 			{ size: -2, align: 2, name: "mSFXPSG2", },
 			{ size: -2, align: 2, name: "mSFXPSG3", },
-			{ size: 0, align: 2, name: "mChannelEnd", },
+			{ size: 0,  align: 2, name: "mChannelEnd", },
 
-			{ size: 0, align: 2, name: "mBackUpLoc", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackDAC1", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackDAC2", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackFM1", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackFM2", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackFM3", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackFM4", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackFM5", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackFM6", cyes: 0x60, },
-			{ size: -1, align: 2, name: "mBackPSG1", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackPSG2", cyes: 0x20, },
-			{ size: -1, align: 2, name: "mBackPSG3", cyes: 0x20, },
+			{ size: 0,  align: 2, cyes: 0x20, name: "mBackUpLoc", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackDAC1", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackDAC2", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackFM1", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackFM2", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackFM3", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackFM4", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackFM5", },
+			{ size: -1, align: 2, cyes: 0x60, name: "mBackFM6", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackPSG1", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackPSG2", },
+			{ size: -1, align: 2, cyes: 0x20, name: "mBackPSG3", },
 
-			{ size: 1, align: 1, name: "mBackTempoMain", cyes: 0x20, },
-			{ size: 1, align: 1, name: "mBackTempoSpeed", cyes: 0x20, },
-			{ size: 1, align: 1, name: "mBackTempo", cyes: 0x20, },
-			{ size: 1, align: 1, name: "mBackTempoCur", cyes: 0x20, },
-			{ size: 4, align: 2, name: "mBackVctMus", cyes: 0x20, },
+			{ size: 1, align: 1, cyes: 0x20, name: "mBackTempoMain", },
+			{ size: 1, align: 1, cyes: 0x20, name: "mBackTempoSpeed", },
+			{ size: 1, align: 1, cyes: 0x20, name: "mBackTempo", },
+			{ size: 1, align: 1, cyes: 0x20, name: "mBackTempoCur", },
+			{ size: 4, align: 2, cyes: 0x20, name: "mBackVctMus", },
 
-			{ size: 1, align: 1, name: "msChktracker", cyes: 0x01, },
+			{ size: 1, align: 1, cyes: 0x01, name: "msChktracker", },
 			{ size: 0, align: 2, name: "mSize", },
 		];
 
@@ -386,6 +388,7 @@
 	<tblcnt><a href="#part8">8 — Creating Custom Music</a></tblcnt>
 	<tblcnt><a href="#part9">9 — Porting Music</a></tblcnt>
 	<tblcnt><a href="#part10">10 — Installing AMPS</a></tblcnt>
+	<tblcnt><a href="#part11">11 — Frequent Questions & Answers</a></tblcnt>
 
 	<h1 id="part1" class="bd">1 — Introduction</h1>
 	<p>
@@ -651,7 +654,7 @@
 		This command is used to set the YM2612 panning for the current channel. This command only works for FM and DAC channels. YM2612 uses channel panning to determine which speaker to play audio on for
 		different sound channels. There is a flaw however: Since both DAC channels and FM6 are technically the same channel for YM2612, they can only pan together. This is why, both active DAC channels or
 		their panning value together. If DAC1's panning is set to $80, and DAC 2's $40, the resulting panning value is $C0. DAC1 sound effects override the panning value for DAC1 music. Currently, panning on
-		FM6 when any DAC channel is running, is considered undefined behaviour, and is therefore disabled in safe mode.
+		FM6 when any DAC channel is running, is considered undefined behaviour, and is therefore disabled in safe mode. This command is skipped when condition is false.
 	</p>
 	<p>
 		The three arguments for ssPan all are used to set the panning value. Since the <a href="https://www.smspower.org/maxim/Documents/YM2612#regb4">panning register is shared with the AMS/FMS data</a> for LFO,
@@ -668,31 +671,31 @@
 	</ul>
 	<h4>$E1 — ssDetune &lt;val&gt;</h4>
 	<p>
-		Sets the channel detune to <b>&lt;val&gt;</b>. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a>
+		Sets the channel detune to <b>&lt;val&gt;</b>. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a> This command is skipped when condition is false.
 	</p>
 	<h4>$E2 — saDetune &lt;val&gt;</h4>
 	<p>
-		Adds <b>&lt;val&gt;</b> to the channel detune. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a>
+		Adds <b>&lt;val&gt;</b> to the channel detune. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a> This command is skipped when condition is false.
 	</p>
 	<h4>$E3 — ssTranspose &lt;val&gt;</h4>
 	<p>
 		Sets the channel pitch to <b>&lt;val&gt;</b>. Pitch is used to change which votes are played, adding channel pitch to the note being played. This is very useful when you want to share routines
-		between FM, PSG and DAC, or for reusing the routine but just transposed.
+		between FM, PSG and DAC, or for reusing the routine but just transposed. This command is skipped when condition is false.
 	</p>
 	<h4>$E4 — saTranspose &lt;val&gt;</h4>
 	<p>
 		Adds <b>&lt;val&gt;</b> to the channel pitch. Pitch is used to change which votes are played, adding channel pitch to the note being played. This is very useful when you want to share routines
-		between FM, PSG and DAC, or for reusing the routine but just transposed.
+		between FM, PSG and DAC, or for reusing the routine but just transposed. This command is skipped when condition is false.
 	</p>
 	<h4>$E5 — ssTickMulCh &lt;val&gt;</h4>
 	<p>
 		Sets channel tick multiplier to <b>&lt;val&gt;</b>. Tick multiplier is used to multiply the delay read from tracker by the tick multiplier value. This is used for some songs.
-		<a href="#part4_1">See the previous part for more details</a>.
+		<a href="#part4_1">See the previous part for more details</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$E6 — ssTickMul &lt;val&gt;</h4>
 	<p>
 		Sets tick multiplier for every channel to <b>&lt;val&gt;</b>. Tick multiplier is used to multiply the delay read from tracker by the tick multiplier value. This is used for some songs.
-		<a href="#part4_1">See the previous part for more details</a>.
+		<a href="#part4_1">See the previous part for more details</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$E7 — sHold</h4>
 	<p>
@@ -703,35 +706,35 @@
 	<h4>$E8 — sVoice &lt;val&gt;</h4>
 	<p>
 		Sets FM voice to &lt;val&gt; or DAC sample to &lt;val&gt;. Using this command on a PSG channel is considered undefined behaviour. Additionally, using this command on a DAC channel when
-		pitch mode is enabled is considered undefined behaviour. Read more about how FM voices work at <a href="#part4_4">part 4.4.</a>
+		pitch mode is enabled is considered undefined behaviour. Read more about how FM voices work at <a href="#part4_4">part 4.4.</a> This command is skipped when condition is false.
 	</p>
 	<h4>$E9 — ssTempoShoes &lt;tempo&gt;</h4>
 	<p>
-		Sets the speed shoes tempo to <b>&lt;tempo&gt;</b>. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>.
+		Sets the speed shoes tempo to <b>&lt;tempo&gt;</b>. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$EA — ssTempo &lt;tempo&gt;</h4>
 	<p>
-		Sets the normal tempo to <b>&lt;tempo&gt;</b>. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>.
+		Sets the normal tempo to <b>&lt;tempo&gt;</b>. You can read more about tempos and how they work at <a href="#part3_1">part 3.1</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$EB — sModeSampDAC</h4>
 	<p>
 		Sets the channel mode to sample mode. Using this command on a FM or PSG channel is considered undefined behaviour. Sample mode makes it so that each note read is treated as a sample
 		instead of a note. This way, you can easily play different samples in quick succession. This mode is most useful when you want to play multiple different samples at the same pitch.
-		You can use <b>ssFreq</b> and <b>ssFreqNote</b> to change the pitch of samples.
+		You can use <b>ssFreq</b> and <b>ssFreqNote</b> to change the pitch of samples. This command is skipped when condition is false.
 	</p>
 	<h4>$EC — sModePitchDAC</h4>
 	<p>
 		Sets the channel mode to pitch mode. Using this command on a FM or PSG channel is considered undefined behaviour. Pitch mode makes it so that each note read is treated as a note
 		instead of a sample. This way, you can easily play different samples at different pitches. This mode is most useful when you want to play samples many times at different pitches,
-		or you want to play most of your samples at varying pitches. You can use <b>sVoice</b> to change the samples you are playing.
+		or you want to play most of your samples at varying pitches. You can use <b>sVoice</b> to change the samples you are playing. This command is skipped when condition is false.
 	</p>
 	<h4>$ED — saVol &lt;vol&gt;</h4>
 	<p>
-		Adds <b>&lt;vol&gt;</b> to the channel volume. AMPS will update the channel volume at the end of the channel update process. <a href="#part6">You can read more about how volume works here.</a>
+		Adds <b>&lt;vol&gt;</b> to the channel volume. AMPS will update the channel volume at the end of the channel update process. <a href="#part6">You can read more about how volume works here.</a> This command is skipped when condition is false.
 	</p>
 	<h4>$EE — ssVol &lt;vol&gt;</h4>
 	<p>
-		Sets the channel volume to <b>&lt;vol&gt;</b>. AMPS will update the channel volume at the end of the channel update process. <a href="#part6">You can read more about how volume works here.</a>
+		Sets the channel volume to <b>&lt;vol&gt;</b>. AMPS will update the channel volume at the end of the channel update process. <a href="#part6">You can read more about how volume works here.</a> This command is skipped when condition is false.
 	</p>
 	<h4>$EF — ssLFO &lt;reg&gt; &lt;ams&gt; [fms] [pan]</h4>
 	<p>
@@ -758,6 +761,9 @@
 		<li><b>$C0, spCentre</b> — Sets panning to both of the speakers, effectively making it centered.</li>
 		<li><b>$C0, spCenter</b> — Silly americans =U</li>
 	</ul>
+	<p>
+		This command is skipped when condition is false.
+	</p>
 	<h4>$F0 — ssMod68k &lt;wait&gt; &lt;speed&gt; &lt;step&gt; &lt;count&gt;</h4>
 	<p>
 		Initializes software frequency modulation. Modulation is useful for creating an effect where frequency moves up and/or down repeatedly, which can be used either for detuning on instruments or for
@@ -765,7 +771,7 @@
 		from SMPS games, but in general it works similarly. The &lt;wait&gt; parameter delays the start of the modulation by that number of frames, where 0 frames means it starts immediately. &lt;speed&gt; is
 		the number of frames to delay until the next step is executed. 0 frames is considered undefined behaviour. &lt;step&gt; is the frequency offset per step. Values are sign extended, so anything above $7F
 		is a negative value. The resulting frequency offset is 16-bit and can also be negative. &lt;count&gt; is the number of steps to perform before negating the &lt;step&gt; parameter. 0 steps will behave as
-		$100 steps. For a more in-depth explanation of the algorithm, <a href="#part4_21">see the next part</a>.
+		$100 steps. For a more in-depth explanation of the algorithm, <a href="#part4_21">see the next part</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F1 — ssPortamento &lt;speed&gt;</h4>
 	<p>
@@ -773,35 +779,35 @@
 		the note rise or fall smoothly until the frequency of the next note is met. The <b>&lt;speed&gt;</b> parameter is used to control how long this transition takes. A speed of $01 means there is 1 frame where the
 		note is transitioning to the next. In that example, the frequency will be in the middle of the 2 notes. Portamento only occurs when the next note is played, and therefore will delay the notes slightly. This also
 		affects note on/off behaviour, which will happen whenever the note is played rather than when it transitions. This can be worked around with the sHold tracker command or by creating complex tracker code to execute
-		the note-on when you want it to happen. This is usually not noticeable enough to matter however. Additionally, since FM frequency ranges overlap somewhat, AMPS accounts for this by skipping them.
+		the note-on when you want it to happen. This is usually not noticeable enough to matter however. Additionally, since FM frequency ranges overlap somewhat, AMPS accounts for this by skipping them. This command is skipped when condition is false.
 	</p>
 	<h4>$F2 — sVolEnv &lt;env&gt;</h4>
 	<p>
 		Sets the channel volume envelope to <b>&lt;env&gt;</b>. Volume envelopes are used to change the volume of a channel per frame, reading from a list. This is particularly useful for PSG channels, since they do not
 		inherently have any capability to change the volume in a meaningful way otherwise. However, if FEATURE_DACFMVOLENV is enabled, DAC and FM channels can also use this functionality. More about volume envelopes in
-		<a href="#part6_1">part 6.1</a>.
+		<a href="#part6_1">part 6.1</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F3 — sModEnv &lt;env&gt;</h4>
 	<p>
 		Sets the channel modulation envelope to <b>&lt;env&gt;</b>. Modulation envelopes are used to change the frequency of a channel per frame, reading from a list. This works similarly to volume enveloes, but has some
 		differences as well. SMPS games have used this feature to create more dynamic sounding instruments. HThis feature is only available when FEATURE_MODENV is enabled. More about modulation envelopes in
-		<a href="#part4_21">part 4.2.1</a>.
+		<a href="#part4_21">part 4.2.1</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F4 — sCont &lt;loc&gt;</h4>
 	<p>
 		Is used to make continuous sound effects work. Playing a continuous sound effect multiple times does not restart the sound effect, but instead make it continue for longer time. This makes it so that the
 		sound effect can loop smoothly, and yet can be extended as necessary. This command allows continuous sound effects to check if the sound effect was played again, and if so, jump back to <b>&lt;loc&gt;</b>
 		in tracker code. AMPS assumes that every sound effect channel will loop, so not looping every sound effect channel is considered undefined behaviour, though most of the time some channels will loop more times
-		than others. If you do not wish a channel to play any sound after some time, loop them inside a bunch of rest notes. Additionally, all the channels should loop at the exact same tick.
+		than others. If you do not wish a channel to play any sound after some time, loop them inside a bunch of rest notes. Additionally, all the channels should loop at the exact same tick. This command is skipped when condition is false.
 	</p>
 	<h4>$F5 — sStop</h4>
 	<p>
 		Will stop the current tracker from running, and release all the resources needed by the channel. Additionally, when sound effect channels are stopped, the music channels they were interrupting are correct restored.
-		After this command, no tracker code will be executed.
+		After this command, no tracker code will be executed. This command is skipped when condition is false.
 	</p>
 	<h4>$F6 — sJump &lt;loc&gt;</h4>
 	<p>
-		Sets the tracker address to be at <b>&lt;loc&gt;</b>. After this command, all tracker code is read starting from <b>&lt;loc&gt;</b>.
+		Sets the tracker address to be at <b>&lt;loc&gt;</b>. After this command, all tracker code is read starting from <b>&lt;loc&gt;</b>. This command is skipped when condition is false.
 	</p>
 	<h4>$F7 — sLoop &lt;index&gt; &lt;loops&gt; &lt;loc&gt;</h4>
 	<p>
@@ -814,21 +820,24 @@
 		<li><b>$01</b> — Available for every channel except PSG3, if FEATURE_DACFMVOLENV is disabled.</li>
 		<li><b>$02</b> — Available only for music channels.</li>
 	</ul>
+	<p>
+		This command is skipped when condition is false.
+	</p>
 	<h4>$F8 — sCall &lt;loc&gt;</h4>
 	<p>
 		Is used to temporarily run another routine, while remembering the last location we were in. The tracker address at <b>&lt;loc&gt;</b> is jumped to, while the location of the next tracker command at the previous
 		address is saved to a stack. This allows us to run another routine, or even multiple other routines, before eventually returning back to the original routine. The sRet command is used to return back a level in the stack.
 		This command is very useful for general routines that you may want to reuse multiple times, or even between multiple different trackers. By default, 3 different routines can be called before the stack runs out of space.
-		This command is not available for sound effect channels, and attempting to use it will result in undefined behaviour.
+		This command is not available for sound effect channels, and attempting to use it will result in undefined behaviour. This command is skipped when condition is false.
 	</p>
 	<h4>$F9 — sRet</h4>
 	<p>
 		Is used to return from a routine called by sCall. This immediately returns to the next tracker code after the corresponding sCall command. If there are no calls present in the stack, the operation is invalid and results
-		in undefined behaviour. This command is not available for sound effect channels, and attempting to use it will result in undefined behaviour.
+		in undefined behaviour. This command is not available for sound effect channels, and attempting to use it will result in undefined behaviour. This command is skipped when condition is false.
 	</p>
 	<h4>$FA — sComm &lt;index&gt; &lt;val&gt;</h4>
 	<p>
-		Sets the communications byte <b>&lt;index&gt;</b> to <b>&lt;val&gt;</b>. Since by default AMPS only supports 8 communications bytes, using indexes higher than that will result in undefined behaviour.
+		Sets the communications byte <b>&lt;index&gt;</b> to <b>&lt;val&gt;</b>. Since AMPS only supports 16 communications bytes, using indexes higher than that will result in undefined behaviour. There are only 8 communications flags installed by default however.
 		If you extend the number of available communications bytes, then they may be used. Read more about communications bytes in <a href="#part5">part 5</a>.
 	</p>
 	<h4>$FB — sCond &lt;index&gt; &lt;cond&gt; &lt;val&gt;</h4>
@@ -865,7 +874,7 @@
 	<p>
 		Sets the game timeout to <b>&lt;frames&gt;</b>. Value of 0 disables this effect. Gate cuts the sound out after a specific number of frames (not ticks!), commencing regular note off behaviour for
 		the channel. This is very useful when you have a lot of notes that should stop few frames/ticks before the actual note length. Instead of placing a bunch of notes with delays, and rests with delays,
-		you can optimize it to use sGate instead. Not only is this faster, but also more space-efficient. This command is not available for sound effects, and trying to use it is considered undefined behaviour.
+		you can optimize it to use sGate instead. Not only is this faster, but also more space-efficient. This command is not available for sound effects, and trying to use it is considered undefined behaviour. This command is skipped when condition is false.
 	</p>
 	<h4>$FE — sCmdYM &lt;reg&gt; &lt;val&gt;</h4>
 	<p>
@@ -874,7 +883,7 @@
 		are lost forever. This is why you should make only non-essential changes for these FM channels. The <b>&lt;reg&gt;</b> parameter is used to choose the YM2612 register to write to, while <b>&lt;val&gt;</b> is
 		loaded into it. For channel-specific registers, the channel type is also added into it, so you can always get the correct register you want. This happens for registers $30 to $A7 and $A8 tp $FF. Attempting to
 		write to another channels registers is considered undefined behaviour. Additionally, using this command from DAC and PSG channels are considered undefined behaviour. For a breakdown of what each registers does,
-		<a href="https://www.smspower.org/maxim/Documents/YM2612">read this page</a>.
+		<a href="https://www.smspower.org/maxim/Documents/YM2612">read this page</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$FF — META</h4>
 	<p>
@@ -996,6 +1005,24 @@
 	<h3 id="part4_5" class="bd">4.5 — Dual PCM</h3>
 
 	<h1 id="part5" class="bd">5 — Communication Bytes</h1>
+	<p>
+		AMPS allows trackers to communicate with the game program using communications bytes. By default, 8 bytes are defined that are accessible to both read & write from
+		the tracker. You can conditionally execute tracker code when checking the communications byte with a condition mode. Whenever condition is set to false, number of
+		commands are skipped instead of executing them. This can be used to skip commands, for example jumping or changing voice, to split the single path into multiple paths.
+		This could be used for all kinds of neat effects, dynamic songs, songs that have ending point as opposed to just fading out, things like this. It is entirely up to the
+		programmer on how they decide to accomplish this. <a href="#part4_1">This earlier part also lists which commands will be skipped.</a>
+	</p>
+	<p>
+		The 8 bytes can be acessed through mQueue to mQueue+7. The game program is free to manipulate these in any way and the programmer is responsible for deciding which
+		communications bytes are used for what purpose. Communications bytes are not initialized to any specific value, so relying on them being, for example, 0 is not adviced.
+		Communication bytes do not get reset ever with AMPS, so sharing them between songs, sound effects or other is possible. It is a good idea to reset all the communications
+		bytes you intend to use for songs with tracker code.
+	</p>
+	<p>
+		Communications bytes can be extended up to 256 bytes if the programmer needs that, but you have to remember, only 16 are available using the sCond command. Additionally,
+		sCondReg command can be used to read from pre-defined RAM addresses or channel offsets. dcCondRegTable contains the table of pointers that are used for reading with this
+		command.
+	</p>
 
 	<h1 id="part6" class="bd">6 — Volume Control</h1>
 
@@ -1027,5 +1054,36 @@
 
 	<h1 id="part10" class="bd">10 — Installing AMPS</h1>
 
+	<h1 id="part11" class="bd">11 — Frequent Questions & Answers</h1>
+	<h3>Do you have a Discord server?</h3>
+	<p>
+		We do indeed! If you want to get the latest AMPS news, talk to the developers, ask questions and get help, and get the latest news and exclusive updates!
+		We also host other related projects under the same server. <a href="https://discord.gg/nW3CFaU">Join here</a>.
+	</p>
+	<h3>Where should I report bugs?</h3>
+	<p>
+		Preferably, you should submit an issue to the Github page of the project. However, you can also report them on our Discord or by directly messaging Natsumi on SSRG, Retro, or Discord.
+	</p>
+	<h3>I have a good idea! But how should I ask for it to get implemented?</h3>
+	<p>
+		Similarly to reporting bugs, you can in the same way also do feature requests or other improvements. There is no guarantee your feature request will get implemented but it will be considered
+		for a future version.
+	</p>
+	<h3>Why is there no installation tutorial for my preferred disassembly?</h3>
+	<p>
+		It would be impossible to make tutorials for every single possible disassembly. Instead, there are pre-made disassemblies available for many common setups. IT is adviced to follow the
+		commits for these disassemblies to port the sound driver to your specific setup. If no pre-made disassembly exists for your setup, you may request for it to be created by messaging Natsumi.
+	</p>
+	<h3>How often is AMPS updated?</h3>
+	<p>
+		It depends entirely on the changes being made and my personal time available. There is no set timeline for updates. The Github repositories will udate more often and a release will only be
+		made when there is something stable to show.
+	</p>
+	<h3>Can I edit AMPS and use it for my project?</h3>
+	<p>
+		Yes, AMPS is open source and anyone can edit it to their liking. The source code is made to be as easy to modify as possible while still being optimal. You are free to use AMPS for
+		any project as well. Although AMPS is open source and free to use for commercial purposes, because it is technically based on SMPS, which is property of SEGA, it may not be a good idea
+		to use for commercial purposes.
+	</p>
 </body>
 </html>
