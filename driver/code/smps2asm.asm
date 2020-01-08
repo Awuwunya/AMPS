@@ -109,15 +109,6 @@ sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 ; ---------------------------------------------------------------------------------------------
-; Command Flag Macros and Equates. Based on the original s1smps2asm, and Flamewing's smps2asm
-; ---------------------------------------------------------------------------------------------
-
-spNone set $00
-spRight set $40
-spLeft set $80
-spCentre set $C0
-spCenter set $C0
-; ---------------------------------------------------------------------------------------------
 ; Macros for FM instruments
 ; Patches - Feedback
 ; ---------------------------------------------------------------------------------------------
@@ -136,99 +127,99 @@ p\name =	sPatNum
 	endif
 
 sPatNum =	sPatNum+1
-spAl	= val
+spAl =		val
     endm
 
 spFeedback macro val
-spFe	= val
+spFe =		val
     endm
 
 ; Patches - Detune
 spDetune macro op1,op2,op3,op4
-spDe1	= op1
-spDe2	= op2
-spDe3	= op3
-spDe4	= op4
+spDe1 =		op1
+spDe2 =		op2
+spDe3 =		op3
+spDe4 =		op4
     endm
 
 ; Patches - Multiple
 spMultiple macro op1,op2,op3,op4
-spMu1	= op1
-spMu2	= op2
-spMu3	= op3
-spMu4	= op4
+spMu1 =		op1
+spMu2 =		op2
+spMu3 =		op3
+spMu4 =		op4
     endm
 
 ; Patches - Rate Scale
 spRateScale macro op1,op2,op3,op4
-spRS1	= op1
-spRS2	= op2
-spRS3	= op3
-spRS4	= op4
+spRS1 =		op1
+spRS2 =		op2
+spRS3 =		op3
+spRS4 =		op4
     endm
 
 ; Patches - Attack Rate
 spAttackRt macro op1,op2,op3,op4
-spAR1	= op1
-spAR2	= op2
-spAR3	= op3
-spAR4	= op4
+spAR1 =		op1
+spAR2 =		op2
+spAR3 =		op3
+spAR4 =		op4
     endm
 
 ; Patches - Amplitude Modulation
 spAmpMod macro op1,op2,op3,op4
-spAM1	= op1
-spAM2	= op2
-spAM3	= op3
-spAM4	= op4
+spAM1 =		op1
+spAM2 =		op2
+spAM3 =		op3
+spAM4 =		op4
     endm
 
 ; Patches - Sustain Rate
 spSustainRt macro op1,op2,op3,op4
-spSR1	= op1		; Also known as decay 1 rate
-spSR2	= op2
-spSR3	= op3
-spSR4	= op4
+spSR1 =		op1		; Also known as decay 1 rate
+spSR2 =		op2
+spSR3 =		op3
+spSR4 =		op4
     endm
 
 ; Patches - Sustain Level
 spSustainLv macro op1,op2,op3,op4
-spSL1	= op1		; also known as decay 1 level
-spSL2	= op2
-spSL3	= op3
-spSL4	= op4
+spSL1 =		op1		; also known as decay 1 level
+spSL2 =		op2
+spSL3 =		op3
+spSL4 =		op4
     endm
 
 ; Patches - Decay Rate
 spDecayRt macro op1,op2,op3,op4
-spDR1	= op1		; Also known as decay 2 rate
-spDR2	= op2
-spDR3	= op3
-spDR4	= op4
+spDR1 =		op1		; Also known as decay 2 rate
+spDR2 =		op2
+spDR3 =		op3
+spDR4 =		op4
     endm
 
 ; Patches - Release Rate
 spReleaseRt macro op1,op2,op3,op4
-spRR1	= op1
-spRR2	= op2
-spRR3	= op3
-spRR4	= op4
+spRR1 =		op1
+spRR2 =		op2
+spRR3 =		op3
+spRR4 =		op4
     endm
 
 ; Patches - SSG-EG
 spSSGEG macro op1,op2,op3,op4
-spSS1	= op1
-spSS2	= op2
-spSS3	= op3
-spSS4	= op4
+spSS1 =		op1
+spSS2 =		op2
+spSS3 =		op3
+spSS4 =		op4
     endm
 
 ; Patches - Total Level
 spTotalLv macro op1,op2,op3,op4
-spTL1	= op1
-spTL2	= op2
-spTL3	= op3
-spTL4	= op4
+spTL1 =		op1
+spTL2 =		op2
+spTL3 =		op3
+spTL4 =		op4
 
 ; Construct the patch finally.
 	dc.b	(spFe<<3)+spAl
@@ -254,10 +245,10 @@ spTLMask1 set ((spAl=7)<<7)
 
 ; Patches - Total Level (for broken total level masks)
 spTotalLv2 macro op1,op2,op3,op4
-spTL1	= op1
-spTL2	= op2
-spTL3	= op3
-spTL4	= op4
+spTL1 =		op1
+spTL2 =		op2
+spTL3 =		op3
+spTL4 =		op4
 
 	dc.b (spFe<<3)+spAl
 	dc.b (spDe1<<4)+spMu1, (spDe3<<4)+spMu3, (spDe2<<4)+spMu2, (spDe4<<4)+spMu4
@@ -272,6 +263,15 @@ spTL4	= op4
 		dc.b 'NAT'	; align the patch
 	endif
     endm
+; ---------------------------------------------------------------------------------------------
+; Command Flag Macros and Equates. Based on the original s1smps2asm, and Flamewing's smps2asm
+; ---------------------------------------------------------------------------------------------
+
+spNone =	$00
+spRight =	$40
+spLeft =	$80
+spCentre =	$C0
+spCenter =	$C0
 ; ---------------------------------------------------------------------------------------------
 ; tracker commands
 ; ---------------------------------------------------------------------------------------------
@@ -289,41 +289,41 @@ sPan		macro pan, ams, fms
     endm
 
 ; E1xx - Set channel frequency displacement to xx (DETUNE_SET)
-ssDetune	macro val
-	dc.b $E1, \val
+ssDetune	macro detune
+	dc.b $E1, \detune
     endm
 
 ; E2xx - Add xx to channel frequency displacement (DETUNE)
-saDetune	macro val
-	dc.b $E2, \val
+saDetune	macro detune
+	dc.b $E2, \detune
     endm
 
 ; E3xx - Set channel pitch to xx (TRANSPOSE - TRNSP_SET)
-ssTranspose	macro val
-	dc.b $E3, \val
+ssTranspose	macro transp
+	dc.b $E3, \transp
     endm
 
 ; E4xx - Add xx to channel pitch (TRANSPOSE - TRNSP_ADD)
-saTranspose	macro val
-	dc.b $E4, \val
+saTranspose	macro transp
+	dc.b $E4, \transp
     endm
 
 ; E5xx - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
-ssTickMulCh	macro val
-	dc.b $E5, \val-1
+ssTickMulCh	macro tick
+	dc.b $E5, \tick-1
     endm
 
 ; E6xx - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
-ssTickMul	macro val
-	dc.b $E6, \val-1
+ssTickMul	macro tick
+	dc.b $E6, \tick-1
     endm
 
 ; E7 - Do not attack of next note (HOLD)
 sHold =		$E7
 
 ; E8xx - Set patch/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
-sVoice		macro val
-	dc.b $E8, \val
+sVoice		macro voice
+	dc.b $E8, \voice
     endm
 
 ; F2xx - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
@@ -505,8 +505,8 @@ sSpinReset	macro
     endm
 
 ; FF20xyzz - Get RAM address pointer offset by y, compare zz with it using condition x (COMM_CONDITION - COMM_SPEC)
-sCondReg	macro off, cond, val
-	dc.b $FF,$20, \off|(\cond<<4),\val
+sCondReg	macro index, cond, val
+	dc.b $FF,$20, \index|(\cond<<4),\val
     endm
 
 ; FF24xx - Play another music/sfx (SND_CMD)
