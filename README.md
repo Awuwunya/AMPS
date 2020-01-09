@@ -5,6 +5,10 @@ AMPS is a 68k-based SMPS-like sound driver, designed to be used with ROM hacks a
 # More info
 Sonic Stuff Research Group - Sonic Retro
 
+# Example implmentations
+* [Sonic 1 2005 implementation](https://github.com/NatsumiFox/AMPS-Sonic-1-2005)
+* [Sonic 2 Git implementation](https://github.com/NatsumiFox/AMPS-Sonic-2)
+
 # Features
 * Highly optimized code, that will ensure that no time is wasted in processing the 68k side code.
 * Lower RAM usage. The driver optimizes the RAM usage, so that it is easier to add into any program. This release of the sound driver uses only $29A bytes of RAM.
