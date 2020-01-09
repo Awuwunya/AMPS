@@ -321,7 +321,7 @@
 			vertical-align: middle;
 		}
 
-		smps2asm {
+		smps2asm, asm {
 			display: block;
 			tab-size: 8;
 			white-space: pre;
@@ -332,36 +332,44 @@
 			padding: .4vw .5vw;
 		}
 
-		smps2asm::-moz-selection, smps2asm > *::-moz-selection {
+		smps2asm::-moz-selection, smps2asm > *::-moz-selection, asm::-moz-selection, asm > *::-moz-selection {
 			background: #606080CF;
 		}
 
-		smps2asm::selection, smps2asm > *::selection {
+		smps2asm::selection, smps2asm > *::selection, asm::selection, asm > *::selection {
 			background: #606080CF;
 		}
 
-		smps2asm > lbl {
+		smps2asm > lbl, asm > lbl {
 			color: #D4D4D4;
 		}
 
-		smps2asm > mac {
+		smps2asm > mac, asm > mac {
 			color: #4CBD00;
 		}
 
-		smps2asm > val {
+		smps2asm > val, asm > val {
 			color: #FF7575;
 		}
 
-		smps2asm > equ {
+		smps2asm > equ, asm > equ {
 			color: #AA7FFF;
 		}
 
-		smps2asm > cmt {
+		smps2asm > cmt, asm > cmt {
 			color: #8F8F8F;
 		}
 
-		smps2asm > opc {
+		smps2asm > opc, asm > opc {
 			color: #9fb6f2;
+		}
+
+		asm > ea {
+			color: #4EB51B;
+		}
+
+		asm > math {
+			color: #FFC273;
 		}
 	</style>
 </head>
@@ -376,19 +384,21 @@
 	<tblcnt><a href="#part4">4 — Trackers</a></tblcnt>
 	<tblcnt><a href="#part4_1">	4.1 — Trackers Overview</a></tblcnt>
 	<tblcnt><a href="#part4_2">	4.2 — Tracker Commands</a></tblcnt>
-	<tblcnt><a href="#part4_21">		4.2.1 — Modulation</a></tblcnt>
 	<tblcnt><a href="#part4_3">	4.3 — SN76496</a></tblcnt>
 	<tblcnt><a href="#part4_4">	4.4 — YM2612</a></tblcnt>
 	<tblcnt><a href="#part4_5">	4.5 — Dual PCM</a></tblcnt>
-	<tblcnt><a href="#part5">5 — Communication Bytes</a></tblcnt>
-	<tblcnt><a href="#part6">6 — Volume Control</a></tblcnt>
+	<tblcnt><a href="#part5">5 — Frequency</a></tblcnt>
+	<tblcnt><a href="#part5_1">	5.1 — Modulation</a></tblcnt>
+	<tblcnt><a href="#part6">6 — Volume</a></tblcnt>
 	<tblcnt><a href="#part6_1">	6.1 — Channel Volumes</a></tblcnt>
 	<tblcnt><a href="#part6_2">	6.2 — Volume Fading</a></tblcnt>
-	<tblcnt><a href="#part7">7 — Memory Map</a></tblcnt>
-	<tblcnt><a href="#part8">8 — Creating Custom Music</a></tblcnt>
-	<tblcnt><a href="#part9">9 — Porting Music</a></tblcnt>
-	<tblcnt><a href="#part10">10 — Installing AMPS</a></tblcnt>
-	<tblcnt><a href="#part11">11 — Frequent Questions & Answers</a></tblcnt>
+	<tblcnt><a href="#part7">7 — Envelopes</a></tblcnt>
+	<tblcnt><a href="#part8">8 — Communication Bytes</a></tblcnt>
+	<tblcnt><a href="#part9">9 — Memory Map</a></tblcnt>
+	<tblcnt><a href="#part10">10 — Creating Custom Music</a></tblcnt>
+	<tblcnt><a href="#part11">11 — Porting Music</a></tblcnt>
+	<tblcnt><a href="#part12">12 — Installing AMPS</a></tblcnt>
+	<tblcnt><a href="#part13">13 — Frequent Questions & Answers</a></tblcnt>
 
 	<h1 id="part1" class="bd">1 — Introduction</h1>
 	<p>
@@ -426,12 +436,12 @@
 			it is possible that a PSG frequency overflows and messes with other PSG channels. This behaviour, for whatever reason,
 			is required to make the insta-shield sound effect from Sonic 3 & Knuckles work correctly.</li>
 		<li><b>FEATURE_SFX_MASTERVOL</b> — When enabled, SFX channels will be affected by <a href="#part6">master volume.</a></li>
-		<li><b>FEATURE_MODULATION</b> — When enabled, <a href="#part4_21">software modulation</a> can be used. This allows
+		<li><b>FEATURE_MODULATION</b> — When enabled, <a href="#part5_1">software modulation</a> can be used. This allows
 			the programmer to define a linear change for frequency over time, which can also go back and forth between
 			rising and falling.</li>
-		<li><b>FEATURE_PORTAMENTO</b> — When enabled, <a href="#part4_21">the portamento command</a> can be used. Portamento
+		<li><b>FEATURE_PORTAMENTO</b> — When enabled, <a href="#part5">the portamento command</a> can be used. Portamento
 			makes the notes smoothly change over specified number of frames (or 0 frames which disables this effect).</li>
-		<li><b>FEATURE_MODENV</b> — When enabled, <a href="#part4_21">modulation envelopes</a> can be used. Similarly to
+		<li><b>FEATURE_MODENV</b> — When enabled, <a href="#part5">modulation envelopes</a> can be used. Similarly to
 			volume envelopes (also known as PSG instruments or PSG tones), they can be used to create more complex patterns
 			for changing channel frequency. Every frame a value is read from a list specified by the modulation envelope ID,
 			and that is used to calculate the frequency displacement.</li>
@@ -627,7 +637,7 @@
 		hold command was played. However, if a note is played instead, AMPS will read its frequency from the appropriate table, and then check the next byte. If this byte is a delay, the delay is also read and processed.
 		There must be no other commands or notes before the delay for this to happen. Again, if no delay was ever played, this is considered undefined behaviour. AMPS will stop reading the tracker, process the delay,
 		and continue to do standard note-on behaviour unless a hold command was played. Although these three approaches may seem confusing and unnecessary, it actually helps to avoid repeating yourself and save some ROM
-		space. It may not be necessary, but it will help those who want it. More about frequencies can be read from <a href="#part4_21">part 4.2.1</a>. Below, you can see a demonstration of how this works:
+		space. It may not be necessary, but it will help those who want it. More about frequencies can be read from <a href="#part5">part 5</a>. Below, you can see a demonstration of how this works:
 	</p>
 	<smps2asm>	<opc>dc.b</opc> <equ>nRst</equ>, <val>$0C</val>			<cmt>; play a rest note for $0C frames</cmt>
 	<opc>dc.b</opc> <equ>nE4</equ>			<cmt>; play E4 note for $0C frames</cmt>
@@ -671,11 +681,11 @@
 	</ul>
 	<h4>$E1 — ssDetune &lt;val&gt;</h4>
 	<p>
-		Sets the channel detune to <b>&lt;val&gt;</b>. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a> This command is skipped when condition is false.
+		Sets the channel detune to <b>&lt;val&gt;</b>. Detune is used to change the frequency of the channel slightly. <a href="#part5">You can read more about how this works here.</a> This command is skipped when condition is false.
 	</p>
 	<h4>$E2 — saDetune &lt;val&gt;</h4>
 	<p>
-		Adds <b>&lt;val&gt;</b> to the channel detune. Detune is used to change the frequency of the channel slightly. <a href="#part4_21">You can read more about how this works here.</a> This command is skipped when condition is false.
+		Adds <b>&lt;val&gt;</b> to the channel detune. Detune is used to change the frequency of the channel slightly. <a href="#part5">You can read more about how this works here.</a> This command is skipped when condition is false.
 	</p>
 	<h4>$E3 — ssTranspose &lt;val&gt;</h4>
 	<p>
@@ -771,7 +781,7 @@
 		from SMPS games, but in general it works similarly. The &lt;wait&gt; parameter delays the start of the modulation by that number of frames, where 0 frames means it starts immediately. &lt;speed&gt; is
 		the number of frames to delay until the next step is executed. 0 frames is considered undefined behaviour. &lt;step&gt; is the frequency offset per step. Values are sign extended, so anything above $7F
 		is a negative value. The resulting frequency offset is 16-bit and can also be negative. &lt;count&gt; is the number of steps to perform before negating the &lt;step&gt; parameter. 0 steps will behave as
-		$100 steps. For a more in-depth explanation of the algorithm, <a href="#part4_21">see the next part</a>. This command is skipped when condition is false.
+		$100 steps. For a more in-depth explanation of the algorithm, <a href="#part5_1">see the next part</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F1 — ssPortamento &lt;speed&gt;</h4>
 	<p>
@@ -791,7 +801,7 @@
 	<p>
 		Sets the channel modulation envelope to <b>&lt;env&gt;</b>. Modulation envelopes are used to change the frequency of a channel per frame, reading from a list. This works similarly to volume enveloes, but has some
 		differences as well. SMPS games have used this feature to create more dynamic sounding instruments. HThis feature is only available when FEATURE_MODENV is enabled. More about modulation envelopes in
-		<a href="#part4_21">part 4.2.1</a>. This command is skipped when condition is false.
+		<a href="#part5">part 5</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F4 — sCont &lt;loc&gt;</h4>
 	<p>
@@ -838,12 +848,12 @@
 	<h4>$FA — sComm &lt;index&gt; &lt;val&gt;</h4>
 	<p>
 		Sets the communications byte <b>&lt;index&gt;</b> to <b>&lt;val&gt;</b>. Since AMPS only supports 16 communications bytes, using indexes higher than that will result in undefined behaviour. There are only 8 communications flags installed by default however.
-		If you extend the number of available communications bytes, then they may be used. Read more about communications bytes in <a href="#part5">part 5</a>.
+		If you extend the number of available communications bytes, then they may be used. Read more about communications bytes in <a href="#part7">part 7</a>.
 	</p>
 	<h4>$FB — sCond &lt;index&gt; &lt;cond&gt; &lt;val&gt;</h4>
 	<p>
 		Checks the value of communications byte <b>&lt;index&gt;</b> against <b>&lt;val&gt;</b>. The command reads the byte at <b>&lt;index&gt;</b>, compares its value to <b>&lt;val&gt;</b>, and then uses
-		<b>&lt;cond&gt;</b> to decide whether to set condition mode to false. When condition is false, execution of some tracker commands is disabled. To read more about this, see <a href="#part5">part 5</a>.
+		<b>&lt;cond&gt;</b> to decide whether to set condition mode to false. When condition is false, execution of some tracker commands is disabled. To read more about this, see <a href="#part7">part 7</a>.
 		Below is a table of all valid conditions:
 	</p>
 	<ul>
@@ -928,7 +938,7 @@
 	<p>
 		Checks the value of a RAM address indexed from a table (dcCondRegTable) at <b>&lt;off&gt;</b> against <b>&lt;val&gt;</b>. The command reads the byte at <b>&lt;index&gt;</b>, compares its
 		value to <b>&lt;val&gt;</b>, and then uses <b>&lt;cond&gt;</b> to decide whether to set condition mode to false. When condition is false, execution of some tracker commands is disabled.
-		To read more about this, see <a href="#part5">part 5</a>. Below is a table of all valid conditions:
+		To read more about this, see <a href="#part7">part 7</a>. Below is a table of all valid conditions:
 	</p>
 	<ul>
 		<li><b>$00, dcoT</b> — Sets condition to true regardless.</li>
@@ -996,15 +1006,52 @@
 		aspects of AMPS, or the programming itself. Only available in safe mode, it is ignored in normal mode.
 	</p>
 
-	<h3 id="part4_21" class="bd">4.2.1 — Modulation</h3>
-
 	<h3 id="part4_3" class="bd">4.3 — SN76496</h3>
 
 	<h3 id="part4_4" class="bd">4.4 — YM2612</h3>
 
 	<h3 id="part4_5" class="bd">4.5 — Dual PCM</h3>
 
-	<h1 id="part5" class="bd">5 — Communication Bytes</h1>
+	<h1 id="part5" class="bd">5 — Frequency</h1>
+
+	<h3 id="part5_1" class="bd">5.1 — Modulation</h3>
+
+	<h1 id="part6" class="bd">6 — Volume</h1>
+	<p>
+		Internally, AMPS uses 7-bit volume for all software channels. This makes the editing of volumes consistent between different sound hardware. This does mean, that PSG volume is
+		actually multiples of 8 of the real hardware volume. AMPS lazily shifts it down instead of using a look-up-table to be more accurate. Volume levels go from $00 to $7F, where $00
+		is the loudest possible and $7F is muted. Any values outside of the range are treated as $7F. Volumes depend on the hardware and other settings so comparing volumes 1:1 between
+		hardware types is difficult. The volume is merely a relative measure to help the programmer adjust the music to their liking. Volume is also useful to make music fade in/out easily.
+	</p>
+	<p>
+		There are a few factors that come into the final volume. There is master volume for each hardware type (SFX may ignore this depending in settings), per-channel volume, volume
+		envelopes, and for FM channels, total level values too. Additionally, the PCM volume levels also affect DAC channels. DAC channels request Dual PCM to load a volume table from ROM
+		into Z80 memory for quick access. This is so that any arbitary volume table can be loaded at any volume level, which helps the code to be more optimal. Because it takes some time to
+		load the table however, it is only possible to do this every 4 frames without quality loss. Unlike Dual PCM, AMPS by default makes the buffer repeat if volumes are updated too
+		quickly. This was deemed less distracting and therefore prefered. Avoid updating DAC volumes more often than once per 4 frames if possible, to avoid this issue.
+	</p>
+
+	<h3 id="part6_1" class="bd">6.1 — Channel Volumes</h3>
+	<p>
+		Channels exclusively handle the volume of hardware channels. Some code may mute the hardware channels, but if a volume needs to be updated, the channel will be requested to do it.
+		This flag is used by the tracker, channel itself, and outside influences to correctly update the channel volume when required. This simplifies the complex process of volume updates.
+		AMPS processes volume in the following order:
+	</p>
+	<ul>
+		<li><b>channel volume</b> — Channel-specific volume. Can be used to easily change the volume of the sound but have to be careful about it as well.</li>
+		<li><b>master volume</b> — For all applicable channels, master volume is loaded. SFX may disable master volume checks. Depending on channel type, volume is loaded from either
+			mMasterVolFM, mMasterVolDAC or mMasterVolPSG</li>
+		<li><b>volume envelopes</b> — Volume envelopes are processed every frame. <a href="#part7">Read more in the next part</a>.</li>
+		<li><b>total level in FM channels</b> — Each FM channel has 4 total level values for each operator. Slot operators are affected by volume calculation, while non-slot aren't.</li>
+		<li><b>underwater mode for FM</b> — Underwater mode also affects the volume calculation and non-slot total level value.</li>
+		<li><b>PCM audio for DAC channels</b> — The PCM audio data itself is basically just a list of volumes, so it makes sense it can affect how loud the volume is.</li>
+		<li><b>PSG audio filtering on real hardware</b> — PSG audio is also somewhat different relatively to FM and DAC audio in real systems. This is because of inconsistent filters
+			and buggy implementation. AMPS can not do anything about this problem however.</li>
+	</ul>
+
+	<h3 id="part6_2" class="bd">6.2 — Volume Fading</h3>
+
+	<h1 id="part7" class="bd">7 — Communication Bytes</h1>
 	<p>
 		AMPS allows trackers to communicate with the game program using communications bytes. By default, 8 bytes are defined that are accessible to both read & write from
 		the tracker. You can conditionally execute tracker code when checking the communications byte with a condition mode. Whenever condition is set to false, number of
@@ -1013,22 +1060,19 @@
 		programmer on how they decide to accomplish this. <a href="#part4_1">This earlier part also lists which commands will be skipped.</a>
 	</p>
 	<p>
-		The 8 bytes can be acessed through mQueue to mQueue+7. The game program is free to manipulate these in any way and the programmer is responsible for deciding which
+		The 8 bytes can be acessed through mComm to mComm+7. The game program is free to manipulate these in any way and the programmer is responsible for deciding which
 		communications bytes are used for what purpose. Communications bytes are not initialized to any specific value, so relying on them being, for example, 0 is not adviced.
 		Communication bytes do not get reset ever with AMPS, so sharing them between songs, sound effects or other is possible. It is a good idea to reset all the communications
-		bytes you intend to use for songs with tracker code.
+		bytes you intend to use for songs with tracker code. Here is an example of reading and writing to the communications flags:
 	</p>
+	<asm>	<opc>move.b</opc>	<equ>mComm</equ><math>+</math><val>3</val><opc>.w</opc>,<ea>d0</ea>					<cmt>; load 4th communications byte to d0</cmt>
+	<opc>and.b</opc>	#<val>$07</val>,<ea>d0</ea>						<cmt>; clear some extra bits out</cmt>
+	<opc>move.b</opc>	<ea>d0</ea>,<equ>mComm</equ><opc>.w</opc>					<cmt>; save as the 1st communications byte</cmt></asm>
 	<p>
 		Communications bytes can be extended up to 256 bytes if the programmer needs that, but you have to remember, only 16 are available using the sCond command. Additionally,
 		sCondReg command can be used to read from pre-defined RAM addresses or channel offsets. dcCondRegTable contains the table of pointers that are used for reading with this
 		command.
 	</p>
-
-	<h1 id="part6" class="bd">6 — Volume Control</h1>
-
-	<h3 id="part6_1" class="bd">6.1 — Channel Volumes</h3>
-
-	<h3 id="part6_2" class="bd">6.2 — Volume Fading</h3>
 
 	<h1 id="part7" class="bd">7 — Memory Map</h1>
 	<p>
