@@ -374,14 +374,15 @@
 		}
 	</style>
 </head>
-<body onload="refRAM()">
+<body onload="refRAM();">
 	<h3 style='text-decoration: underline;'>AMPS v2.0 technical manual</h3>
 	<h1>Table of contents</h1>
 	<tblcnt><a href="#part1">1 — Introduction</a></tblcnt>
+	<tblcnt><a href="#part1_1">	1.1 — Undefined Behaviour</a></tblcnt>
 	<tblcnt><a href="#part2">2 — AMPS Overview</a></tblcnt>
 	<tblcnt><a href="#part3">3 — Sound System</a></tblcnt>
-	<tblcnt><a href="#part3_1">   3.1 — Music Files</a></tblcnt>
-	<tblcnt><a href="#part3_2">   3.2 — Sound Effect Files</a></tblcnt>
+	<tblcnt><a href="#part3_1">	3.1 — Music Files</a></tblcnt>
+	<tblcnt><a href="#part3_2">	3.2 — Sound Effect Files</a></tblcnt>
 	<tblcnt><a href="#part4">4 — Trackers</a></tblcnt>
 	<tblcnt><a href="#part4_1">	4.1 — Trackers Overview</a></tblcnt>
 	<tblcnt><a href="#part4_2">	4.2 — Tracker Commands</a></tblcnt>
@@ -392,7 +393,8 @@
 	<tblcnt><a href="#part5_1">	5.1 — Modulation</a></tblcnt>
 	<tblcnt><a href="#part6">6 — Volume</a></tblcnt>
 	<tblcnt><a href="#part6_1">	6.1 — Channel Volumes</a></tblcnt>
-	<tblcnt><a href="#part6_2">	6.2 — Volume Fading</a></tblcnt>
+	<tblcnt><a href="#part6_2">	6.2 — Underwater mode</a></tblcnt>
+	<tblcnt><a href="#part6_3">	6.3 — Volume Fading</a></tblcnt>
 	<tblcnt><a href="#part7">7 — Envelopes</a></tblcnt>
 	<tblcnt><a href="#part8">8 — Communication Bytes</a></tblcnt>
 	<tblcnt><a href="#part9">9 — Memory Map</a></tblcnt>
@@ -417,6 +419,15 @@
 		for other sound drivers, you can convert the files into AMPS format. More on that in <a href="#part9">part 9</a>.
 	</p>
 
+	<h3 id="part1_1" class="bd">1.1 — Undefined Behaviour</h3>
+	<p>
+		This document will talk a lot about undefined behaviour. But what is undefined behaviour? Simply, undefined behaviour is things that you can do from a technical sense, and there is
+		nothing stopping you, but it is not intended to be done and therefore the result can be whatever. It can change, or stay the same, depend on something, and change between versions.
+		While it is possible to do, you really shouldn't. It is never guaranteed to work the way you expect, want, or desire. Furthermore, trying to support someone's preferences of things
+		that weren't ever supposed to exist is not possible, and I won't waste my time trying. In the future, safe mode will be more careful about checking for undefined behaviour, but right
+		now often that is not the case.
+	</p>
+
 	<h1 id="part2" class="bd">2 — AMPS Overview</h1>
 	<p>
 		AMPS is based on sound data files, perhaps erroneously referred to as tracker files. These files define each song and sound effect
@@ -436,7 +447,7 @@
 		<li><b>FEATURE_SAFE_PSGFREQ</b> — When enabled, the PSG frequency behaviour is set to safe mode. When disabled,
 			it is possible that a PSG frequency overflows and messes with other PSG channels. This behaviour, for whatever reason,
 			is required to make the insta-shield sound effect from Sonic 3 & Knuckles work correctly.</li>
-		<li><b>FEATURE_SFX_MASTERVOL</b> — When enabled, SFX channels will be affected by <a href="#part6">master volume.</a></li>
+		<li><b>FEATURE_SFX_MASTERVOL</b> — When enabled, sound effect channels will be affected by <a href="#part6">master volume.</a></li>
 		<li><b>FEATURE_MODULATION</b> — When enabled, <a href="#part5_1">software modulation</a> can be used. This allows
 			the programmer to define a linear change for frequency over time, which can also go back and forth between
 			rising and falling.</li>
@@ -450,7 +461,7 @@
 			channels along with PSG channels. They can be used to create more complex patterns for changing channel volume.
 			Every frame a value is read from a list specified by the volume envelope ID, which is then used to calculate the
 			volume displacement.</li>
-		<li><b>FEATURE_UNDERWATER</b> — When enabled, <a href="#part6_1">underwater mode</a> is enabled. This makes it so that
+		<li><b>FEATURE_UNDERWATER</b> — When enabled, <a href="#part6_2">underwater mode</a> is enabled. This makes it so that
 			68k can request underwater mode to be activated, and when it is, all FM voices will sound slightly muffled. This is intended
 			to emulate how music would sound if it were played underwater. Although the effect is not perfect, it creates an
 			additional "depth" to how your game will sound when implemented right.</li>
@@ -482,11 +493,11 @@
 	<ul>
 		<li><b>mus_Reset</b> — Resets various things about AMPS: the underwater mode, speed shoes mode, and any backed-up song status.</li>
 		<li><b>mus_FadeOut</b> — Fades out the current song.</li>
-		<li><b>mus_Stop</b> — Stops the current song and sfx immediately. Also clears sound driver memory and mutes hardware.</li>
+		<li><b>mus_Stop</b> — Stops the current song and sound effects immediately. Also clears sound driver memory and mutes hardware.</li>
 		<li><b>mus_ShoesOn</b> — Enables the speed shoes mode. This changes the tempo from using normal tempo, to the speed up tempo defined for the song.</li>
 		<li><b>mus_ShoesOff</b> — Disables the speed shoes mode. This changes the tempo from using speed up tempo, to the normal tempo defined for the song.</li>
-		<li><b>mus_ToWater</b> — Enables <a href="#part6_1">underwater mode</a>.</li>
-		<li><b>mus_OutWater</b> — Disables <a href="#part6_1">underwater mode</a>.</li>
+		<li><b>mus_ToWater</b> — Enables <a href="#part6_2">underwater mode</a>.</li>
+		<li><b>mus_OutWater</b> — Disables <a href="#part6_2">underwater mode</a>.</li>
 		<li><b>mus_Pause</b> — Pauses the execution of AMPS and mutes hardware. AMPS will ignore everything except sound commands at this point.</li>
 		<li><b>mus_Unpause</b> — Unpauses the execution of AMPS. Some notes will not play for a moment after the unpause, due to limitations with the hardware.</li>
 		<li><b>mus_StopSFX</b> — Safely stops every sound effect. This will correctly release all hardware channels back to music.</li>
@@ -1025,11 +1036,8 @@
 		hardware types is difficult. The volume is merely a relative measure to help the programmer adjust the music to their liking. Volume is also useful to make music fade in/out easily.
 	</p>
 	<p>
-		There are a few factors that come into the final volume. There is master volume for each hardware type (SFX may ignore this depending in settings), per-channel volume, volume
-		envelopes, and for FM channels, total level values too. Additionally, the PCM volume levels also affect DAC channels. DAC channels request Dual PCM to load a volume table from ROM
-		into Z80 memory for quick access. This is so that any arbitary volume table can be loaded at any volume level, which helps the code to be more optimal. Because it takes some time to
-		load the table however, it is only possible to do this every 4 frames without quality loss. Unlike Dual PCM, AMPS by default makes the buffer repeat if volumes are updated too
-		quickly. This was deemed less distracting and therefore prefered. Avoid updating DAC volumes more often than once per 4 frames if possible, to avoid this issue.
+		There are a few factors that come into the final volume. There is master volume for each hardware type (sound effects may ignore this depending in settings), per-channel volume,
+		volume envelopes, and for FM channels, total level values too. Additionally, the PCM volume levels also affect DAC channels.
 	</p>
 
 	<h3 id="part6_1" class="bd">6.1 — Channel Volumes</h3>
@@ -1040,8 +1048,8 @@
 	</p>
 	<ul>
 		<li><b>channel volume</b> — Channel-specific volume. Can be used to easily change the volume of the sound but have to be careful about it as well.</li>
-		<li><b>master volume</b> — For all applicable channels, master volume is loaded. SFX may disable master volume checks. Depending on channel type, volume is loaded from either
-			mMasterVolFM, mMasterVolDAC or mMasterVolPSG</li>
+		<li><b>master volume</b> — For all applicable channels, master volume is loaded. Sound effects may disable master volume checks. Depending on channel type, volume is loaded from
+			either mMasterVolFM, mMasterVolDAC or mMasterVolPSG</li>
 		<li><b>volume envelopes</b> — Volume envelopes are processed every frame. <a href="#part7">Read more in the next part</a>.</li>
 		<li><b>total level in FM channels</b> — Each FM channel has 4 total level values for each operator. Slot operators are affected by volume calculation, while non-slot aren't.</li>
 		<li><b>underwater mode for FM</b> — Underwater mode also affects the volume calculation and non-slot total level value.</li>
@@ -1049,10 +1057,66 @@
 		<li><b>PSG audio filtering on real hardware</b> — PSG audio is also somewhat different relatively to FM and DAC audio in real systems. This is because of inconsistent filters
 			and buggy implementation. AMPS can not do anything about this problem however.</li>
 	</ul>
+	<p>
+		The final step of this process is to send the volume to hardware. In case of PSG, this is a single PSG command containing the volume. For FM, it is 4 total level operators per
+		channel. For DAC, however, it is a bit more complex. Dual PCM uses a volume filter bank with $80 levels of volume to scale the PCM input volume. This allows for very complex filters
+		or a simple filter that AMPS comes with. By default, AMPS uses a logarithmic filter that closely mimics FM volume (but not 100%). However, custom filters may be applied. There is a
+		tracker commad, ssFilter, that allows to change the bank. AMPS is very lazy with handling these filters and they can also affect sound effect channels (a filter loaded with DAC1 on
+		music will affect SFX DAC1, and vice versa), so you have to be careful. AMPS requests a volume update from Dual PCM in order to load the correct volume table in Z80 RAM, which then
+		acts as the current filter for the current volume level. It takes some time to load the volume table in RAM, so loading a new volume only every 4 frames or more is recommended. If
+		you load it more often, quality loss is likely to happen. AMPS tells Dual PCM to wrap the buffer around, so a part of the sample will repeat on itself. This is less distracting than
+		the default behaviour of Dual PCM where the samples will delay for a moment. The best thing to do is avoid updating PCM volume too often.
+	</p>
+	<p>
+		Updating PSG and DAC volume is fairly fast for the 68k to do (even given the amount of work required), but unfortunately FM volume is noticeably slower. This is mainly because of the
+		4 operators that need updating, and the fact we've got to take time from Dual PCM for a while. AMPS optimizes this but at the cost of more 68k time. Avoid updating volume unless it
+		is necessary!
+	</p>
 
-	<h3 id="part6_2" class="bd">6.2 — Volume Fading</h3>
+	<h3 id="part6_2" class="bd">6.2 — Underwater Mode</h3>
+	<p>
+		Underwater mode is a software effect intended to emulate the music playing under water. This is especially useful for adding more depth for water-based levels. The effect is not
+		perfect but it often sounds convincing enough. This feature can be enabled/disabled with FEATURE_UNDERWATER. Underwater mode currently only affects FM volumes. It works by using the
+		algorithm of the voice to read a value from the table (below), and adding part of it into slot operators (volume), and addint it fully to non-slot operators (modulator/sharpness).
+		The table explains it below:
+	</p>
+	<table border="1">
+		<tr><td>algorithm</td><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td></tr>
+		<tr><td>slot offset</td><td>$00</td><td>$00</td><td>$00</td><td>$00</td><td>$02</td><td>$06</td><td>$06</td><td>$07</td></tr>
+		<tr><td>nonslot offs</td><td>$08</td><td>$08</td><td>$08</td><td>$08</td><td>$0A</td><td>$0E</td><td>$0E</td><td>$0F</td></tr>
+	</table>
+	<p>
+		This can cause issues with some instruments, that do not sound good when this algorithm is applied. For underwater levels, you may have to consider how music and sound effects sound
+		when underwater mode is enabled.
+	</p>
 
-	<h1 id="part7" class="bd">7 — Communication Bytes</h1>
+	<h3 id="part6_3" class="bd">6.3 — Volume Fading</h3>
+	<p>
+		AMPS provides a custom and extensible way to create custom volume fades. By default, only a fade in and fade out are defined. AMPS uses a list of volumes to define how to do fades.
+		Technically, a volume fade does not need to be limited to ending or starting at a muted volume, it can be fade from any volume to any other, and can use any values. The only things
+		that matter is that there is a starting point, and it ends with a command. The table below explains what each command does:
+	</p>
+	<ul>
+		<li><b>$80, fEnd</b> — Simply ends the volume fade.</li>
+		<li><b>$84, fStop</b> — Stops the current song and sound effects immediately and ends the volume fade. Also clears sound driver memory and mutes hardware.</li>
+		<li><b>$88, fResVol</b> — Resets master volume and asks channels to update their volume.</li>
+		<li><b>$8C, fReset</b> — Does the same as both fStop and fResVol.</li>
+	</ul>
+	<p>
+		Volume fading can be enabled programmatically from 68k by calling dLoadFade, where a4 is the volume fade data address. AMPS will automatically use the current FM volume and search
+		the volume fade to find the closest spot to that. This helps make volume fades smooth and consistent, but it also makes it possible that your volume fade is cut short. Overall its
+		not a good idea to rely on volume fades being consistent or taking certain amount of time, instead allowing it to take longer or shorter.
+	</p>
+	<p>
+		Volume filters are read 3 values per frame. The format is FM volume, DAC volume, PSG volume. Instead, a command may be used as well. Channel volumes are added to music volumes and
+		updated with the channel after volume changes (if the volume does not change, no update happens!). Any value $80 or above is treated as a command, as it is not a valid volume anyway.
+		Updating DAC volume more often than once per 4 frames is not recommended because this will result in audible quality loss. Volume fades are processed before sound channels. A word of
+		warning: If any volume fade data is located before ROM address $10000, the fading will never occur. This is simply a limitation with AMPS.
+	</p>
+
+	<h1 id="part7" class="bd">7 — Envelopes</h1>
+
+	<h1 id="part8" class="bd">8 — Communication Bytes</h1>
 	<p>
 		AMPS allows trackers to communicate with the game program using communications bytes. By default, 8 bytes are defined that are accessible to both read & write from
 		the tracker. You can conditionally execute tracker code when checking the communications byte with a condition mode. Whenever condition is set to false, number of
@@ -1075,7 +1139,7 @@
 		command.
 	</p>
 
-	<h1 id="part7" class="bd">7 — Memory Map</h1>
+	<h1 id="part9" class="bd">9 — Memory Map</h1>
 	<p>
 		Below is the memory map for every individual channel and the entire sound driver. You can select various modes depending on which flags you have enabled, and the correct sequence is computed for you.
 	</p>
@@ -1093,13 +1157,13 @@
 	</div>
 	<br/>
 
-	<h1 id="part8" class="bd">8 — Creating Custom Music</h1>
+	<h1 id="part10" class="bd">10 — Creating Custom Music</h1>
 
-	<h1 id="part9" class="bd">9 — Porting Music</h1>
+	<h1 id="part11" class="bd">11 — Porting Music</h1>
 
-	<h1 id="part10" class="bd">10 — Installing AMPS</h1>
+	<h1 id="part12" class="bd">12 — Installing AMPS</h1>
 
-	<h1 id="part11" class="bd">11 — Frequent Questions & Answers</h1>
+	<h1 id="part13" class="bd">13 — Frequent Questions & Answers</h1>
 	<h3>Do you have a Discord server?</h3>
 	<p>
 		We do indeed! If you want to get the latest AMPS news, talk to the developers, ask questions and get help, and get the latest news and exclusive updates!
