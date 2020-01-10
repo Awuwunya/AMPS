@@ -377,7 +377,7 @@ dcNoisePSG:
 ; ---------------------------------------------------------------------------
 
 dcSound:
-		move.b	(a2)+,mQueue+2.w	; load sound ID from tracker to sound queue
+		move.b	(a2)+,mQueue.w		; load sound ID from tracker to sound queue
 
 Return_dcSound:
 		rts
@@ -400,6 +400,7 @@ dcYM:
 		btst	#cfbInt,(a1)		; is this channel overridden by SFX?
 		bne.s	Return_dcSound		; if so, skip
 
+	CheckCue				; check that cue is valid
 		cmp.b	#$30,d3			; is this register 00-2F?
 		blo.s	.pt1			; if so, write to part 1 always
 
@@ -408,7 +409,6 @@ dcYM:
 		cmp.b	#$08,d4 		; is this register A8-AF?
 		blo.s	.pt1			; if so, write to part 1 always
 
-	CheckCue				; check that cue is valid
 	InitChYM				; prepare to write to YM channel
 	stopZ80
 	WriteChYM	d3, d1			; write to the channel
@@ -417,7 +417,6 @@ dcYM:
 		rts
 
 .pt1
-	CheckCue				; check that cue is valid
 	stopZ80
 	WriteYM1	d3, d1			; write register to YM1
 	;	st	(a0)			; write end marker
@@ -799,7 +798,7 @@ dcVoice:
 ;   d6 - Used for modulator offset
 ; ---------------------------------------------------------------------------
 
-WriteReg	macro	offset, reg
+dVoiceReg	macro	offset, reg
 .offs =	\offset
 
 	rept narg-1
@@ -836,12 +835,12 @@ dUpdateVoiceFM:
 		or.b	d2,d3			; add channel offset to register
 		move.b	d3,(a5)+		; write register to buffer
 
-	WriteReg	0, $30, $38, $34, $3C	; Detune, Multiple
-	WriteReg	0, $50, $58, $54, $5C	; Rate Scale, Attack Rate
-	WriteReg	0, $60, $68, $64, $6C	; Decay 1 Rate
-	WriteReg	0, $70, $78, $74, $7C	; Decay 2 Rate
-	WriteReg	0, $80, $88, $84, $8C	; Decay 1 level, Release Rate
-	WriteReg	0, $90, $98, $94, $9C	; SSG-EG
+	dVoiceReg	0, $30, $38, $34, $3C	; Detune, Multiple
+	dVoiceReg	0, $50, $58, $54, $5C	; Rate Scale, Attack Rate
+	dVoiceReg	0, $60, $68, $64, $6C	; Decay 1 Rate
+	dVoiceReg	0, $70, $78, $74, $7C	; Decay 2 Rate
+	dVoiceReg	0, $80, $88, $84, $8C	; Decay 1 level, Release Rate
+	dVoiceReg	0, $90, $98, $94, $9C	; SSG-EG
 
 		moveq	#4-1,d1			; prepare 4 operators to d1
 		move.b	cVolume(a1),d3		; load FM channel volume to d3
@@ -999,6 +998,7 @@ dcStop:
 ;   a1 - Channel to operate on
 ; thrash:
 ;   a2 - Used for envelope data address
+;   a5 - Used to temporarily use stack for saving LFO values
 ;   d1 - Used ato store YM address
 ;   d2 - Used as dbf counter
 ;   d3 - Used to detect enabled operators
@@ -1010,33 +1010,40 @@ dcStop:
 dcsLFO:
 		moveq	#0,d4
 		move.b	cVoice(a1),d4		; load FM voice ID of the channel to d4
-	dCALC_BANK 9				; get the voice table address to a4
+	dCALC_BANK	9			; get the voice table address to a4
 	dCALC_VOICE				; get address of the specific voice to a4
 
 		move.b	(a2),d3			; load LFO enable operators to d3
-		lea	dAMSEn_Ops(pc),a5	; load Decay 1 Rate address table to a5
-		moveq	#4-1,d2			; prepare 4 operators to d2
-
 	CheckCue				; check that cue is valid
+		btst	#cfbInt,(a1)		; check if channel is interrupted
+		bne.w	.skipLFO		; if so, skip loading LFO
+
+		move.l	sp,a5			; copy stack pointer to a5
+		subq.l	#4,sp			; reserve some space in the stack
+
+	rept 4
+		moveq	#0,d5			; prepare d5 as clear (for roxr)
+		add.b	d3,d3			; check if AMS is enabled for this channel
+		roxr.b	#$01,d5			; if yes, rotate carry bit into bit7 (value of $80)
+
+		move.b	(a4)+,d4		; get Decay 1 Level value from voice to d4
+		or.b	d5,d4			; or the AMS enable value
+		move.b	d4,-(a5)		; save in stack
+	endr
+
+	InitChYM				; prepare to write Channel-specific YM registers
+	stopZ80
+	WriteChYM	#$60, (a5)+		; Decay 1 level: Decay 1 + AMS enable bit for operator 1
+	WriteChYM	#$68, (a5)+		; Decay 1 level: Decay 1 + AMS enable bit for operator 3
+	WriteChYM	#$64, (a5)+		; Decay 1 level: Decay 1 + AMS enable bit for operator 2
+	WriteChYM	#$6C, (a5)+		; Decay 1 level: Decay 1 + AMS enable bit for operator 4
+		bra.s	.cont
+
+.skipLFO
 	InitChYM				; prepare to write Channel-specific YM registers
 	stopZ80
 
-		btst	#cfbInt,(a1)		; check if channel is interrupted
-		bne.s	.skipLFO		; if so, skip loading LFO
-
-.decayloop
-		move.b	(a4)+,d4		; get Decay 1 Level value from voice to d4
-		move.b	(a5)+,d1		; load YM address to write to d1
-
-		add.b	d3,d3			; check if LFO is enabled for this channel
-		bcc.s	.noLFO			; if not, skip
-		or.b	#$80,d4			; set enable LFO bit
-	WriteChYM	d1, d4			; Decay 1 level: Decay 1 + AMS enable bit
-
-.noLFO
-		dbf	d2,.decayloop		; repeat for each Decay 1 Level operator
-
-.skipLFO
+.cont
 	WriteYM1	#$22, (a2)+		; LFO: LFO frequency and enable
 		move.b	(a2)+,d3		; load AMS, FMS & Panning from tracker
 		move.b	d3,cPanning(a1)		; save to channel panning
@@ -1048,6 +1055,7 @@ dcsLFO:
 .skipPan
 	;	st	(a0)			; write end marker
 	startZ80
+		move.l	a5,sp			; restore stack pointer
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -1132,7 +1140,8 @@ dcCondCom:
 .false
 		bset	#cfbCond,(a1)		; set condition to false
 
-.cond	rts			; T
+.cond
+	rts			; T
 	rts
 	dcCondJump bra.s	; F
 	dcCondJump bls.s	; HI

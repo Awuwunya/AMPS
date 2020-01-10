@@ -29,6 +29,7 @@ Test_FM1:
 	sModEnv		mTest
 
 .loop
+	ssLFO		$E8, $f2
 ;	ssPortamento	$2A
 	dc.b nC2, $30, sHold
 ;	ssPortamento	$0C
