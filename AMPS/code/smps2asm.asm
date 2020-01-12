@@ -6,7 +6,7 @@
 ; ---------------------------------------------------------------------------------------------
 
 ; this macro is created to emulate enum in AS
-enum	macro	lable
+enum		macro lable
 	rept narg
 \lable =	_num
 _num =		_num+1
@@ -17,7 +17,7 @@ _num =		_num+1
 ; Note Equates
 ; ---------------------------------------------------------------------------------------------
 
-_num =	$80
+_num =		$80
 	enum nRst
 	enum nC0,nCs0,nD0,nEb0,nE0,nF0,nFs0,nG0,nAb0,nA0,nBb0,nB0
 	enum nC1,nCs1,nD1,nEb1,nE1,nF1,nFs1,nG1,nAb1,nA1,nBb1,nB1
@@ -32,8 +32,8 @@ nHiHat =	nA6
 ; Other Equates
 ; ---------------------------------------------------------------------------------------------
 
-v00 =	$00
-m00 =	$00
+v00 =		$00
+m00 =		$00
 ; ---------------------------------------------------------------------------------------------
 ; Header Macros
 ; ---------------------------------------------------------------------------------------------
@@ -127,11 +127,11 @@ p\name =	sPatNum
 	endif
 
 sPatNum =	sPatNum+1
-spAl =		val
+spAl =		\val
     endm
 
 spFeedback	macro val
-spFe =		val
+spFe =		\val
     endm
 
 ; Patches - Detune
@@ -222,9 +222,11 @@ spTL3 =		\op3
 spTL4 =		\op4
 
 ; Construct the patch finally.
-	dc.b	(spFe<<3)+spAl
+	dc.b (spFe<<3)+spAl
+
 ;   0     1     2     3     4     5     6     7
 ;%1000,%1000,%1000,%1000,%1010,%1110,%1110,%1111
+
 spTLMask4 =	$80
 spTLMask2 =	((spAl>=5)<<7)
 spTLMask3 =	((spAl>=4)<<7)
@@ -411,12 +413,12 @@ ssPortamento	macro frames
 
 ; FF00 - Turn on Modulation (MOD_SET - MODS_ON)
 sModOn		macro
-	dc.b $FF, $00
+	dc.b $FF,$00
     endm
 
 ; FF04 - Turn off Modulation (MOD_SET - MODS_OFF)
 sModOff		macro
-	dc.b $FF, $04
+	dc.b $FF,$04
     endm
 
 ; F4xxxx - Keep looping back to xxxx each time the SFX is being played (CONT_SFX)
@@ -544,7 +546,7 @@ sBackup		macro
 
 ; FF3Cxx - PSG4 noise mode xx (PSG_NOISE - PNOIS_AMPS)
 sNoisePSG	macro mode
-	dc.b $FF, $3C, \mode
+	dc.b $FF,$3C, \mode
     endm
 
 ; FF40 - Freeze 68k. Debug flag (DEBUG_STOP_CPU)

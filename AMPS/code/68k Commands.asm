@@ -999,7 +999,7 @@ dcStop:
 ; thrash:
 ;   a2 - Used for envelope data address
 ;   a5 - Used to temporarily use stack for saving LFO values
-;   d1 - Used ato store YM address
+;   d1 - Used to store YM address
 ;   d2 - Used as dbf counter
 ;   d3 - Used to detect enabled operators
 ;   d4 - Various uses
