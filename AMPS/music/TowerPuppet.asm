@@ -9,8 +9,8 @@ TowerPuppet_Header:
 	sHeaderFM	TowerPuppet_FM3, $00, $10
 	sHeaderFM	TowerPuppet_FM4, $00, $10
 	sHeaderFM	TowerPuppet_FM5, $00, $1F
-	sHeaderPSG	TowerPuppet_PSG1, $DC+$0C, $08, $00, v00
-	sHeaderPSG	TowerPuppet_PSG2, $DC+$0C, $18, $00, v00
+	sHeaderPSG	TowerPuppet_PSG1, $DC+$0C, $08, $00, vNone
+	sHeaderPSG	TowerPuppet_PSG2, $DC+$0C, $18, $00, vNone
 	sHeaderPSG	TowerPuppet_PSG3, $00, $08, $00, vDyHe03
 
 	; Patch $00
@@ -1621,7 +1621,7 @@ TowerPuppet_PSG1:
 	dc.b nC6, $04, nRst, $02, nE6, $04, nRst, $02
 	saVol		-$08
 	dc.b nRst, $30, nRst, nRst, nRst, nRst, $18
-	sVolEnv		v00
+	sVolEnv		vNone
 	saVol		$08
 	saTranspose	$F4
 	ssMod68k	$13, $02, $02, $02
@@ -1663,7 +1663,7 @@ TowerPuppet_Loop17:
 	dc.b $04, nBb5, $02, nRst, $04, nF5, $06, sHold
 	dc.b nF5, $04, nRst, $02, nG5, $04, nRst, $02
 	dc.b nRst, $0C
-	sVolEnv		v00
+	sVolEnv		vNone
 	ssMod68k	$14, $02, $02, $02
 	dc.b nD5, $18, sHold, nD5, $1E, nCs5, $06, nD5
 	dc.b nG5, sHold, nG5, nFs5, $0C, nE5, $16, nRst

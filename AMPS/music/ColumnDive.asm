@@ -9,9 +9,9 @@ ColumnDive_Header:
 	sHeaderFM	ColumnDive_FM3, $F4, $14
 	sHeaderFM	ColumnDive_FM4, $F4, $1A
 	sHeaderFM	ColumnDive_FM5, $F4, $14
-	sHeaderPSG	ColumnDive_PSG1, $E8, $20, $00, v00
-	sHeaderPSG	ColumnDive_PSG2, $E8, $20, $00, v00
-	sHeaderPSG	ColumnDive_PSG3, $00, $10, $00, v00
+	sHeaderPSG	ColumnDive_PSG1, $E8, $20, $00, vNone
+	sHeaderPSG	ColumnDive_PSG2, $E8, $20, $00, vNone
+	sHeaderPSG	ColumnDive_PSG3, $00, $10, $00, vNone
 
 	; Patch $00
 	; $20
@@ -188,7 +188,7 @@ ColumnDive_FM3:
 ColumnDive_PSG1:
 	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call20
-	sVolEnv		v00
+	sVolEnv		vNone
 	sCall		ColumnDrive_Call21
 	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call22
@@ -242,7 +242,7 @@ ColumnDive_FM5:
 ColumnDive_PSG2:
 	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call24
-	sVolEnv		v00
+	sVolEnv		vNone
 	sCall		ColumnDrive_Call25
 	sVolEnv		vCol3_03
 	sCall		ColumnDrive_Call26

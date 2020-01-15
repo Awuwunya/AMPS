@@ -450,7 +450,7 @@
 		<li><b>FEATURE_MODULATION</b> — When enabled, <a href="#part5_1">software modulation</a> can be used. This allows
 			the programmer to define a linear change for frequency over time, which can also go back and forth between
 			rising and falling.</li>
-		<li><b>FEATURE_PORTAMENTO</b> — When enabled, <a href="#part5">the portamento command</a> can be used. Portamento
+		<li><b>FEATURE_PORTAMENTO</b> — When enabled, <a href="#part5_2">the portamento command</a> can be used. Portamento
 			makes the notes smoothly change over specified number of frames (or 0 frames which disables this effect).</li>
 		<li><b>FEATURE_MODENV</b> — When enabled, <a href="#part5">modulation envelopes</a> can be used. Similarly to
 			volume envelopes (also known as PSG instruments or PSG tones), they can be used to create more complex patterns
@@ -796,11 +796,10 @@
 	</p>
 	<h4>$F1 — ssPortamento &lt;speed&gt;</h4>
 	<p>
-		Sets the portamento speed to <b>&lt;speed&gt;</b> frames, where 0 frames disables the effect. Portamento is an effect where the frequency of the previous note is blended smoothly with the current note. This makes
-		the note rise or fall smoothly until the frequency of the next note is met. The <b>&lt;speed&gt;</b> parameter is used to control how long this transition takes. A speed of $01 means there is 1 frame where the
+		Sets the portamento speed to <b>&lt;speed&gt;</b> frames, where 0 frames disables the effect. Portamento is an effect where the frequency of the previous note is blended smoothly with the current note. The <b>&lt;speed&gt;</b> parameter is used to control how long this transition takes. A speed of $01 means there is 1 frame where the
 		note is transitioning to the next. In that example, the frequency will be in the middle of the 2 notes. Portamento only occurs when the next note is played, and therefore will delay the notes slightly. This also
 		affects note on/off behaviour, which will happen whenever the note is played rather than when it transitions. This can be worked around with the sHold tracker command or by creating complex tracker code to execute
-		the note-on when you want it to happen. This is usually not noticeable enough to matter however. Additionally, since FM frequency ranges overlap somewhat, AMPS accounts for this by skipping them. This command is skipped when condition is false.
+		the note-on when you want it to happen. This is usually not noticeable enough to matter however. <a href="#part5_2">Read more about portament in this part</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F2 — sVolEnv &lt;env&gt;</h4>
 	<p>
@@ -1019,13 +1018,117 @@
 
 	<h3 id="part4_3" class="bd">4.3 — SN76496</h3>
 
+
+
+	<table border="1">
+		<tr><td>octave</td><td>nC</td><td>nCs</td><td>nD</td><td>nEb</td><td>nE</td><td>nF</td><td>nFs</td><td>nG</td><td>nAb</td><td>nA</td><td>nBb</td><td>nB</td></tr>
+<tr><td>0</td><td>$80, $03FF</td><td>$81, $03FF</td><td>$82, $03FF</td><td>$83, $03FF</td><td>$84, $03FF</td><td>$85, $03FF</td><td>$86, $03FF</td><td>$87, $03FF</td><td>$88, $03FF</td><td>$89, $03F7</td><td>$8A, $03BE</td><td>$8B, $0388</td></tr>
+<tr><td>1</td><td>$8C, $0356</td><td>$8D, $0326</td><td>$8E, $02F9</td><td>$8F, $02CE</td><td>$90, $02A5</td><td>$91, $0280</td><td>$92, $025C</td><td>$93, $023A</td><td>$94, $021A</td><td>$95, $01FB</td><td>$96, $01DF</td><td>$97, $01C4</td></tr>
+<tr><td>2</td><td>$98, $01AB</td><td>$99, $0193</td><td>$9A, $017D</td><td>$9B, $0167</td><td>$9C, $0153</td><td>$9D, $0140</td><td>$9E, $012E</td><td>$9F, $011D</td><td>$A0, $010D</td><td>$A1, $00FE</td><td>$A2, $00EF</td><td>$A3, $00E2</td></tr>
+<tr><td>3</td><td>$A4, $00D6</td><td>$A5, $00C9</td><td>$A6, $00BE</td><td>$A7, $00B4</td><td>$A8, $00A9</td><td>$A9, $00A0</td><td>$AA, $0097</td><td>$AB, $008F</td><td>$AC, $0087</td><td>$AD, $007F</td><td>$AE, $0078</td><td>$AF, $0071</td></tr>
+<tr><td>4</td><td>$B0, $006B</td><td>$B1, $0065</td><td>$B2, $005F</td><td>$B3, $005A</td><td>$B4, $0055</td><td>$B5, $0050</td><td>$B6, $004B</td><td>$B7, $0047</td><td>$B8, $0043</td><td>$B9, $0040</td><td>$BA, $003C</td><td>$BB, $0039</td></tr>
+<tr><td>5</td><td>$BC, $0036</td><td>$BD, $0033</td><td>$BE, $0030</td><td>$BF, $002D</td><td>$C0, $002B</td><td>$C1, $0028</td><td>$C2, $0026</td><td>$C3, $0024</td><td>$C4, $0022</td><td>$C5, $0020</td><td>$C6, $001F</td><td>$C7, $001D</td></tr>
+<tr><td>6</td><td>$C8, $001B</td><td>$C9, $001A</td><td>$CA, $0018</td><td>$CB, $0017</td><td>$CC, $0016</td><td>$CD, $0015</td><td>$CE, $0013</td><td>$CF, $0012</td><td>$D0, $0011</td><td>$D1, $0000</td><tD colspan="2"></tD></tr>
+	</table>
+
 	<h3 id="part4_4" class="bd">4.4 — YM2612</h3>
+
+
+
+
+	<table border="1">
+		<tr><td>octave</td><td>nC</td><td>nCs</td><td>nD</td><td>nEb</td><td>nE</td><td>nF</td><td>nFs</td><td>nG</td><td>nAb</td><td>nA</td><td>nBb</td><td>nB</td></tr>
+<tr><td>-1</td><td colspan="11"></td><td>$80, $025E</td></tr>
+<tr><td>0</td><td>$81, $0284</td><td>$82, $02AB</td><td>$83, $02D3</td><td>$84, $02FE</td><td>$85, $032D</td><td>$86, $035C</td><td>$87, $038F</td><td>$88, $03C5</td><td>$89, $03FF</td><td>$8A, $043C</td><td>$8B, $047C</td><td>$8C, $0A5E</td></tr>
+<tr><td>1</td><td>$8D, $0A84</td><td>$8E, $0AAB</td><td>$8F, $0AD3</td><td>$90, $0AFE</td><td>$91, $0B2D</td><td>$92, $0B5C</td><td>$93, $0B8F</td><td>$94, $0BC5</td><td>$95, $0BFF</td><td>$96, $0C3C</td><td>$97, $0C7C</td><td>$98, $125E</td></tr>
+<tr><td>2</td><td>$99, $1284</td><td>$9A, $12AB</td><td>$9B, $12D3</td><td>$9C, $12FE</td><td>$9D, $132D</td><td>$9E, $135C</td><td>$9F, $138F</td><td>$A0, $13C5</td><td>$A1, $13FF</td><td>$A2, $143C</td><td>$A3, $147C</td><td>$A4, $1A5E</td></tr>
+<tr><td>3</td><td>$A5, $1A84</td><td>$A6, $1AAB</td><td>$A7, $1AD3</td><td>$A8, $1AFE</td><td>$A9, $1B2D</td><td>$AA, $1B5C</td><td>$AB, $1B8F</td><td>$AC, $1BC5</td><td>$AD, $1BFF</td><td>$AE, $1C3C</td><td>$AF, $1C7C</td><td>$B0, $225E</td></tr>
+<tr><td>4</td><td>$B1, $2284</td><td>$B2, $22AB</td><td>$B3, $22D3</td><td>$B4, $22FE</td><td>$B5, $232D</td><td>$B6, $235C</td><td>$B7, $238F</td><td>$B8, $23C5</td><td>$B9, $23FF</td><td>$BA, $243C</td><td>$BB, $247C</td><td>$BC, $2A5E</td></tr>
+<tr><td>5</td><td>$BD, $2A84</td><td>$BE, $2AAB</td><td>$BF, $2AD3</td><td>$C0, $2AFE</td><td>$C1, $2B2D</td><td>$C2, $2B5C</td><td>$C3, $2B8F</td><td>$C4, $2BC5</td><td>$C5, $2BFF</td><td>$C6, $2C3C</td><td>$C7, $2C7C</td><td>$C8, $325E</td></tr>
+<tr><td>6</td><td>$C9, $3284</td><td>$CA, $32AB</td><td>$CB, $32D3</td><td>$CC, $32FE</td><td>$CD, $332D</td><td>$CE, $335C</td><td>$CF, $338F</td><td>$D0, $33C5</td><td>$D1, $33FF</td><td>$D2, $343C</td><td>$D3, $347C</td><td>$D4, $3A5E</td></tr>
+<tr><td>7</td><td>$D5, $3A84</td><td>$D6, $3AAB</td><td>$D7, $3AD3</td><td>$D8, $3AFE</td><td>$D9, $3B2D</td><td>$DA, $3B5C</td><td>$DB, $3B8F</td><td>$DC, $3BC5</td><td>$DD, $3BFF</td><td>$DE, $3C3C</td><td>$DF, $3C7C</td><td></td></tr>
+	</table>
 
 	<h3 id="part4_5" class="bd">4.5 — Dual PCM</h3>
 
+
+
+	<table border="1">
+		<tr><td>octave</td><td>nC</td><td>nCs</td><td>nD</td><td>nEb</td><td>nE</td><td>nF</td><td>nFs</td><td>nG</td><td>nAb</td><td>nA</td><td>nBb</td><td>nB</td></tr>
+<tr><td>?</td><td colspan="11"></td><td>$80, $0000</td></tr>
+<tr><td>0</td><td>$81, $0010</td><td>$82, $0011</td><td>$83, $0012</td><td>$84, $0013</td><td>$85, $0014</td><td>$86, $0015</td><td>$87, $0017</td><td>$88, $0018</td><td>$89, $0019</td><td>$8A, $001B</td><td>$8B, $001D</td><td>$8C, $001E</td></tr>
+<tr><td>1</td><td>$8D, $0020</td><td>$8E, $0022</td><td>$8F, $0024</td><td>$90, $0026</td><td>$91, $0028</td><td>$92, $002B</td><td>$93, $002D</td><td>$94, $0030</td><td>$95, $0033</td><td>$96, $0036</td><td>$97, $0039</td><td>$98, $003C</td></tr>
+<tr><td>2</td><td>$99, $0040</td><td>$9A, $0044</td><td>$9B, $0048</td><td>$9C, $004C</td><td>$9D, $0051</td><td>$9E, $0055</td><td>$9F, $005B</td><td>$A0, $0060</td><td>$A1, $0066</td><td>$A2, $006C</td><td>$A3, $0072</td><td>$A4, $0079</td></tr>
+<tr><td>3</td><td>$A5, $0080</td><td>$A6, $0088</td><td>$A7, $0090</td><td>$A8, $0098</td><td>$A9, $00A1</td><td>$AA, $00AB</td><td>$AB, $00B5</td><td>$AC, $00C0</td><td>$AD, $00CB</td><td>$AE, $00D7</td><td>$AF, $00E4</td><td>$B0, $00F2</td></tr>
+<tr><td>4</td><td>$B1, $0100</td><td>$B2, $010F</td><td>$B3, $011F</td><td>$B4, $0130</td><td>$B5, $0143</td><td>$B6, $0156</td><td>$B7, $016A</td><td>$B8, $0180</td><td>$B9, $0196</td><td>$BA, $01AF</td><td>$BB, $01C8</td><td>$BC, $01E3</td></tr>
+<tr><td>5</td><td>$BD, $0200</td><td>$BE, $021E</td><td>$BF, $023F</td><td>$C0, $0261</td><td>$C1, $0285</td><td>$C2, $02AB</td><td>$C3, $02D4</td><td>$C4, $02FF</td><td>$C5, $032D</td><td>$C6, $035D</td><td>$C7, $0390</td><td>$C8, $03C7</td></tr>
+<tr><td>6</td><td>$C9, $0400</td><td>$CA, $043D</td><td>$CB, $047D</td><td>$CC, $04C2</td><td>$CD, $050A</td><td>$CE, $0557</td><td>$CF, $05A8</td><td>$D0, $05FE</td><td>$D1, $0659</td><td>$D2, $06BA</td><td>$D3, $0721</td><td>$D4, $078D</td></tr>
+<tr><td>7</td><td>$D5, $0800</td><td>$D6, $087A</td><td>$D7, $08FB</td><td>$D8, $0983</td><td>$D9, $0A14</td><td>$DA, $0AAE</td><td>$DB, $0B50</td><td>$DC, $0BFD</td><td>$DD, $0CB3</td><td>$DE, $0D74</td><td>$DF, $0E41</td><td>$E0, $0F1A</td></tr>
+<tr><td>8</td><td>$E1, $0FFF</td><td>$E2, $0FFF</td><td>$E3, $0FFF</td><td>$E4, $0FFF</td><td>$E5, $0FFF</td><td>$E6, $0FFF</td><td>$E7, $0FFF</td><td>$E8, $0FFF</td><td>$E9, $0FFF</td><td>$EA, $0FFF</td><td>$EB, $0FFF</td><td>$EC, $0FFF</td></tr>
+<tr><td>9</td><td>$ED, $0FFF</td><td>$EE, $0FFF</td><td>$EF, $0FFF</td><td>$F0, $0FFF</td><td>$F1, $0FFF</td><td>$F2, $0FFF</td><td>$F3, $0FFF</td><td>$F4, $0FFF</td><td>$F5, $0FFF</td><td>$F6, $0FFF</td><td>$F7, $0FFF</td><td>$F8, $0FFF</td></tr>
+<tr><td>10</td><td>$F9, $0FFF</td><td>$FA, $0FFF</td><td>$FB, $0FFF</td><td>$FC, $0FFF</td><td>$FD, $0FFF</td><td>$FE, $0FFF</td><td>$FF, $0FFF</td><td colspan="5"></td></tr>
+<tr><td>-10</td><td colspan="4"></td><td>$00, -$FFF</td><td>$01, -$FFF</td><td>$02, -$FFF</td><td>$03, -$FFF</td><td>$04, -$FFF</td><td>$05, -$FFF</td><td>$06, -$FFF</td><td>$07, -$FFF</td></tr>
+<tr><td>-9</td><td>$08, -$FFF</td><td>$09, -$FFF</td><td>$0A, -$FFF</td><td>$0B, -$FFF</td><td>$0C, -$FFF</td><td>$0D, -$FFF</td><td>$0E, -$FFF</td><td>$0F, -$FFF</td><td>$10, -$FFF</td><td>$11, -$FFF</td><td>$12, -$FFF</td><td>$13, -$FFF</td></tr>
+<tr><td>-8</td><td>$14, -$FFF</td><td>$15, -$FFF</td><td>$16, -$FFF</td><td>$17, -$FFF</td><td>$18, -$FFF</td><td>$19, -$FFF</td><td>$1A, -$FFF</td><td>$1B, -$FFF</td><td>$1C, -$FFF</td><td>$1D, -$FFF</td><td>$1E, -$FFF</td><td>$1F, -$FFF</td></tr>
+<tr><td>-7</td><td>$20, -$F1A</td><td>$21, -$E41</td><td>$22, -$D74</td><td>$23, -$CB3</td><td>$24, -$BFD</td><td>$25, -$B50</td><td>$26, -$AAE</td><td>$27, -$A14</td><td>$28, -$983</td><td>$29, -$8FB</td><td>$2A, -$87A</td><td>$2B, -$800</td></tr>
+<tr><td>-6</td><td>$2C, -$78D</td><td>$2D, -$721</td><td>$2E, -$6BA</td><td>$2F, -$659</td><td>$30, -$5FE</td><td>$31, -$5A8</td><td>$32, -$557</td><td>$33, -$50A</td><td>$34, -$4C2</td><td>$35, -$47D</td><td>$36, -$43D</td><td>$37, -$400</td></tr>
+<tr><td>-5</td><td>$38, -$3C7</td><td>$39, -$390</td><td>$3A, -$35D</td><td>$3B, -$32D</td><td>$3C, -$2FF</td><td>$3D, -$2D4</td><td>$3E, -$2AB</td><td>$3F, -$285</td><td>$40, -$261</td><td>$41, -$23F</td><td>$42, -$21E</td><td>$43, -$200</td></tr>
+<tr><td>-4</td><td>$44, -$1E3</td><td>$45, -$1C8</td><td>$46, -$1AF</td><td>$47, -$196</td><td>$48, -$180</td><td>$49, -$16A</td><td>$4A, -$156</td><td>$4B, -$143</td><td>$4C, -$130</td><td>$4D, -$11F</td><td>$4E, -$10F</td><td>$4F, -$100</td></tr>
+<tr><td>-3</td><td>$50, -$0F2</td><td>$51, -$0E4</td><td>$52, -$0D7</td><td>$53, -$0CB</td><td>$54, -$0C0</td><td>$55, -$0B5</td><td>$56, -$0AB</td><td>$57, -$0A1</td><td>$58, -$098</td><td>$59, -$090</td><td>$5A, -$088</td><td>$5B, -$080</td></tr>
+<tr><td>-2</td><td>$5C, -$079</td><td>$5D, -$072</td><td>$5E, -$06C</td><td>$5F, -$066</td><td>$60, -$060</td><td>$61, -$05B</td><td>$62, -$055</td><td>$63, -$051</td><td>$64, -$04C</td><td>$65, -$048</td><td>$66, -$044</td><td>$67, -$040</td></tr>
+<tr><td>-1</td><td>$68, -$03C</td><td>$69, -$039</td><td>$6A, -$036</td><td>$6B, -$033</td><td>$6C, -$030</td><td>$6D, -$02D</td><td>$6E, -$02B</td><td>$6F, -$028</td><td>$70, -$026</td><td>$71, -$024</td><td>$72, -$022</td><td>$73, -$020</td></tr>
+<tr><td>-0</td><td>$74, -$01E</td><td>$75, -$01D</td><td>$76, -$01B</td><td>$77, -$019</td><td>$78, -$018</td><td>$79, -$017</td><td>$7A, -$015</td><td>$7B, -$014</td><td>$7C, -$013</td><td>$7D, -$012</td><td>$7E, -$011</td><td>$7F, -$010</td></tr>
+	</table>
+
+	<script>
+		/*
+		var str = "", ln = "", lnum = -10, note = 0x00;
+		var oops = `-$FFF,-$FFF`;
+
+		for(let x of oops.split("\n")){
+			ln = "<tr><td>"+ lnum++ +"</td>";
+
+			for(let n of x.split(",")){
+				n = n.replace(",", "").trim();
+				ln += "<td>$"+ note.toString(16).toUpperCase() +", "+ n +"</td>";
+				note++;
+			}
+
+			str += ln + "</tr>\n";
+		}
+
+		console.log(str);
+		// Real Programmers Don't Use SMPS
+*/
+	</script>
+
 	<h1 id="part5" class="bd">5 — Frequency</h1>
+	<p>
+		In AMPS, frequency depends entirely on the sound hardware used. You can see the actual tables used in previous parts for <a href="#part4_4">FM</a>, <a href="#part4_3">PSG</a>
+		and <a href="#part4_5">DAC</a>. This is why AMPS abstracts actual frequencies as notes, which are mostly consistent with each other. Transposition is also used to shift the notes
+		around to read different entries from the frequency table. This is most useful for DAC which has negative not frequencies not accessible otherwise. Attempting to read an invalid note
+		from these tables is considered undefined behaviour. The frequency read along with detune is used to calculate the final frequency. Additionally, modulation, portamento and
+		modulation envelope are added into the frequency every frame (when active).
+	</p>
 
 	<h3 id="part5_1" class="bd">5.1 — Modulation</h3>
+
+	<h3 id="part5_2" class="bd">5.2 — Portamento</h3>
+	<p>
+		Portamento is an effect which allows the frequency between notes to be blended smoothly over time. FEATURE_PORTAMENTO must be enabled to use the portamento effect. Portamento effect
+		has a certain speed, where $00 disables the effect, any other number indicates the number of between frames that are used for blending. Portamento uses a displacement value for
+		changing offset each frame, and a frequency offset that keeps track of how far from the current note the actual frequency is supposed to be. This works irrespective of any other
+		frequency effects so the results are correct every time.
+	</p>
+	<p>
+		The algorithm for portamento simply remembers the difference of the 2 notes, and calculates using the portamento value how much to change it per frame. The algorithm skips some
+		frequency ranges for FM however, because they actually overlap. This makes the effect sound almost perfect. If the difference is too small, the difference is the smallest possible
+		so the note does eventually change. Previous portamento offsets are also considered, so it is safe to change the note while portamento is in progress.
+	</p>
+	<p>
+		Every frame, portamento is processed and calculated. The portamento displacement is added to portamento offset, until it is 0, or changes sign. At this point, portamento is disabled
+		until next note-on. Similarly, portamento from or to rests is not possible. This process again skips the FM ranges that are equivalent.
+	</p>
 
 	<h1 id="part6" class="bd">6 — Volume</h1>
 	<p>
@@ -1114,6 +1217,33 @@
 	</p>
 
 	<h1 id="part7" class="bd">7 — Envelopes</h1>
+	<p>
+		AMPS has 2 types of envelopes: Modulation envelopes and volume envelopes. Volume envelopes can be enabled for only PSG channels, or all channels, using FEATURE_DACFMVOLENV.
+		Modulation envelopes can be enabled or disabled using FEATURE_MODENV. These two assembly flags allow to choose which settings you will need, where them being disabled is faster and
+		uses less RAM, but also allows for less features. The algorithm for both work very similarly, but modulation envelopes have an additional step. This will be mentioned later.
+	</p>
+	<p>
+		Essentially, the algorithm simply looks for the next value in sequence every frame. There are volumes/frequencies and commands, and each envelope must end on a command. When a value
+		is read from the volume envelope, if its between $00 and $7F, or $8C to $FF. Negative values apply a negative offset to volume or frequency. Values read from the envelope data
+		signify the end of the envelope processing for the frame. The next byte is read next frame, and the current byte is used to calculate output volume or frequency offset. In case of
+		volume envelopes, it is simply added to channel volume for the current frame (result is not saved), and modulation envelopes are slightly more complex. For modulation envelopes, the
+		modulation sensitivity is used to multiply the read value. A sensitivity of $04 with read value of $07 results in offset of $23. Since the sensitivity read used is actually from $01
+		to $100 instead of $00 to $FF. This can be set with a separate command. Below is the list of commands available:
+	</p>
+	<ul>
+		<li><b>$80, eReset</b> — Restart to the start of the volume envelope. Continues execution from the beginning.</li>
+		<li><b>$82, eHold</b> — Holds the volume or frequency offset at the last read value. Technically, the position is always decremented and value is read again.</li>
+		<li><b>$84, eLoop x</b> — Set offset in volume envelope data to x. A value of 0 is equivalent to eReset. Continues execution from the loop point.</li>
+		<li><b>$86, eStop</b> — Note off the channel and stop envelope processing.</li>
+		<li><b>$88, esSens x</b> — Sets the modulation envelope sensitivity to x. Only valid for modulation envelopes! Continues execution afterwards.</li>
+		<li><b>$8A, eaSens x</b> — Adds x to the modulation envelope sensitivity. Only valid for modulation envelopes! Continues execution afterwards.</li>
+	</ul>
+	<p>
+		Some commands stop processing the envelope processing while others continue afterwards. Envelopes are defined in code/Data.asm, in <b>VolEnvs</b> and <b>ModEnvs</b>. They define a
+		list of envelopes and afterwards their data. You can look at examples in these lists. Volume envelopes get the <b>vd</b> prefix for the data and <b>v</b> prefix for the equate.
+		Modulation envelopes get the <b>md</b> envelope for data and <b>m</b> prefix for equates. Special equates, <b>vNone</b> and <b>mNone</b> refer to non-existent envelopes, that just
+		skip the envelope process entirely. They have no effect to volume or frequency.
+	</p>
 
 	<h1 id="part8" class="bd">8 — Communication Bytes</h1>
 	<p>

@@ -99,10 +99,15 @@ dPortamento	macro jump,loop,type
 .ppos
 		add.w	cPortaDisp(a1),d5	; add displacement to d5
 		bmi.s	.noover			; branch if overflow did not occur
-.pclr		moveq	#0,d5			; if it did, clear displacement
 
-.noover		move.w	d5,cPortaFreq(a1)	; save portamento frequency back
-.nochk		add.w	d5,d2			; add it to the current pitch
+.pclr
+		moveq	#0,d5			; if it did, clear displacement
+
+.noover
+		move.w	d5,cPortaFreq(a1)	; save portamento frequency back
+
+.nochk
+		add.w	d5,d2			; add it to the current pitch
 
 		if (type=0)|(type=1)
 			move.w	d2,d5		; special FM code to skip over some frequencies, because it sounds bad

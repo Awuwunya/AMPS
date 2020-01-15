@@ -9,8 +9,8 @@ ChoosePath_Header:
 	sHeaderFM	ChoosePath_FM3, $02, $1A
 	sHeaderFM	ChoosePath_FM4, $02, $15
 	sHeaderFM	ChoosePath_FM5, $02, $1A
-	sHeaderPSG	ChoosePath_PSG1, $DE+$0C, $20, $00, v00
-	sHeaderPSG	ChoosePath_PSG2, $DE+$0C, $28, $00, v00
+	sHeaderPSG	ChoosePath_PSG1, $DE+$0C, $20, $00, vNone
+	sHeaderPSG	ChoosePath_PSG2, $DE+$0C, $28, $00, vNone
 	sHeaderPSG	ChoosePath_PSG3, $00, $00, $00, vRistar02
 
 	; Patch $00

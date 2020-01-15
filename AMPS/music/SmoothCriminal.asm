@@ -9,8 +9,8 @@ SmoothCriminal_Header:
 	sHeaderFM	SmoothCriminal_FM3, $00, $16
 	sHeaderFM	SmoothCriminal_FM4, $00, $16
 	sHeaderFM	SmoothCriminal_FM5, $00, $16
-	sHeaderPSG	SmoothCriminal_PSG1, $DC+$0C, $38, $00, v00
-	sHeaderPSG	SmoothCriminal_PSG2, $DC+$0C, $38, $00, v00
+	sHeaderPSG	SmoothCriminal_PSG1, $DC+$0C, $38, $00, vNone
+	sHeaderPSG	SmoothCriminal_PSG2, $DC+$0C, $38, $00, vNone
 	sHeaderPSG	SmoothCriminal_PSG3, $00, $18, $00, vMoonWalker04
 
 	; Patch $00

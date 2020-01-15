@@ -16,7 +16,7 @@ Pelimusa_Header:
 	sHeaderFM	Pelimusa_FM5, $00, $18
 	sHeaderPSG	Pelimusa_PSG1, $0C, $50, $30, vRistar10
 	sHeaderPSG	Pelimusa_PSG2, $0C, $40, $00, vCol3_02
-	sHeaderPSG	Pelimusa_PSG3, $00, $40, $00, v00
+	sHeaderPSG	Pelimusa_PSG3, $00, $40, $00, vNone
 
 	; Patch $00 - Syntikkabasso 1 and 2 (From Columns III)
 	spAlgorithm	$02, Basso

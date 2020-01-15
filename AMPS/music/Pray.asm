@@ -9,9 +9,9 @@ Pray_Header:
 	sHeaderFM	Pray_FM3, $00, $0D
 	sHeaderFM	Pray_FM2, $00, $0D
 	sHeaderFM	Pray_FM5, $00, $15
-	sHeaderPSG	Pray_PSG1, $E8+$0C, $28, $00, v00
-	sHeaderPSG	Pray_PSG2, $E8+$0C, $28, $00, v00
-	sHeaderPSG	Pray_PSG3, $00, $08, $00, v00
+	sHeaderPSG	Pray_PSG1, $E8+$0C, $28, $00, vNone
+	sHeaderPSG	Pray_PSG2, $E8+$0C, $28, $00, vNone
+	sHeaderPSG	Pray_PSG3, $00, $08, $00, vNone
 
 	; Patch $00
 	; $3B

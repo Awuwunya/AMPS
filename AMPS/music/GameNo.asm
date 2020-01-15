@@ -10,9 +10,9 @@ GameNo_Header:
 	sHeaderFM	GameNo_FM4, $0C, $14
 	sHeaderFM	GameNo_FM5, $00, $08
 	sHeaderFM	GameNo_FM6, $00, $12
-	sHeaderPSG	GameNo_PSG1, $E8, $30, $00, v00
-	sHeaderPSG	GameNo_PSG2, $E8, $30, $00, v00
-	sHeaderPSG	GameNo_PSG3, $0C, $28, $00, v00
+	sHeaderPSG	GameNo_PSG1, $E8, $30, $00, vNone
+	sHeaderPSG	GameNo_PSG2, $E8, $30, $00, vNone
+	sHeaderPSG	GameNo_PSG3, $0C, $28, $00, vNone
 
 	; Patch $00
 	; $3D
