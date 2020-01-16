@@ -787,12 +787,13 @@
 	</p>
 	<h4>$F0 — ssMod68k &lt;wait&gt; &lt;speed&gt; &lt;step&gt; &lt;count&gt;</h4>
 	<p>
-		Initializes software frequency modulation. Modulation is useful for creating an effect where frequency moves up and/or down repeatedly, which can be used either for detuning on instruments or for
-		custom effects. They are often used for sound effects to make them sound interesting, realistic or fun. They are also use in music to create bigger immersion. Modulation in AMPS is slightly different
-		from SMPS games, but in general it works similarly. The &lt;wait&gt; parameter delays the start of the modulation by that number of frames, where 0 frames means it starts immediately. &lt;speed&gt; is
-		the number of frames to delay until the next step is executed. 0 frames is considered undefined behaviour. &lt;step&gt; is the frequency offset per step. Values are sign extended, so anything above $7F
-		is a negative value. The resulting frequency offset is 16-bit and can also be negative. &lt;count&gt; is the number of steps to perform before negating the &lt;step&gt; parameter. 0 steps will behave as
-		$100 steps. For a more in-depth explanation of the algorithm, <a href="#part5_1">see the next part</a>. This command is skipped when condition is false.
+		Initializes software frequency modulation. Modulation is useful for creating an effect where frequency moves up and/or down repeatedly, which can be used either for detuning on
+		instruments or for custom effects. They are often used for sound effects to make them sound interesting, realistic or fun. They are also use in music to create bigger immersion.
+		Modulation in AMPS is slightly different from SMPS games, but in general it works similarly. The &lt;wait&gt; parameter delays the start of the modulation by that number of frames,
+		where 0 frames means it starts immediately. &lt;speed&gt; is the number of frames to delay until the next step is executed. 0 frames is considered undefined behaviour. &lt;step&gt;
+		is the frequency offset per step. Values are sign extended, so anything above $7F is a negative value. The resulting frequency offset is 16-bit and can also be negative.
+		&lt;count&gt; is the number of steps to perform before negating the &lt;step&gt; parameter. 0 steps will behave as $100 steps. For a more in-depth explanation of the algorithm,
+		<a href="#part5_1">see the next part</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F1 — ssPortamento &lt;speed&gt;</h4>
 	<p>
@@ -1017,18 +1018,43 @@
 	</p>
 
 	<h3 id="part4_3" class="bd">4.3 — SN76496</h3>
-
-
+	<p>
+		The SN76496, better known as PSG, is the simplest sound chip on the Mega Drive. It really only has capability to control volume, frequency, and channel 4 noise. Although the chip is
+		hilariously barebones, it can still be used to generate really interesting sounds. PSG is a squarewave generator chip, which means that each noise goes from mute to max volume nearly
+		instantly. Due to limitations with filteration and the sound chip itself, it looks less like a square and more of a spiky square-like structure. The details are not overly important,
+		and <a href="https://www.smspower.org/Development/SN76489">you can read more in detail about PSG here</a>. What really is important, is how AMPS interacts with the PSG chip.
+	</p>
+	<p>
+		Although PSG has 4 channels, AMPS only supports 3 at a time. AMPS can switch between PSG3 or PSG4 mode for PSG3 channel. PSG3 mode is a normal tone channel, much like PSG1 and PSG2.
+		This does not allow PSG4 to be used (though if you REALLY wanted you could do it - please don't.), but is very good if you dont need it anyway. Since PSG4 allows for relatively
+		unconvincing but reasonable hats, using PSG4 mode is more common. In this mode, PSG4 can use one of a few settings to enable noise. Below is a list of the PSG commands and their
+		meanings:
+	</p>
+	<table border="1">
+		<tr><td>PSG command</td><td>$E0</td><td>$E1</td><td>$E2</td><td>$E3</td><td>$E4</td><td>$E5</td><td>$E6</td><td>$E7</td></tr>
+		<tr><td>Mode</td><td colspan="4">Periodic noise</td><td colspan="4">White noise</td></tr>
+		<tr><td>Frequency</td><td>$0010</td><td>$0020</td><td>$0040</td><td>PSG3</td><td>$0010</td><td>$0020</td><td>$0040</td><td>PSG3</td></tr>
+	</table>
+	<p>
+		Most commonly, PSG4 mode is used for songs, to add some extra depth. In AMPS, you can also enable and disable PSG4 mode with the sNoisePSG command. Using values on the table above
+		you can enable it for the specific mode, and using $00 disables it. PSG4 has its own channel volume, but in case of using PSG3 mode, it does not have its own frequency. This is
+		particularly problematic because usually PSG hi-hats use frequency of $0000, which is not pre-defined in the modes. It is possible to use another frequency instead and also use PSG3
+		at the same time, allowing PSG to output 4 different sounds at once, but currently AMPS does not have support for that.
+	</p>
+	<p>
+		PSG has a very small range of possible frequencies. Though this does not usually present an issue, the range of notes available in AMPS is limited. Below is a table of all notes,
+		their raw values, and frequencies. There is also a special equate in AMPS, nHiHat, that corresponds to nA6 so long as there is no transposition.
+	</p>
 
 	<table border="1">
 		<tr><td>octave</td><td>nC</td><td>nCs</td><td>nD</td><td>nEb</td><td>nE</td><td>nF</td><td>nFs</td><td>nG</td><td>nAb</td><td>nA</td><td>nBb</td><td>nB</td></tr>
-<tr><td>0</td><td>$80, $03FF</td><td>$81, $03FF</td><td>$82, $03FF</td><td>$83, $03FF</td><td>$84, $03FF</td><td>$85, $03FF</td><td>$86, $03FF</td><td>$87, $03FF</td><td>$88, $03FF</td><td>$89, $03F7</td><td>$8A, $03BE</td><td>$8B, $0388</td></tr>
-<tr><td>1</td><td>$8C, $0356</td><td>$8D, $0326</td><td>$8E, $02F9</td><td>$8F, $02CE</td><td>$90, $02A5</td><td>$91, $0280</td><td>$92, $025C</td><td>$93, $023A</td><td>$94, $021A</td><td>$95, $01FB</td><td>$96, $01DF</td><td>$97, $01C4</td></tr>
-<tr><td>2</td><td>$98, $01AB</td><td>$99, $0193</td><td>$9A, $017D</td><td>$9B, $0167</td><td>$9C, $0153</td><td>$9D, $0140</td><td>$9E, $012E</td><td>$9F, $011D</td><td>$A0, $010D</td><td>$A1, $00FE</td><td>$A2, $00EF</td><td>$A3, $00E2</td></tr>
-<tr><td>3</td><td>$A4, $00D6</td><td>$A5, $00C9</td><td>$A6, $00BE</td><td>$A7, $00B4</td><td>$A8, $00A9</td><td>$A9, $00A0</td><td>$AA, $0097</td><td>$AB, $008F</td><td>$AC, $0087</td><td>$AD, $007F</td><td>$AE, $0078</td><td>$AF, $0071</td></tr>
-<tr><td>4</td><td>$B0, $006B</td><td>$B1, $0065</td><td>$B2, $005F</td><td>$B3, $005A</td><td>$B4, $0055</td><td>$B5, $0050</td><td>$B6, $004B</td><td>$B7, $0047</td><td>$B8, $0043</td><td>$B9, $0040</td><td>$BA, $003C</td><td>$BB, $0039</td></tr>
-<tr><td>5</td><td>$BC, $0036</td><td>$BD, $0033</td><td>$BE, $0030</td><td>$BF, $002D</td><td>$C0, $002B</td><td>$C1, $0028</td><td>$C2, $0026</td><td>$C3, $0024</td><td>$C4, $0022</td><td>$C5, $0020</td><td>$C6, $001F</td><td>$C7, $001D</td></tr>
-<tr><td>6</td><td>$C8, $001B</td><td>$C9, $001A</td><td>$CA, $0018</td><td>$CB, $0017</td><td>$CC, $0016</td><td>$CD, $0015</td><td>$CE, $0013</td><td>$CF, $0012</td><td>$D0, $0011</td><td>$D1, $0000</td><tD colspan="2"></tD></tr>
+<tr><td>0</td><td>$81, $03FF</td><td>$82, $03FF</td><td>$83, $03FF</td><td>$84, $03FF</td><td>$85, $03FF</td><td>$86, $03FF</td><td>$87, $03FF</td><td>$88, $03FF</td><td>$89, $03FF</td><td>$8A, $03F7</td><td>$8B, $03BE</td><td>$8C, $0388</td></tr>
+<tr><td>1</td><td>$8D, $0356</td><td>$8E, $0326</td><td>$8F, $02F9</td><td>$90, $02CE</td><td>$91, $02A5</td><td>$92, $0280</td><td>$93, $025C</td><td>$94, $023A</td><td>$95, $021A</td><td>$96, $01FB</td><td>$97, $01DF</td><td>$98, $01C4</td></tr>
+<tr><td>2</td><td>$99, $01AB</td><td>$9A, $0193</td><td>$9B, $017D</td><td>$9C, $0167</td><td>$9D, $0153</td><td>$9E, $0140</td><td>$9F, $012E</td><td>$A0, $011D</td><td>$A1, $010D</td><td>$A2, $00FE</td><td>$A3, $00EF</td><td>$A4, $00E2</td></tr>
+<tr><td>3</td><td>$A5, $00D6</td><td>$A6, $00C9</td><td>$A7, $00BE</td><td>$A8, $00B4</td><td>$A9, $00A9</td><td>$AA, $00A0</td><td>$AB, $0097</td><td>$AC, $008F</td><td>$AD, $0087</td><td>$AE, $007F</td><td>$AF, $0078</td><td>$B0, $0071</td></tr>
+<tr><td>4</td><td>$B1, $006B</td><td>$B2, $0065</td><td>$B3, $005F</td><td>$B4, $005A</td><td>$B5, $0055</td><td>$B6, $0050</td><td>$B7, $004B</td><td>$B8, $0047</td><td>$B9, $0043</td><td>$BA, $0040</td><td>$BB, $003C</td><td>$BC, $0039</td></tr>
+<tr><td>5</td><td>$BD, $0036</td><td>$BE, $0033</td><td>$BF, $0030</td><td>$C0, $002D</td><td>$C1, $002B</td><td>$C2, $0028</td><td>$C3, $0026</td><td>$C4, $0024</td><td>$C5, $0022</td><td>$C6, $0020</td><td>$C7, $001F</td><td>$C8, $001D</td></tr>
+<tr><td>6</td><td>$C9, $001B</td><td>$CA, $001A</td><td>$CB, $0018</td><td>$CC, $0017</td><td>$CD, $0016</td><td>$CE, $0015</td><td>$CF, $0013</td><td>$D0, $0012</td><td>$D1, $0011</td><td>$D2, $0000</td><td colspan="2"></td></tr>
 	</table>
 
 	<h3 id="part4_4" class="bd">4.4 — YM2612</h3>
@@ -1082,8 +1108,9 @@
 
 	<script>
 		/*
-		var str = "", ln = "", lnum = -10, note = 0x00;
-		var oops = `-$FFF,-$FFF`;
+		var str = "", ln = "", lnum = 0, note = 0x81;
+		var oops = `
+		`;
 
 		for(let x of oops.split("\n")){
 			ln = "<tr><td>"+ lnum++ +"</td>";
@@ -1112,6 +1139,36 @@
 	</p>
 
 	<h3 id="part5_1" class="bd">5.1 — Modulation</h3>
+	<p>
+		Software modulation in AMPS is similar but not quite the same to SMPS. In SMPS, the 68k versions and Z80 versions have a slightly different algorithm to each other, and AMPS is also
+		slightly different in another way. The differences will be explained as I explain the algorithm. Modulation has 4 user-defined values: <b>wait</b>, <b>speed</b>, <b>step</b> & <b>
+		count</b>. These help define the behaviour of the modulation process. There is also a flag that enables and disables modulation independent of setting it up, and can be controlled
+		in tracker with sModOn and sModOff. These only set the state of the flag rather than modifying modulation data. Below is the explanation of the algorithm:
+	</p>
+	<p>
+		There can be some delay before the modulation starts. If <b>wait</b> is not 0, the modulation gets delayed by that many frames instead. The <b>speed</b> parameter defines how often
+		modulation is stepped forwards. Value of $00 actually represents $100, and $01 is the minimum amount (gets stepped every frame). When a step occurs, <b>step</b> is added to the
+		modulation frequency offset (which is later added to channel frequency!). This value is a signed 8-bit value, -$80 to $7F, and gets extended to a 16-bit value for the purposes of
+		the frequency offsetting. This allows for a great dynamic frequency range with relatively little effort. There is also the <b>count</b> variable that is the number of steps. When
+		modulation is initialized, this value is halve (rounded down) and set as the initial value. This allows the modulation to go back and forth around the channel frequency, however it
+		doesn't have to. When the <b>count</b> is 0, the modulation speed is negated, and step counter is reloaded. This makes the frequency offset go backwards, to approximately the
+		negative value of it.
+	</p>
+	<p>
+		There is also a trick many games use to make modulation only up/down. You can set <b>count</b> to $FF, in order to have enough steps to not run out of them. This results in a
+		sequence where the <b>step</b> is never negated. If your note is veeery long, this might happen, but its rarely going to be so long in any real situation. If the <b>count</b>
+		parameter is $00, it will act as $100. However, at the same time, this is undefined behaviour as of writing this tutorial.
+	</p>
+	<p>
+		There are few interesting differences between SMPS
+		versions and AMPS. In SMPS 68k, after the <b>count</b> parameter is reloaded, the rest of the modulation code is skipped. This includes decrementing the counter and processing
+		frequency. This makes it so that the last step lasts 2 frames and the modulation is slightly longer. This can be simply fixed by adding 1 to the <b>count</b> parameter in your
+		tracker code. SMPS Z80 is a bit more difficult. For some odd reason, it decrements modulation step counter every frame (after modulation wait delay has passed), and therefore can
+		negate the direction even in the middle of the step. Also, the <b>step</b> parameter is therefore multiplied by the <b>speed</b> parameter. This is a problem particularly because its
+		technically impossible to correctly recreate all modulation from SMPS Z80 games. In practice, this does not matter because you don't have to get the modulaton matching 100% to be
+		good enough.
+	</p>
+
 
 	<h3 id="part5_2" class="bd">5.2 — Portamento</h3>
 	<p>
@@ -1127,7 +1184,7 @@
 	</p>
 	<p>
 		Every frame, portamento is processed and calculated. The portamento displacement is added to portamento offset, until it is 0, or changes sign. At this point, portamento is disabled
-		until next note-on. Similarly, portamento from or to rests is not possible. This process again skips the FM ranges that are equivalent.
+		until next note-on. This process again skips the FM ranges that are equivalent. Portamento from or to rests is not possible.
 	</p>
 
 	<h1 id="part6" class="bd">6 — Volume</h1>
@@ -1270,7 +1327,9 @@
 
 	<h1 id="part9" class="bd">9 — Memory Map</h1>
 	<p>
-		Below is the memory map for every individual channel and the entire sound driver. You can select various modes depending on which flags you have enabled, and the correct sequence is computed for you.
+		Below is the memory map for every individual channel and the entire sound driver. You can select various modes depending on which flags you have enabled, and the correct sequence is
+		computed for you. This memory map is merely for reference purposes and you should never use the offsets provided here for actual work. The equates exist to make portability and
+		consistency in mind and therefore are highly recommended to be used at all times.
 	</p>
 	<cbox><input type="checkbox" onclick="refRAM()" title="mdsafe" id="mdsafe" checked /><span>safe mode</span></cbox>
 	<cbox><input type="checkbox" onclick="refRAM()" title="mdmod" id="mdmod" checked /><span>FEATURE_MODULATION</span></cbox>
