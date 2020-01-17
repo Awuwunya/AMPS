@@ -1039,7 +1039,8 @@
 		Most commonly, PSG4 mode is used for songs, to add some extra depth. In AMPS, you can also enable and disable PSG4 mode with the sNoisePSG command. Using values on the table above
 		you can enable it for the specific mode, and using $00 disables it. PSG4 has its own channel volume, but in case of using PSG3 mode, it does not have its own frequency. This is
 		particularly problematic because usually PSG hi-hats use frequency of $0000, which is not pre-defined in the modes. It is possible to use another frequency instead and also use PSG3
-		at the same time, allowing PSG to output 4 different sounds at once, but currently AMPS does not have support for that.
+		at the same time, allowing PSG to output 4 different sounds at once, but currently AMPS does not have support for that. Both sound effects and music can use PSG4 mode, and it will be
+		correctly restored when sound effects end.
 	</p>
 	<p>
 		PSG has a very small range of possible frequencies. Though this does not usually present an issue, the range of notes available in AMPS is limited. Below is a table of all notes,
@@ -1056,6 +1057,18 @@
 <tr><td>5</td><td>$BD, $0036</td><td>$BE, $0033</td><td>$BF, $0030</td><td>$C0, $002D</td><td>$C1, $002B</td><td>$C2, $0028</td><td>$C3, $0026</td><td>$C4, $0024</td><td>$C5, $0022</td><td>$C6, $0020</td><td>$C7, $001F</td><td>$C8, $001D</td></tr>
 <tr><td>6</td><td>$C9, $001B</td><td>$CA, $001A</td><td>$CB, $0018</td><td>$CC, $0017</td><td>$CD, $0016</td><td>$CE, $0015</td><td>$CF, $0013</td><td>$D0, $0012</td><td>$D1, $0011</td><td>$D2, $0000</td><td colspan="2"></td></tr>
 	</table>
+	<p>
+		Each of these notes can be converted to the following format: xy, where x is the identifier of the note (for example nEb), and y is the octave (for example 4). This would result in
+		equate nEb4, which can directly be used in tracker. These note names are largely arbitary and only theoretically correspond to real instruments. Indeed, many other sound drivers on
+		the Mega Drive have different frequencies for the notes anyway. These frequencies and notes are heavily based on SMPS for consistency's sake, and for no real need to change them.
+	</p>
+	<p>
+		PSG uses a 7-bit volume in AMPS as opposed to 4-bit that the SN76496 uses. This is to make PSG more aligned with FM and DAC, but at the cost of making the PSG volumes not match
+		hardware levels. AMPS lazily converts the volume simply by dividing by 8, which results in a difference to the volume curve, but is accurate enough to work. There is also special
+		behaviour with frequency of PSG, where you can disable safety measures intended to stop invalid frequencies being loaded. This is, oddly, necessary for the insta-shield sound effect
+		in Sonic 3 & Knuckles! The problem with not capping the frequency is that it can write commands instead of frequencies into PSG, leading to undefined behaviour. For whatever reason,
+		this does not seem to break anything. It is still not recommended to be used for any other reason!
+	</p>
 
 	<h3 id="part4_4" class="bd">4.4 — YM2612</h3>
 
@@ -1076,9 +1089,57 @@
 	</table>
 
 	<h3 id="part4_5" class="bd">4.5 — Dual PCM</h3>
-
-
-
+	<p>
+		Dual PCM FlexEd is not an actual sound chip, but rather a piece of software that is responsible for dealing with PCM audio and YM2612 commands. Dual PCM is heavily integrated with
+		AMPS to give the best possible user experience. It allows playing back 2 PCM samples at once, with the ability to change pitch and volume as well. Although Dual PCM is "only" 14KHz
+		8-bit PCM audio per channel, it still leads to excellent audio quality. <a href="Dual PCM - FlexEd (Technical Document).pdf" target="_blank">There is in-depth documentation
+		available for Dual PCM</a>, so I will not dive too deeply into how it works. Instead, I will focus more on how AMPS interacts with it.
+	</p>
+	<p>
+		Dual PCM uses SWF format for samples. This is a custom PCM format specifically for use with Dual PCM. AMPS stores raw samples in the <b>dac</b> folder, and <b>ConvPCM.exe</b> is used to convert
+		general sample formats to SWF. After this, SWF files should be stored in <b>dac/incSWF</b>. AMPS will access files from there. Samples are included in <b>code/Data.asm</b>, at the bottom of the
+		file. There should be a bunch of <b>incSWF</b> statements with names on them. These are file names of the individual samples. They should only contain A-Z, a-z, 0-9 and _, otherwise they wont be
+		assembled correctly. AMPS will generate the necessary structures to include the file into the disassembly. You need to add samples into the bottom of the file before you can use them in your
+		trackers. Also, you need to define data for them. At SampleList, you will see a list of defined tracker samples. These define the settings and names for the samples. Here is an example:
+	</p>
+	<asm>	<mac>sample</mac> <val>$0180</val>, <equ>Tom</equ>, <equ>Stop</equ>, <equ>HiTom</equ>		<cmt>; High Tom</cmt></asm>
+	<p>
+		This defines a sample, with equate name <b>dHiTom</b>, with base frequency of $180. This frequency is added to calculated frequency whenever it is updated. Frequency of $0100 is the neutral
+		frequency, where the sample speed/frequency is at 100%. The higher the frequency goes, the faster the sample is, same for lower. Negative values make it go backwards (from the end to start). The
+		sample name <b>Tom</b> is loaded from memory to start the sample, and the sample <b>Stop</b> is loaded as the looping point. This makes the Tom sample play fully before the sound is stopped. You
+		could insert another sample as the loop sample, and you'd get an infinitely looping sample (so long as a note is played that is). Defining a 3rd name, in this case <b>HiTom</b> is not required.
+		Omitting it means the first name, <b>Tom</b> in this case, uses that name for the sample equate. That would result in <b>dTom</b>. Here is an example of that:
+	</p>
+	<asm>	<mac>sample</mac> <val>$0100</val>, <equ>Tom</equ>, <equ>Stop</equ>			<cmt>; Mid Tom</cmt></asm>
+	<p>
+		The looping happens internally in Dual PCM rather than with AMPS, so it can be very useful for creating samples that repeat in quicker than per frame. Making the samples too short will lead to a
+		lot of quality loss, so sometimes repeating the sample a few times is a good idea. Adding a lot of blank space at the end of the sample can inflate the ROM size however, so use these tricks very
+		carefully.
+	</p>
+	<p>
+		DAC channels have 2 modes: Sample mode and pitch mode. These can be selected using tracker commands sModeSampDAC and sModePitchDAC. In sample mode, each note represents a sample to be used at the
+		current channel pitch. AMPS will also remember what sample was last used and it will work like channels normally with the exception that you're changing the sample, not the pitch. Pitch mode is
+		how channels work normally, every note represents a frequency from the frequency table. The last used sample is used to play the new note. You can use sVoice to change the sample in pitch mode,
+		and ssFreq & ssFreqNote to change the frequency of the channel in sample mode.
+	</p>
+	<p>
+		Panning for DAC channels is bit of an exception. The 2 currently active channels add the panning value together to get the final value. If SFX DAC1 channel is active, it will override DAC1. If
+		one channel is panned to the centre and other is to left, the panning will be centre anyway. It is a good idea to pan one channel to none and the other controls panning for both. This may be a
+		problem when using SFX DAC1, as it can not be guaranteed to have control over panning and may cause music to sound strange. You should be careful when using panning like this.
+	</p>
+	<p>
+		Dual PCM has $80 volume levels for samples, and it uses a table to load these volumes from. AMPS by default comes equipped with a logarithmic volume filter that mimics the perceived volume levels
+		of YM2612 as closely as possible. It will never be a perfect match but its usually not noticeable. AMPS also includes a linear volume table but using this isn't really recommended. You can also
+		create custom tables and use them with AMPS, but this is not properly supported at the moment, and you'd have to figure it out yourself. Because of limitations with Dual PCM, attempting to update
+		volume more often than every 4 frames will lead to quality loss. In AMPS, this is done by wrapping the PCM buffers when they run out of data, so that a part of the PCM data will play twice over.
+		This has been considered less distracting than stopping the sample playback outright. This is a good idea to remember for channel volumes, volume fading, volume envelopes and others.
+	</p>
+	<p>
+		DAC has a wide range of possible frequencies, including backwards frequencies. Many of these frequencies are not particularly useful, because they go quite fast, but they are included because
+		someone might find them useful or cool to experiment with. The frequency table is $100 elements long, so any note and transposition value can be used. This is done mostly to support the backwards
+		frequencies correctly. It is technically possible to go over $FFF or below -$FFF in frequency, but this is not supported by the Dual PCM configuration and may lead to glitches. Below is a table
+		of all notes, their raw values, and frequencies:
+	</p>
 	<table border="1">
 		<tr><td>octave</td><td>nC</td><td>nCs</td><td>nD</td><td>nEb</td><td>nE</td><td>nF</td><td>nFs</td><td>nG</td><td>nAb</td><td>nA</td><td>nBb</td><td>nB</td></tr>
 <tr><td>?</td><td colspan="11"></td><td>$80, $0000</td></tr>
@@ -1105,6 +1166,11 @@
 <tr><td>-1</td><td>$68, -$03C</td><td>$69, -$039</td><td>$6A, -$036</td><td>$6B, -$033</td><td>$6C, -$030</td><td>$6D, -$02D</td><td>$6E, -$02B</td><td>$6F, -$028</td><td>$70, -$026</td><td>$71, -$024</td><td>$72, -$022</td><td>$73, -$020</td></tr>
 <tr><td>-0</td><td>$74, -$01E</td><td>$75, -$01D</td><td>$76, -$01B</td><td>$77, -$019</td><td>$78, -$018</td><td>$79, -$017</td><td>$7A, -$015</td><td>$7B, -$014</td><td>$7C, -$013</td><td>$7D, -$012</td><td>$7E, -$011</td><td>$7F, -$010</td></tr>
 	</table>
+	<p>
+		Each of these notes can be converted to the following format: xy, where x is the identifier of the note (for example nA), and y is the octave (for example 2). This would result in
+		equate nA2, which can directly be used in tracker. These note names are largely arbitary and only theoretically correspond to real instruments. Majority of these notes are only accessible with
+		transposition. Afterall, you can only play $81 to $DF using the tracker by default. Although, with ssFreqNote, you can actually play any of these notes at any time in sample mode.
+	</p>
 
 	<script>
 		/*
