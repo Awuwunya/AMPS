@@ -262,13 +262,19 @@
 		table {
 			font: .95vw 'Roboto Mono', sans-serif;
 			margin: 0 .5vw;
-			border: .1vw solid whitesmoke;
 			border-collapse: collapse;
 			text-align: center;
+
+			overflow-x: auto;
+			max-width: 100%;
+			width: fit-content;
+			display: block;
+			position: relative;
 		}
 
 		td {
 			padding: .24vw .24vw;
+			border: .1vw solid whitesmoke;
 		}
 
 		cbox {
@@ -324,7 +330,7 @@
 
 		smps2asm, asm {
 			display: block;
-			overflow-x: scroll;
+			overflow-x: auto;
 			tab-size: 8;
 			white-space: pre;
 			background: #272823;
@@ -374,71 +380,85 @@
 			color: #FFC273;
 		}
 
-		@media screen and (max-width: 700px){
+		@media screen and (max-width: 800px){
 			body {
 				border: .2vw solid gray;
 				border-radius: 2.2vw;
 			}
 
-			h1 {
-				font-size: 3.5vw;
-			}
-
-			h3 {
-				font-size: 2.8vw;
-			}
-
-			h4 {
+			tblcnt {
 				font-size: 1.8vw;
 			}
 
+			h1 {
+				font-size: 4vw;
+			}
+
+			h3 {
+				font-size: 3.2vw;
+			}
+
+			h4 {
+				font-size: 2.4vw;
+			}
+
 			p {
-				font: 1.6vw 'Rubik';
+				font-size: 1.8vw;
+			}
+
+			ul {
+				margin-top: .4vw;
+				margin-bottom: .6vw;
 			}
 
 			li {
-				font-size: 1.6vw;
+				font-size: 1.7vw;
 				margin: 0 1.7vw 0 0;
 			}
 
 			table {
-				font: 1.3vw;
+				font-size: 1.5vw;
 				border-width: .15vw;
+				margin: .7vw .1vw 1vw;
 			}
 
 			td {
-				padding: .29vw .29vw;
+				padding: .3vw .4vw;
 			}
 
 			cbox > input[type=checkbox] {
-				width: 1.25vw;
-				height: 1.25vw;
-				border-width: .18vw;
-				padding: .6vw;
+				width: 1.8vw;
+				height: 1.8vw;
+				border-width: .2vw;
+				padding: .8vw;
 			}
 
 			cbox > input[type=checkbox]:checked:after {
-				font-width: 1.3vw;
-				top: -.5vw;
+				font-size: 1.6vw;
+				top: -.3vw;
 			}
 
 			cbox > span {
-				font-size: 1.4vw;
+				font-size: 1.8vw;
 			}
 
 			smps2asm, asm {
-				font-size: 1.2vw;
-				border-width: .18vw;
-				margin: .2vw .5vw;
-				padding: .6vw .7vw;
+				font-size: 1.5vw;
+				border-width: .2vw;
+				margin: .1vw .5vw;
+				padding: .3vw .4vw;
 			}
 		}
 
-		@media screen and (max-width: 500px){
+		@media screen and (max-width: 600px){
 			body {
 				border: .2vw solid gray;
-				border-radius: 2.2vw;
-				padding: 2.5vw;
+				border-radius: 0;
+				padding: 1vw;
+			}
+
+			tblcnt {
+				font-size: 2vw;
 			}
 
 			.bd {
@@ -446,38 +466,43 @@
 			}
 
 			h1 {
-				font-size: 3.5vw;
+				font-size: 5vw;
 				margin: 1.8vw 0;
 			}
 
 			h3 {
-				font-size: 2.8vw;
+				font-size: 3.8vw;
 				margin: 1.5vw 0;
 			}
 
 			h4 {
-				font-size: 1.8vw;
+				font-size: 2.8vw;
 				margin: 1.5vw 0;
 			}
 
 			p {
-				font: 1.6vw 'Rubik';
+				font-size: 2.4vw;
 				margin: .5vw 1.6vw 1vw 0;
 			}
 
+			ul {
+				margin-top: 1vw;
+				margin-bottom: 1vw;
+			}
+
 			li {
-				font-size: 1.9vw;
+				font-size: 2.25vw;
 				margin: 0 1.9vw 0 0;
 			}
 
 			table {
-				font: 1.6vw;
-				margin: 0 .7vw;
+				font-size: 1.9vw;
+				margin: 1vw .1vw 1.5vw;
 				border-width: .2vw;
 			}
 
 			td {
-				padding: .36vw .36vw;
+				padding: .5vw .6vw;
 			}
 
 			cbox {
@@ -485,22 +510,27 @@
 			}
 
 			cbox > input[type=checkbox] {
-				width: 1.4vw;
-				height: 1.4vw;
-				border-width: .25vw;
-				padding: .8vw;
+				width: 3vw;
+				height: 3vw;
+				border-width: .28vw;
+				padding: 1vw;
 			}
 
 			cbox > input[type=checkbox]:checked:after {
-				font-width: 1.5vw;
-				top: -.7vw;
+				font-size: 2.5vw;
+				top: -.6vw;
+			}
+
+			cbox > span {
+				font-size: 2.4vw;
+				margin-left: .4vw;
 			}
 
 			smps2asm, asm {
-				font-size: 1.5vw;
-				border-width: .25vw;
-				margin: .3vw .4vw;
-				padding: .75vw .9vw;
+				font-size: 1.8vw;
+				border-width: .3vw;
+				margin: 0 .4vw;
+				padding: .4vw .2vw;
 			}
 		}
 	</style>
