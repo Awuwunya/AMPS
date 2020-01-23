@@ -47,7 +47,7 @@
 __mus =		MusOff
 
 MusicIndex:
-	ptrMusic Test, $00
+	ptrMusic Test, $00, S82, $00
 	ptrMusic Pelimusa, $1A, MysticCave, $34, DIS, $1E, ZaxxRemix, $00
 	ptrMusic ColumnDive, $3C, Pray, $0B, HydroCity, $1E, GameNo, $74
 	ptrMusic TowerPuppet, $00, ChoosePath, $0E, Shop, $74, Beach, $32

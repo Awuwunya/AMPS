@@ -174,6 +174,32 @@
 			num = num.toString(16).toUpperCase();
 			return "$" + ("0".repeat(len - num.length)) + num;
 		}
+
+		function tmpc(e){
+			let a = document.getElementById(e).value;
+			if(a !== a || a == undefined) return;
+
+			a.startsWith("$") && (a = a.substring(1));
+			a.startsWith("0x") && (a = a.substring(2));
+			a = parseInt(a, 16);
+			if(a !== a || a == undefined) return;
+
+			if(e == "tmsh2") a = (-a) & 0xFF;
+
+			let n = ((a == 0) << 8) | a;
+			n = ((((n - 1) << 8) + (n >> 1)) / n) & 0xFF;
+			n = (0x100 - ((n == 0) | n)) & 0xFF;
+
+			if(e == "tmctr") {
+				let x = a;
+				a = n;
+				n = x;
+			}
+
+			document.getElementById("tmctr").value = n.toString(16).toUpperCase();
+			document.getElementById("tmsh2").value = ((-a) & 0xFF).toString(16).toUpperCase();
+			document.getElementById("tmofw").value = a.toString(16).toUpperCase();
+		}
 	</script>
 	<link href="https://fonts.googleapis.com/css?family=Noto+Sans&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap" rel="stylesheet">
@@ -328,6 +354,28 @@
 			vertical-align: middle;
 		}
 
+		input {
+			background: #1e1e1e;
+			border-color: #5c585b;
+			color: whitesmoke;
+			font: 1vw 'Roboto Mono', monospace;
+		}
+
+		input:focus, input:active {
+			background: #2e2e2e;
+		}
+
+		button {
+			background: #1e1e1e;
+			color: whitesmoke;
+			border: .1vw solid #5c585b;
+			font: .8vw 'Overpass', sans-serif;
+		}
+
+		button:focus, button:active {
+			background: #2e2e2e;
+		}
+
 		smps2asm, asm {
 			display: block;
 			overflow-x: auto;
@@ -442,6 +490,15 @@
 				font-size: 1.8vw;
 			}
 
+			input {
+				font: 1.7vw 'Roboto Mono', monospace;
+			}
+
+			button {
+				border: .15vw solid #5c585b;
+				font: 1.4vw 'Overpass', sans-serif;
+			}
+
 			smps2asm, asm {
 				font-size: 1.5vw;
 				border-width: .2vw;
@@ -524,6 +581,15 @@
 			cbox > span {
 				font-size: 2.4vw;
 				margin-left: .4vw;
+			}
+
+			input {
+				font: 2.5vw 'Roboto Mono', monospace;
+			}
+
+			button {
+				border: .2vw solid #5c585b;
+				font: 2vw 'Overpass', sans-serif;
 			}
 
 			smps2asm, asm {
@@ -682,6 +748,14 @@
 		Then the counter value is also read back into the accumulator. You can change the tempo algorithm in <b>code/macro.asm</b>.
 		You can see a visualization of the two methods in the below image (thanks to MarkeyJester!)
 	</p>
+	<p>
+		Below is a tool to help you convert between different tempo algorithms.
+	</p>
+	<table border="1">
+		<tr><td>counter</td><td><input id="tmctr" /></td><td><button onclick="tmpc('tmctr')">convert</button></td></tr>
+		<tr><td>overflow</td><td><input id="tmofw" /></td><td><button onclick="tmpc('tmofw')">convert</button></td></tr>
+		<tr><td>Sonic 2</td><td><input id="tmsh2" /></td><td><button onclick="tmpc('tmsh2')">convert</button></td></tr>
+	</table>
 	<p>
 		Music also has an additional variable: Tick multiplier. For sound effects and often music, this value is set to $01, but you can use other values if
 		you want to. When a delay is read from the tracker, that value is multiplied by the tick multiplier amount. Tick multiplier of $01 means it
