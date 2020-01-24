@@ -1262,7 +1262,7 @@
 	</p>
 	<p>
 		Although PSG has 4 channels, AMPS only supports 3 at a time. AMPS can switch between PSG3 or PSG4 mode for PSG3 channel. PSG3 mode is a normal tone channel, much like PSG1 and PSG2.
-		This does not allow PSG4 to be used (though if you REALLY wanted you could do it - please don't.), but is very good if you dont need it anyway. Since PSG4 allows for relatively
+		This does not allow PSG4 to be used (though if you REALLY wanted you could do it - please don't), but is very good if you dont need it anyway. Since PSG4 allows for relatively
 		unconvincing but reasonable hats, using PSG4 mode is more common. In this mode, PSG4 can use one of a few settings to enable noise. Below is a list of the PSG commands and their
 		meanings:
 	</p>
@@ -1307,9 +1307,59 @@
 	</p>
 
 	<h3 id="part4_4" class="bd">4.4 — YM2612</h3>
-
-
-
+	<p>
+		The YM2612, also known as FM (frequency modulation), is the more complex sound chip in the Mega Drive. It is used to produce most sounds, as it has the most channels and the most rich sound
+		output. It allows for a large number of parameters that change how music sounds, and more complex sinewave mixing. Although there could be a lot said about it,
+		<a href="https://segaretro.org/YM2612">there are already a lot of documentation out there</a>. Instead, how FM works within AMPS is more important for this document.
+	</p>
+	<p>
+		AMPS has support for all 6 channels at once, even while DAC is playing. Although, when DAC is not playing the mute sample (if the sample itself is mute, it does NOT count!), FM6 will be
+		automatically disabled. Dual PCM is reponsible for this, which means the enabling/disabling happens immediately, not at the end of the frame. In theory, this should never lead to artifacts in
+		sound, but it can sound weird if samples go in and out all the time. You need to enable FEATURE_FM6 in order to use FM6. Additionally, panning in FM6 is currently not implemented correctly. It
+		overrides panning for both DAC channels, and vice versa too. The results of that are considered undefined behaviour, so panning on FM6 is not recommended.
+	</p>
+	<p>
+		AMPS uses FM voice tables to load FM instruments. Music has a single table for all its channels, and sound effects use a common table for all voices. Unlike in SMPS, AMPS uses a more efficient
+		format where loading any voice is as fast as any other. Therefore, a globabl voice table for sound effects actually improves performance overall. Instruments can be given unique names so that
+		removing or adding them can be done without breaking anything. The global voice table for sound effects is in <b>Voices.S2A</b>. Below is an example of a voice, along with the more common names
+		for each parameter:
+	</p>
+	<smps2asm>	<cmt>; Voice $00</cmt>
+	<mac>spAlgorithm</mac>	<val>$04</val>, <lbl>Rings</lbl>			<cmt>; Algorithm. The second parameter defines the name, in this case, pRings</cmt>
+	<mac>spFeedback</mac>	<val>$00</val>				<cmt>; Feedback</cmt>
+	<mac>spDetune</mac>	<val>$03</val>, <val>$07</val>, <val>$07</val>, <val>$04</val>		<cmt>; Detune</cmt>
+	<mac>spMultiple</mac>	<val>$07</val>, <val>$07</val>, <val>$02</val>, <val>$09</val>		<cmt>; Multiple</cmt>
+	<mac>spRateScale</mac>	<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>		<cmt>; Rate Scaling</cmt>
+	<mac>spAttackRt</mac>	<val>$1F</val>, <val>$1F</val>, <val>$1F</val>, <val>$1F</val>		<cmt>; Attack Rate</cmt>
+	<mac>spAmpMod</mac>	<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>		<cmt>; Amplitude Modulation</cmt>
+	<mac>spSustainRt</mac>	<val>$07</val>, <val>$07</val>, <val>$0A</val>, <val>$0D</val>		<cmt>; First Decay Rate; Decay 1 Rate</cmt>
+	<mac>spSustainLv</mac>	<val>$01</val>, <val>$01</val>, <val>$00</val>, <val>$00</val>		<cmt>; Secondary Amplitude; Decay Level</cmt>
+	<mac>spDecayRt</mac>	<val>$00</val>, <val>$00</val>, <val>$0B</val>, <val>$0B</val>		<cmt>; Second Decay Rate; Decay 2 Rate</cmt>
+	<mac>spReleaseRt</mac>	<val>$0F</val>, <val>$0F</val>, <val>$0F</val>, <val>$0F</val>		<cmt>; Release Rate</cmt>
+	<mac>spSSGEG</mac>		<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>		<cmt>; SSG-EG. This was introduced in AMPS.</cmt>
+	<mac>spTotalLv</mac>	<val>$23</val>, <val>$23</val>, <val>$00</val>, <val>$00</val>		<cmt>; Total Level</cmt></smps2asm>
+	<p>
+		Each voice in AMPS is 32 bytes in size, and has 3 unused bytes. This is done for the sake of alignment and efficiency. The above parameters are used to define each instrument, and they are sent
+		to YM2612 via Dual PCM. This means, that the timings between voices and notes are different to SMPS and therefore some things will sound different. This sometimes causes perfectly good sound
+		effects from SMPS games to sound absolute thrash in AMPS. This is largely unavoidable and there seems to be no real solution to this issue. Potential fixes are being investigated but there is no
+		guarantee for it.
+	</p>
+	<p>
+		FM has $80 total volume levels per operator and depending on the algorithm, different operators act as the volume (slot operators), and others as modulators (nonslot operators). SMPS2ASM will
+		correctly tell AMPS which operators are used for which purpose, but this can be changed by the programmer if they wish to have different behaviour. It is not recommended, unless the programmer
+		knows what they are doing. All the slot operators can have different total level values, as they are simply just added into the calculated volume. Additionally, <a href="#part6_2">underwater
+		mode</a> changes the slot and nonslot total levels too.
+	</p>
+	<p>
+		You can send arbitary YM2612 commands from tracker as well. This is useful for editing single instrument parameters or doing some more uncommon tricks. This is dangerous, because if a sound
+		effect interrupts the channel, all your changes are lost. Indeed, relying on changes to stick is a terrible idea. Additionally, songs that use the backup system will also make these changes be
+		lost, this time in every FM channel. Some other settings, such as LFO, will neither stick around correctly. However, because SSG-EG is in the instrument data, it will always be restored.
+	</p>
+	<p>
+		YM2612 has an interesting frequency range. It has frequencies from $000 to $7FF, and octaves from $00xx to $38xx. Each octave, well, is an octave higher than the previous. However, the frequency
+		between octaves also has some overlap. A lower octave frequency may sound the same as higher octave frequency, but earlier from the frequency range. To put it more simply, $4C0 may sound the same
+		as $A5C. The point where this happens precisely is not known yet, but the estimate provided is close enough. Below is a table of all notes, their raw values, and frequencies.
+	</p>
 
 	<table border="1">
 		<tr><td>octave</td><td>nC</td><td>nCs</td><td>nD</td><td>nEb</td><td>nE</td><td>nF</td><td>nFs</td><td>nG</td><td>nAb</td><td>nA</td><td>nBb</td><td>nB</td></tr>
