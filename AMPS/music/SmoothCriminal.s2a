@@ -796,7 +796,7 @@ SmoothCriminal_Loop25:
 d81 = dKick
 d82 = dSnare
 d84 = dClap
-d90 = dKcSnare
+d90 = dLowSnare
 d91 = dHiTom
 
 SmoothCriminal_DAC2:

@@ -47,11 +47,11 @@
 __mus =		MusOff
 
 MusicIndex:
-	ptrMusic Test, $00, S82, $00
+	ptrMusic Test, $00
 	ptrMusic Pelimusa, $1A, MysticCave, $34, DIS, $1E, ZaxxRemix, $00
 	ptrMusic ColumnDive, $3C, Pray, $0B, HydroCity, $1E, GameNo, $74
 	ptrMusic TowerPuppet, $00, ChoosePath, $0E, Shop, $74, Beach, $32
-	ptrMusic SmoothCriminal, $2A
+	ptrMusic SmoothCriminal, $2A, S82, $00
 
 MusCount =	__mus-MusOff		; number of installed music tracks
 SFXoff =	__mus			; first SFX ID
@@ -73,41 +73,42 @@ SampleList:
 	sample $0100, Kick, Stop		; 81 - Kick
 	sample $0100, LowKick, Stop		; 82 - Low Kick
 	sample $0100, Snare, Stop		; 83 - Snare
-	sample $0100, Clap, Stop		; 84 - Clap
-	sample $0180, Tom, Stop, HiTom		; 85 - High Tom
-	sample $0100, Tom, Stop			; 86 - Mid Tom
-	sample $00C0, Tom, Stop, LowTom		; 87 - Low Tom
-	sample $0080, Tom, Stop, FloorTom	; 88 - Floor Tom
+	sample $00E0, Snare, Stop, LowSnare	; 84 - Low Snare
+	sample $0100, Clap, Stop		; 85 - Clap
+	sample $0180, Tom, Stop, HiTom		; 86 - High Tom
+	sample $0100, Tom, Stop			; 87 - Mid Tom
+	sample $00C0, Tom, Stop, LowTom		; 88 - Low Tom
+	sample $0080, Tom, Stop, FloorTom	; 89 - Floor Tom
 
-	sample $0100, OrchHit, Stop		; 89 - Orchestra hit (Dynamite Headdy)
-	sample $0100, ZaxxOOH, Stop		; 8A - OOH 0-4 (Zaxxon Motherbase 2000)
-	sample $0080, ZaxxOOH, Stop, ZaxxLoOOH	; 8B - OOH Low 0-6 (Zaxxon Motherbase 2000)
-	sample $0100, ZaxxGO, Stop		; 8C - GO 0-5 (Zaxxon Motherbase 2000)
-	sample $0100, ZaxxDIS, Stop		; 8D - DIS 2-3 (Zaxxon Motherbase 2000)
-	sample $0100, ZaxxIT, Stop		; 8E - IT 2-9 (Zaxxon Motherbase 2000)
-	sample $0100, ZaxxEYO, Stop		; 8F - EYO 2-A (Zaxxon Motherbase 2000)
+	sample $0100, OrchHit, Stop		; 8A - Orchestra hit (Dynamite Headdy)
+	sample $0100, ZaxxOOH, Stop		; 8B - OOH 0-4 (Zaxxon Motherbase 2000)
+	sample $0080, ZaxxOOH, Stop, ZaxxLoOOH	; 8C - OOH Low 0-6 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxGO, Stop		; 8D - GO 0-5 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxDIS, Stop		; 8E - DIS 2-3 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxIT, Stop		; 8F - IT 2-9 (Zaxxon Motherbase 2000)
+	sample $0100, ZaxxEYO, Stop		; 90 - EYO 2-A (Zaxxon Motherbase 2000)
 
-	sample $0100, KcTom, Stop		; 90 - Tom (Knuckles Chaotix)
-	sample $00C0, KcTom, Stop, KcLowTom	; 91 - Low Tom (Knuckles Chaotix)
-	sample $0080, KcTom, Stop, KcFloorTom	; 92 - Floor Tom (Knuckles Chaotix)
-	sample $0100, kcCymbal, Stop		; 93 - Cymbal? (Knuckles Chaotix)
-	sample $0100, KcSnare, Stop		; 94 - Snare (Knuckles Chaotix)
-	sample $0100, KcTamb, Stop		; 95 - Tambourine? (Knuckles Chaotix)
-	sample $0100, Kc87, Stop		; 96 - Not really sure? (Knuckles Chaotix)
-	sample $0100, KcCrash, Stop		; 97 - Crash Cymbal (Knuckles Chaotix)
+	sample $0100, KcTom, Stop		; 91 - Tom (Knuckles Chaotix)
+	sample $00C0, KcTom, Stop, KcLowTom	; 92 - Low Tom (Knuckles Chaotix)
+	sample $0080, KcTom, Stop, KcFloorTom	; 93 - Floor Tom (Knuckles Chaotix)
+	sample $0100, kcCymbal, Stop		; 94 - Cymbal? (Knuckles Chaotix)
+	sample $0100, KcSnare, Stop		; 95 - Snare (Knuckles Chaotix)
+	sample $0100, KcTamb, Stop		; 96 - Tambourine? (Knuckles Chaotix)
+	sample $0100, Kc87, Stop		; 97 - Not really sure? (Knuckles Chaotix)
+	sample $0100, KcCrash, Stop		; 98 - Crash Cymbal (Knuckles Chaotix)
 
-	sample $0100, Meow, Stop	; AVG	; 98 - Meow (Meow Mix - Cyriak)
-	sample $0100, Wooh, WoohLoop	; AVG	; 99 - Wooh (The Amazing Atheist)
-	sample $0100, Lazer, Stop	; AVG	; 9A - Lazer (R2D2 bird)
+	sample $0100, Meow, Stop	; AVG	; 9) - Meow (Meow Mix - Cyriak)
+	sample $0100, Wooh, WoohLoop	; AVG	; 9A - Wooh (The Amazing Atheist)
+	sample $0100, Lazer, Stop	; AVG	; 9B - Lazer (R2D2 bird)
 
-	sample $0100, Kaiku1, Stop		; 9B - Kaiku (Wings - Pelimusa)
-	sample $0100, Kaiku2, Stop		; 9C - Kaiku (Wings - Pelimusa)
-	sample $0100, Kaiku3, Stop		; 9D - Kaiku (Wings - Pelimusa)
-	sample $0100, Kaiku4, Stop		; 9E - Kaiku (Wings - Pelimusa)
-	sample $0100, Kaiku5, Stop		; 9F - Kaiku (Wings - Pelimusa)
-	sample $0100, KaikuL1, KaikuL2, KaikuL2	; A0 - Kaiku (Wings - Pelimusa)
-	sample $0100, KaikuL1, KaikuL3, KaikuL3	; A1 - Kaiku (Wings - Pelimusa)
-	sample $0100, Sarobasso, Stop		; A2 - Sarobasso (Wings - Pelimusa)
+	sample $0100, Kaiku1, Stop		; 9C - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku2, Stop		; 9D - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku3, Stop		; 9E - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku4, Stop		; 9F - Kaiku (Wings - Pelimusa)
+	sample $0100, Kaiku5, Stop		; A0 - Kaiku (Wings - Pelimusa)
+	sample $0100, KaikuL1, KaikuL2, KaikuL2	; A1 - Kaiku (Wings - Pelimusa)
+	sample $0100, KaikuL1, KaikuL3, KaikuL3	; A2 - Kaiku (Wings - Pelimusa)
+	sample $0100, Sarobasso, Stop		; A3 - Sarobasso (Wings - Pelimusa)
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define volume envelopes and their data
