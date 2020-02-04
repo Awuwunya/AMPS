@@ -351,15 +351,15 @@ dUpdateAllAMPS:
 ; better. You may choose this setting in the macro.asm file,
 ; ---------------------------------------------------------------------------
 
-	if tempo=0	; Overflow method
-		move.b	mTempo.w,d3		; get tempo to d3
-		add.b	d3,mTempoCur.w		; add to accumulator
-		bcc.s	dAMPSdoDAC		; if carry clear, branch
-
-	else		; Counter method
+	if TEMPO_ALGORITHM		; Counter method
 		subq.b	#1,mTempoCur.w		; sub 1 from counter
 		bne.s	dAMPSdoDAC		; if nonzero, branch
 		move.b	mTempo.w,mTempoCur.w	; copy tempo again
+
+	else				; Overflow method
+		move.b	mTempo.w,d3		; get tempo to d3
+		add.b	d3,mTempoCur.w		; add to accumulator
+		bcc.s	dAMPSdoDAC		; if carry clear, branch
 	endif
 
 .ch =	mDAC1+cDuration				; start at DAC1 duration

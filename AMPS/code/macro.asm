@@ -1,14 +1,14 @@
 ; REGISTER USAGE:
 ;   a0 - Dual PCM cue
-;   a1 - current channel
+;   a1 - Current channel
 ;   a2 - Tracker
 ;   a3 - Special address (channels), target channel (playsnd), scratch
-;   a4 - music channel (dcStop), other various uses, scratch
-;   a5-a6 - scratch, use lower number when possible
+;   a4 - Music channel (dcStop), other various uses, scratch
+;   a5-a6 - Scratch, use lower number when possible
 ;   d0 - Channel dbf counter, other dbf counters
 ;   d1 - Various things read from the tracker, scratch
 ;   d2 - Volume or pitch when calculating it
-;   d3-d7 - scatch, use lower number when possible
+;   d3-d6 - Scatch, use lower number when possible
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -27,17 +27,17 @@ FEATURE_BACKUP =	1	; set to 1 to enable back-up channels. Used for the 1-up SFX 
 FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Used for the 1-up SFX.
 FEATURE_FM6 =		1	; set to 1 to enable FM6 to be used in music
 
+; Select the tempo algorith.
+; 0 = Overflow method.
+; 1 = Counter method.
+
+TEMPO_ALGORITHM =	0
+
 ; if safe mode is enabled (1), then the driver will attempt to find any issues.
 ; if Vladik's error debugger is installed, then the error will be displayed.
 ; else, the CPU is trapped.
 
 safe =	1
-
-; Select the tempo algorith.
-; 0 = Overflow method.
-; 1 = Counter method.
-
-tempo =	0
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Channel configuration

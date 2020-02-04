@@ -424,6 +424,10 @@
 			color: #9fb6f2;
 		}
 
+		smps2asm > mth, asm > mth {
+			color: #FFC273;
+		}
+
 		asm > ea {
 			color: #4EB51B;
 		}
@@ -1323,7 +1327,7 @@
 		sound, but it can sound weird if samples go in and out all the time. You need to enable FEATURE_FM6 in order to use FM6. Additionally, panning in FM6 is currently not implemented correctly. It
 		overrides panning for both DAC channels, and vice versa too. The results of that are considered undefined behaviour, so panning on FM6 is not recommended.
 	</p>
-	<p>
+	<p id="part_4_41">
 		AMPS uses FM voice tables to load FM instruments. Music has a single table for all its channels, and sound effects use a common table for all voices. Unlike in SMPS, AMPS uses a more efficient
 		format where loading any voice is as fast as any other. Therefore, a globabl voice table for sound effects actually improves performance overall. Instruments can be given unique names so that
 		removing or adding them can be done without breaking anything. The global voice table for sound effects is in <b>Voices.S2A</b>. Below is an example of a voice, along with the more common names
@@ -1705,6 +1709,122 @@
 	<h1 id="part10" class="bd">10 — Creating Custom Music</h1>
 
 	<h1 id="part11" class="bd">11 — Porting Music</h1>
+	<p>
+		Due to the difficulty of porting music from non-SMPS games, it will not be covered here at all. Although I could cover it, it would be massively complicated and largely unhelpful. Instead, this
+		part will list the kind of information you need to port music. Since AMPS is SMPS2ASM format exclusive, this tutorial will only talk about the aspects of SMPS2ASM. For more information to
+		correctly converting music, see <a href="http://sonicresearch.org/community/index.php?threads/md-music-player-scriptable-smps2asm.4354/">MDMusicPlayer</a>. Since AMPS uses a custom version of
+		the standard SMPS2ASM format created by Natsumi, using older versions (Cinossu's S1SMPS2ASM or Flamewing's SMPS2ASM) is not recommended, as those require manual conversion into AMPS format.
+		Unlike most SMPS drivers, AMPS does not generally use separate tracker commands for adjusting various things about channels (for example, no adding FM or PSG volume with different commands), so
+		these are to be converted by hand. Here is a full list of common commands and their conversions, and various notes about other commands:
+	</p>
+	<table border="1">
+		<tr><td>SMPS command</td><td>AMPS command</td><td>Additional notes</td></tr>
+		<tr><td>saVolFM</td><td>saVol</td><td></td></tr>
+		<tr><td>ssVolS3K</td><td>ssVol</td><td>Volume is negated in a strange way in S3K, but Natsumi's SMPS2ASM will disassemble it correctly. If the volume sounds weird, it may be an older file without correct conversion applied.</td></tr>
+		<tr><td>sPatFM</td><td>sVoice</td><td></td></tr>
+		<tr><td>sVolEnvPSG</td><td>sVolEnv</td><td>Previously, this would have been converted as sVoice, but since FEATURE_FMDACVOLENV was implemented, it should no longer be used.</td></tr>
+		<tr><td>ssMod68k</td><td>ssModAMPS</td><td>The resulting modulation will be slightly different. See <a href="#part5_1">documentation about modulation for more info</a>.</td></tr>
+		<tr><td>ssModZ80</td><td>ssModAMPS</td><td>The resulting modulation will be significantly different. See <a href="#part5_1">documentation about modulation for more info</a>.</td></tr>
+		<tr><td>sYMcmd</td><td>sCmdYM</td><td>sCmdYM can correctly take in account the current channel type.</td></tr>
+		<tr><td>sYM1cmd</td><td>sCmdYM</td><td>There are some differences in how these commands function.</td></tr>
+		<tr><td>sNoteTimeOut</td><td>sGate</td><td>sNoteTimeOut was the previous name for sGate, and may still be in use with your file. This is not supported for sound effects.</td></tr>
+		<tr><td>sSSGEG</td><td></td><td>Currently you can not set SSG-EG from tracker. This must be enabled in FM voice.</td></tr>
+		<tr><td>sModEnv</td><td></td><td>This command with 2 parameters is not supported in AMPS. You could use sCond to check for channel type bits, and execute code based on that.</td></tr>
+		<tr><td>saVolFMP</td><td></td><td>Not supported in AMPS. You could use sCond to check for channel type bits, and execute code based on that.</td></tr>
+		<tr><td>sComm</td><td></td><td>The first parameter in AMPS is the command byte number. SMPS only supported 1 of them, which is why that parameter does not exist.</td></tr>
+		<tr><td>sPanAni</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sSpecFM3</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sMusPause</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sFadeSpec</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sMuteStopFM</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sPlayDAC</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sPitchSlide</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sRawFreq</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sPitchSlide</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sCopyMem</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>saTimerA</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>ssTimerA</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>ssTimingSFX</td><td></td><td>Not supported in AMPS.</td></tr>
+	</table>
+	<p>
+		The header of music and sound effects is different in AMPS than SMPS. Since AMPS uses 2-channel playback, most of the time another channel needs to be added. Also, there is no pointer to the
+		voice table, so it needs to be moved right below the header. Sound effects do not have separate voice tables, <a href="#part_4_41">so they have to get their voices from the global table</a>.
+		Here is an example music header, and below that is what it should look like when converted. Remember to observe the comments:
+	</p>
+	<smps2asm>	<mac>sHeaderInit</mac>						<cmt>; Z80 offset is $8DC8</cmt>
+	<mac>sHeaderPatch</mac>	<lbl>LunchPlace_Patches</lbl>			<cmt>; will be deleted</cmt>
+	<mac>sHeaderCh</mac>	<val>$06</val>, <val>$03</val>				<cmt>; this and the line below swap places. Also, the number of FM channels needs to be $05.</cmt>
+	<mac>sHeaderTempo</mac>	<val>$01</val>, <val>$2F</val>				<cmt>; this song uses the overflow method, so it may need to be converted for the counter method</cmt>
+	<mac>sHeaderDAC</mac>	<lbl>LunchPlace_DAC</lbl>				<cmt>; this line will need to be duplicated and modified</cmt>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM1</lbl>, <val>$00</val>, <val>$0C</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM2</lbl>, <val>$0C</val>, <val>$08</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM3</lbl>, <val>$00</val>, <val>$0C</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM4</lbl>, <val>$00</val>, <val>$0C</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM5</lbl>, <val>$0C</val>, <val>$0C</val>
+	<mac>sHeaderPSG</mac>	<lbl>LunchPlace_PSG1</lbl>, <val>$F4</val>, <val>$02</val>, <val>$00</val>, <lbl>v00</lbl>	<cmt>; <- notice the channel volume here</cmt>
+	<mac>sHeaderPSG</mac>	<lbl>LunchPlace_PSG2</lbl>, <val>$F4</val>, <val>$04</val>, <val>$00</val>, <lbl>v00</lbl>	<cmt>; <- also notice the transposition</cmt>
+	<mac>sHeaderPSG</mac>	<lbl>LunchPlace_PSG3</lbl>, <val>$00</val>, <val>$02</val>, <val>$00</val>, <lbl>v00</lbl>	<cmt>; <-</cmt>
+	...							<cmt>; notice that there may be some lines right here.</cmt>
+
+<lbl>LunchPlace_Patches:</lbl>
+
+	<cmt>; Patch $00
+	; $03
+	; $62, $40, $44, $31,	$1F, $1F, $1F, $1C
+	; $0B, $0A, $02, $01,	$08, $0B, $04, $06
+	; $1F, $1F, $1F, $1F,	$2A, $1A, $2B, $80</cmt>
+	<mac>spAlgorithm</mac>	<val>$03</val>
+	<mac>spFeedback</mac>	<val>$00</val>
+	<mac>spDetune</mac>	<val>$06</val>, <val>$04</val>, <val>$04</val>, <val>$03</val>
+	<mac>spMultiple</mac>	<val>$02</val>, <val>$04</val>, <val>$00</val>, <val>$01</val>
+	<mac>spRateScale</mac>	<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>
+	<mac>spAttackRt</mac>	<val>$1F</val>, <val>$1F</val>, <val>$1F</val>, <val>$1C</val>
+	<mac>spAmpMod</mac>	<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>
+	<mac>spSustainRt</mac>	<val>$0B</val>, <val>$02</val>, <val>$0A</val>, <val>$01</val>
+	<mac>spSustainLv</mac>	<val>$01</val>, <val>$01</val>, <val>$01</val>, <val>$01</val>
+	<mac>spDecayRt</mac>	<val>$08</val>, <val>$04</val>, <val>$0B</val>, <val>$06</val>
+	<mac>spReleaseRt</mac>	<val>$0F</val>, <val>$0F</val>, <val>$0F</val>, <val>$0F</val>			<cmt>; voices will be mostly the same, but we will add another line just below</cmt>
+	<mac>spTotalLv</mac>	<val>$2A</val>, <val>$2B</val>, <val>$1A</val>, <val>$00</val>
+	...</smps2asm>
+	<p>
+		Now, the converted version:
+	</p>
+	<smps2asm>	<mac>sHeaderInit</mac>
+	<mac>sHeaderTempo</mac>	<val>$01</val>, <val>$2F</val>				<cmt>; no conversion was done, since the overflow method is also used by AMPS for this example</cmt>
+	<mac>sHeaderCh</mac>	<val>$05</val>, <val>$03</val>				<cmt>; there are 5 FM channels in this song, so the FM channel count was changed to $05</cmt>
+	<mac>sHeaderDAC</mac>	<lbl>LunchPlace_DAC1</lbl>				<cmt>; this line was added. However, DAC1 is not used because the original song used 1 DAC channel, and DAC1 can be interrupted by sfx</cmt>
+	<mac>sHeaderDAC</mac>	<lbl>LunchPlace_DAC2</lbl>				<cmt>; DAC2 is used for the original singular DAC track. If there were 2 DAC tracks already, then you will need to adapt both.</cmt>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM1</lbl>, <val>$00</val>, <val>$0C</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM2</lbl>, <val>$0C</val>, <val>$08</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM3</lbl>, <val>$00</val>, <val>$0C</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM4</lbl>, <val>$00</val>, <val>$0C</val>
+	<mac>sHeaderFM</mac>	<lbl>LunchPlace_FM5</lbl>, <val>$0C</val>, <val>$0C</val>
+	<mac>sHeaderPSG</mac>	<lbl>LunchPlace_PSG1</lbl>, <val>$F4</val><mth>+</mth><val>$0C</val>, <val>$10</val>, <val>$00</val>, <lbl>vNone</lbl><cmt>; volume is multiplied by $08, and v00 was changed to vNone</cmt>
+	<mac>sHeaderPSG</mac>	<lbl>LunchPlace_PSG2</lbl>, <val>$F4</val><mth>+</mth><val>$0C</val>, <val>$20</val>, <val>$00</val>, <lbl>vNone</lbl><cmt>; songs from 68k SMPS drivers need $0C to be added to the transposition of the channel, because of differences in frequency tables.</cmt>
+	<mac>sHeaderPSG</mac>	<lbl>LunchPlace_PSG3</lbl>, <val>$00</val>, <val>$10</val>, <val>$00</val>, <lbl>vNone</lbl>	<cmt>; this is not always the case. If only nHiHat is used, the transposition can be kept at $00.</cmt>
+								<cmt>; now, we can not have anything else between this and the voice table</cmt>
+	<cmt>; Patch $00
+	; $03
+	; $62, $40, $44, $31,	$1F, $1F, $1F, $1C
+	; $0B, $0A, $02, $01,	$08, $0B, $04, $06
+	; $1F, $1F, $1F, $1F,	$2A, $1A, $2B, $80</cmt>
+	<mac>spAlgorithm</mac>	<val>$03</val>
+	<mac>spFeedback</mac>	<val>$00</val>
+	<mac>spDetune</mac>	<val>$06</val>, <val>$04</val>, <val>$04</val>, <val>$03</val>
+	<mac>spMultiple</mac>	<val>$02</val>, <val>$04</val>, <val>$00</val>, <val>$01</val>
+	<mac>spRateScale</mac>	<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>
+	<mac>spAttackRt</mac>	<val>$1F</val>, <val>$1F</val>, <val>$1F</val>, <val>$1C</val>
+	<mac>spAmpMod</mac>	<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>
+	<mac>spSustainRt</mac>	<val>$0B</val>, <val>$02</val>, <val>$0A</val>, <val>$01</val>
+	<mac>spSustainLv</mac>	<val>$01</val>, <val>$01</val>, <val>$01</val>, <val>$01</val>
+	<mac>spDecayRt</mac>	<val>$08</val>, <val>$04</val>, <val>$0B</val>, <val>$06</val>
+	<mac>spReleaseRt</mac>	<val>$0F</val>, <val>$0F</val>, <val>$0F</val>, <val>$0F</val>
+	<mac>spSSGEG</mac>		<val>$00</val>, <val>$00</val>, <val>$00</val>, <val>$00</val>			<cmt>; voices in AMPS store SSG-EG data inside of them. Its a good idea to add this line before spTotalLv.</cmt>
+	<mac>spTotalLv</mac>	<val>$2A</val>, <val>$2B</val>, <val>$1A</val>, <val>$00</val>
+	...							<cmt>; notice that there may be some lines right here.</cmt>
+
+<lbl>LunchPlace_DAC1:</lbl>
+	<mac>sStop</mac>							<cmt>; these lines need to be added to disable DAC1. You can later reuse this label to add DAC1 track.</cmt></smps2asm>
 
 	<h1 id="part12" class="bd">12 — Installing AMPS</h1>
 
