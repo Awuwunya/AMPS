@@ -634,7 +634,7 @@
 	<tblcnt><a href="#part8">8 — Communication Bytes</a></tblcnt>
 	<tblcnt><a href="#part9">9 — Memory Map</a></tblcnt>
 	<tblcnt><a href="#part10">10 — Creating Custom Music</a></tblcnt>
-	<tblcnt><a href="#part11">11 — Porting Music</a></tblcnt>
+	<tblcnt><a href="#part11">11 — Porting Music And Sound Effects</a></tblcnt>
 	<tblcnt><a href="#part12">12 — Installing AMPS</a></tblcnt>
 	<tblcnt><a href="#part13">13 — Frequent Questions & Answers</a></tblcnt>
 
@@ -1707,8 +1707,11 @@
 	<br/>
 
 	<h1 id="part10" class="bd">10 — Creating Custom Music</h1>
+	<p>
+		To be written in the future.
+	</p>
 
-	<h1 id="part11" class="bd">11 — Porting Music</h1>
+	<h1 id="part11" class="bd">11 — Porting Music And Sound Effects</h1>
 	<p>
 		Due to the difficulty of porting music from non-SMPS games, it will not be covered here at all. Although I could cover it, it would be massively complicated and largely unhelpful. Instead, this
 		part will list the kind of information you need to port music. Since AMPS is SMPS2ASM format exclusive, this tutorial will only talk about the aspects of SMPS2ASM. For more information to
@@ -1720,27 +1723,27 @@
 	<table border="1">
 		<tr><td>SMPS command</td><td>AMPS command</td><td>Additional notes</td></tr>
 		<tr><td>saVolFM</td><td>saVol</td><td></td></tr>
+		<tr><td>saVolPSG</td><td>saVol</td><td>You must remember to multiply the volume by $08 for every instance.</td></tr>
 		<tr><td>ssVolS3K</td><td>ssVol</td><td>Volume is negated in a strange way in S3K, but Natsumi's SMPS2ASM will disassemble it correctly. If the volume sounds weird, it may be an older file without correct conversion applied.</td></tr>
 		<tr><td>sPatFM</td><td>sVoice</td><td></td></tr>
 		<tr><td>sVolEnvPSG</td><td>sVolEnv</td><td>Previously, this would have been converted as sVoice, but since FEATURE_FMDACVOLENV was implemented, it should no longer be used.</td></tr>
-		<tr><td>ssMod68k</td><td>ssModAMPS</td><td>The resulting modulation will be slightly different. See <a href="#part5_1">documentation about modulation for more info</a>.</td></tr>
-		<tr><td>ssModZ80</td><td>ssModAMPS</td><td>The resulting modulation will be significantly different. See <a href="#part5_1">documentation about modulation for more info</a>.</td></tr>
+		<tr><td>ssMod68k</td><td>sModAMPS</td><td>The resulting modulation will be slightly different. See <a href="#part5_1">documentation about modulation for more info</a>.</td></tr>
+		<tr><td>ssModZ80</td><td>sModAMPS</td><td>The resulting modulation will be significantly different. See <a href="#part5_1">documentation about modulation for more info</a>.</td></tr>
 		<tr><td>sYMcmd</td><td>sCmdYM</td><td>sCmdYM can correctly take in account the current channel type.</td></tr>
 		<tr><td>sYM1cmd</td><td>sCmdYM</td><td>There are some differences in how these commands function.</td></tr>
 		<tr><td>sNoteTimeOut</td><td>sGate</td><td>sNoteTimeOut was the previous name for sGate, and may still be in use with your file. This is not supported for sound effects.</td></tr>
 		<tr><td>sSSGEG</td><td></td><td>Currently you can not set SSG-EG from tracker. This must be enabled in FM voice.</td></tr>
 		<tr><td>sModEnv</td><td></td><td>This command with 2 parameters is not supported in AMPS. You could use sCond to check for channel type bits, and execute code based on that.</td></tr>
 		<tr><td>saVolFMP</td><td></td><td>Not supported in AMPS. You could use sCond to check for channel type bits, and execute code based on that.</td></tr>
-		<tr><td>sComm</td><td></td><td>The first parameter in AMPS is the command byte number. SMPS only supported 1 of them, which is why that parameter does not exist.</td></tr>
+		<tr><td>sComm</td><td></td><td>The first parameter in AMPS is the command byte number. SMPS only supported 1 of them, which is why that parameter does not exist. Uusually, you would use 0 as the first parameter in this case.</td></tr>
 		<tr><td>sPanAni</td><td></td><td>Not supported in AMPS.</td></tr>
-		<tr><td>sSpecFM3</td><td></td><td>Not supported in AMPS.</td></tr>
+		<tr><td>sSpecFM3</td><td></td><td>Not supported in AMPS currently.</td></tr>
 		<tr><td>sMusPause</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>sFadeSpec</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>sMuteStopFM</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>sPlayDAC</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>sPitchSlide</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>sRawFreq</td><td></td><td>Not supported in AMPS.</td></tr>
-		<tr><td>sPitchSlide</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>sCopyMem</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>saTimerA</td><td></td><td>Not supported in AMPS.</td></tr>
 		<tr><td>ssTimerA</td><td></td><td>Not supported in AMPS.</td></tr>
@@ -1825,13 +1828,87 @@
 
 <lbl>LunchPlace_DAC1:</lbl>
 	<mac>sStop</mac>							<cmt>; these lines need to be added to disable DAC1. You can later reuse this label to add DAC1 track.</cmt></smps2asm>
+	<p>
+		You need to keep in mind that since sound effects put the voices into the <a href="#part_4_41">global voice table</a>, you need to relocate them there and change all references to it in the
+		tracker code. Additionally, below is how you would change the sfx header:
+	</p>
+	<smps2asm>	<mac>sHeaderInit</mac>
+	<mac>sHeaderPatch</mac>		<lbl>sfx_Voices</lbl>				<cmt>; will be deleted</cmt>
+	<mac>sHeaderTick</mac>		<val>$01</val>					<cmt>; will be changed with another line. If tick multiplier is not $01, you will have to set it with a tracker command.</cmt>
+	<mac>sHeaderCh</mac>		<val>$02</val>
+	<mac>sHeaderSFX</mac>		<val>$80</val>, <val>$05</val>, <lbl>sfx_FM5</lbl>, <val>$00</val>, <val>$06</val>		<cmt>; channel type will be changed</cmt>
+	<mac>sHeaderSFX</mac>		<val>$80</val>, <val>$A0</val>, <lbl>sfx_PSG2</lbl>, <val>$0C</val>, <val>$03</val>		<cmt>; many parameters will be changed</cmt></smps2asm>
+	<p>
+		Here is the edited version
+	</p>
+	<smps2asm>	<mac>sHeaderInit</mac>
+	<mac>sHeaderPrio</mac>		<val>$80</val>					<cmt>; priority of all SFX channels. This helps with overriding the least important channels.</cmt>
+	<mac>sHeaderCh</mac>		<val>$02</val>
+	<mac>sHeaderSFX</mac>		<val>$80</val>, <equ>ctFM5</equ>, <lbl>sfx_FM5</lbl>, <val>$00</val>, <val>$06</val>		<cmt>; see list of equates below for chanel types.</cmt>
+	<mac>sHeaderSFX</mac>		<val>$A1</val>, <equ>ctPSG2</equ>, <lbl>sfx_PSG2</lbl>, <val>$0C</val><mth>+</mth><val>$0C</val>, <val>$18</val>	<cmt>; channel pitch and volume changed. Also, channel flags MUST be $A1.</cmt></smps2asm>
+	<p>
+		Here is the table of different channel types:
+	</p>
+	<table border="1">
+		<tr><td>Equate name</td><td>ctFM1</td><td>ctFM2</td><td>ctFM3</td><td>ctFM4</td><td>ctFM5</td><td>ctFM6</td><td>ctPSG1</td><td>ctPSG2</td><td>ctPSG3</td></tr>
+		<tr><td>Type value</td><td>$00</td><td>$01</td><td>$02</td><td>$04</td><td>$05</td><td>$06</td><td>$80</td><td>$A0</td><td>$C0</td></tr>
+	</table>
+	<p>
+		You must also keep in mind that different SMPS games use different volume and modulation envelope tables. Therefore, to fully port songs between games, these envelopes must be ported to AMPS.
+		You may also look for one that is similar enough to not be very noticeable. Indeed, this is often done if the difference is already minimal. It depends on the case how you acquire the data, but
+		you should convert it to ASM (eg, series of dc.b statements). I can not help with this because it largely depends on the case. In the case of volume envelopes used for PSG, all the volumes must
+		be multiplied by $08. There are various commands for envelopes as well, they are usually between $80 and $A0 (sometimes negative values are also used as part of the envelopes), and they must be
+		converted correctly. It depends on the game which values correspond to what. These often can be found in
+		<a href="https://forums.sonicretro.org/index.php?threads/valley-bells-smps-research.32473/">SMPS Research Pack</a>. Below is a table of common commands and their AMPS equivalents:
+	</p>
+	<table border="1">
+		<tr><td>command id</td><td>SMPS research pack name</td><td>AMPS equate</td><td>notes</td></tr>
+		<tr><td>80</td><td>RESET</td><td>eReset</td><td></td></tr>
+		<tr><td>81</td><td>HOLD</td><td>eHold</td><td></td></tr>
+		<tr><td>82</td><td>LOOP</td><td>eLoop</td><td></td></tr>
+		<tr><td>83</td><td>STOP</td><td>eStop</td><td>This one and the below one are equivalent for volume envelopes.</td></tr>
+		<tr><td>83</td><td>VOLSTOP_MODHOLD</td><td></td><td>eStop for volume envelopes and eHold for modulation envelopes.</td></tr>
+		<tr><td>84</td><td>CHG_MULT</td><td>esSens</td><td></td></tr>
+		<tr><td></td><td></td><td>eaSens</td><td>Not supported by SMPS by default.</td></tr>
+	</table>
+	<p>
+		To insert this data into AMPS, have a look in <a href="#part7">this part</a>.
+	</p>
+	<p>
+		It is possible you may have to port samples between games as well. This, again, can be very difficult feat. If you wish to port samples, you will have to find the file for the sample. This can be
+		disassembled from the game or may exist somewhere already. You will have to figure out whether it is DPCM or PCM format, and the sample rate. Often, drivers have specific "base rate", and
+		modifiers that add to this rate. This is very specific and therefore difficult to explain. If you are unsure of how to port these samples, you may ask someone more knowledgeable to help.
+	</p>
+	<p>
+		However, if you have both the sample file, its format, and sample rate, it is very easy to convert it to a wav file. Simply, convert any DPCM format samples to PCM first (there are various tools
+		for this available), and then load it into <a href="https://www.audacityteam.org/">Audacity</a>, and import as raw. You get some options after you've selected the file. Simply, the file needs to
+		be "uncompressed 8-bit PCM", at the sample rate you found out, 1-channel mono and big-endian. In theory, the sample should be imported correctly. Then, change the sample rate to the sample rate
+		of Dual PCM (typically this would be 14000Hz), and export the sample as 8-bit wav. This will ensure that the minimal amount of quality loss happens. However, Audacity has some options that can
+		affect the sample quality negatively as well. It is a good idea to try playing around with them to find the most optimal settings. Next, drag & drop the new wav file into ConvPCM, and the SWF
+		sample file will be generated, ready to use. <a href="#part4_5">You can follow these instructions to add your sample</a>.
+	</p>
+	<p>
+		Within the tracker file, you can change references to a sample name to the name of the new sample you added, or any sample you want to replace it with. This in most cases should work as a simple
+		text replacement over the entire file.
+	</p>
+	<p>
+		There are a few differences in various SMPS versions, that need to be considered when porting music. These have been taken from the SMPS research pack, and adapted to be specific to AMPS:
+	</p>
+	<ul>
+		<li>There are minor differences between frequency tables between 68k SMPS, Z80 SMPS and AMPS. Most of the time this does not matter but can lead to some unintended glitches.</li>
+		<li>In Z80 SMPS, playing a <b>note, rest, delay, delay</b> will play the note again at the last delay. In AMPS and 68k SMPS, rest will be played twice.</li>
+		<li>AMPS, 68k SMPS and Z80 SMPS all have different modulation algorithms.</li>
+		<li>Tick multiplier only affects delays in 68k SMPS and AMPS, but also affects gate in Z80 SMPS.</li>
+		<li>Modulation envelope sensitivity is signed in AMPS and 68k SMPS, but unsigned in Z80 SMPS. Additionally, in AMPS and Z80 SMPS, the multiplier is from 1 to $100, while in 68k SMPS it is 0 to $FF.</li>
+		<li>The bit 7 (value greater than or $80) is used to determine the slot operators for total level values in AMPS and Z80 SMPS, while in 68k SMPS uses another table to determine it.</li>
+	</ul>
 
 	<h1 id="part12" class="bd">12 — Installing AMPS</h1>
 
 	<h1 id="part13" class="bd">13 — Frequent Questions & Answers</h1>
 	<h3>Do you have a Discord server?</h3>
 	<p>
-		We do indeed! If you want to get the latest AMPS news, talk to the developers, ask questions and get help, and get the latest news and exclusive updates!
+		We do indeed! If you want to get the latest AMPS news and exclusive updates, talk to the developers, ask questions and get help, do join in!
 		We also host other related projects under the same server. <a href="https://discord.gg/nW3CFaU">Join here</a>.
 	</p>
 	<h3>Where should I report bugs?</h3>
