@@ -436,6 +436,11 @@
 			color: #FFC273;
 		}
 
+		asm > str {
+			color: #FF8597;
+			background: #5729467D;
+		}
+
 		@media screen and (max-width: 800px){
 			body {
 				border: .2vw solid gray;
@@ -640,18 +645,14 @@
 
 	<h1 id="part1" class="bd">1 — Introduction</h1>
 	<p>
-		AMPS is a 68k-based, SMPS-like sound driver, designed to be used with ROM hacks and Sega Mega Drive software.
-		Although similar to SMPS, AMPS is fundamentally different in many aspects. It is also heavily customized, RAM-efficient
-		and cycle-efficient. AMPS is additionally powered by Dual PCM FlexEd, meaning that you can use 2 DAC sample channels
-		with pitch and volume control. AMPS was designed to be a well-documented driver with a lot of capabilities so that
-		the music created for the sound driver can sound better, and the music and game program can interact with each other.
-		To ensure this, AMPS has a very robust codebase built to allow future expansion and customized programming for
-		game-specific circumstances.
+		AMPS is a 68k-based, SMPS-like sound driver, designed to be used with ROM hacks and Sega Mega Drive software. Although similar to SMPS, AMPS is fundamentally different in many aspects. It is
+		also heavily customized, RAM-efficient and cycle-efficient. AMPS is additionally powered by Dual PCM FlexEd, meaning that you can use 2 DAC sample channels with pitch and volume control. AMPS
+		was designed to be a well-documented driver with a lot of capabilities so that the music created for the sound driver can sound better, and the program and music can interact with each other.
+		To ensure this, AMPS has a very robust codebase built to allow future expansion and customized programming for program-specific circumstances.
 	</p>
 	<p>
-		AMPS is open source and free to use, given that you follow the license. You can easily make your own modifications, do feature
-		requests, and make some great music. Currently, there is a limited number of options to create music, but using tools designed
-		for other sound drivers, you can convert the files into AMPS format. More on that in <a href="#part9">part 9</a>.
+		AMPS is open source and free to use, given that you follow the license. You can easily make your own modifications, do feature requests, and make some great music. Currently, there is a limited
+		number of options to create music, but using tools designed for SMPS sound drivers, you can convert the files into AMPS format. More on that in <a href="#part9">part 11</a>.
 	</p>
 
 	<h3 id="part1_1" class="bd">1.1 — Undefined Behaviour</h3>
@@ -665,56 +666,42 @@
 
 	<h1 id="part2" class="bd">2 — AMPS Overview</h1>
 	<p>
-		AMPS is based on sound data files, perhaps erroneously referred to as tracker files. These files define each song and sound effect
-		you may hear in a game. They do not specify samples themselves, as those are handled by a different system. They are
-		the backbone of AMPS and without them no sound would be generated. Tracker files tell AMPS what notes to play, how long to
-		play them, and can also tell AMPS about other aspects of how hardware should act. For example, you can manipulate
-		<a href="#part4_4">YM2612</a> registers or tell <a href="#part4_5">Dual PCM</a> how to play samples. Additionally, AMPS has
-		a long list of built-in features that help the programmer to make cool effects without needing to have in-depth programming
-		ability.
+		AMPS is based on sound data files, perhaps erroneously referred to as tracker files. These files define each music and sound effect you may hear in a game or a program. They do not specify
+		samples themselves, as those are handled by a different system. They are the backbone of AMPS and without them no sound would be generated. Tracker files tell AMPS what notes to play, how long to
+		play them, and can also tell AMPS about other aspects of how hardware should act. For example, you can manipulate <a href="#part4_4">YM2612</a> registers or tell <a href="#part4_5">Dual PCM</a>
+		how to play samples. Additionally, AMPS has a long list of built-in features that help the programmer to make cool effects without needing to have in-depth programming ability.
 	</p>
 	<p>
-		AMPS includes a number of customizable flags, that allow the programmer to decide which features they are going to need for
-		their project. The more flags are enabled, generally, the more system RAM and processor cycles are required to execute AMPS,
-		though there are also exceptions. Here is a list of currently available flags:
+		AMPS includes a number of customizable flags, that allow the programmer to decide which features they are going to need for their project. The more flags are enabled, generally, the more system
+		RAM and processor cycles are required to execute AMPS, though there are also exceptions. Here is a list of currently available flags:
 	</p>
 	<ul>
-		<li><b>FEATURE_SAFE_PSGFREQ</b> — When enabled, the PSG frequency behaviour is set to safe mode. When disabled,
-			it is possible that a PSG frequency overflows and messes with other PSG channels. This behaviour, for whatever reason,
-			is required to make the insta-shield sound effect from Sonic 3 & Knuckles work correctly.</li>
+		<li><b>FEATURE_SAFE_PSGFREQ</b> — When enabled, the PSG frequency behaviour is made safer. When disabled, it is possible that a PSG frequency overflows and messes with other PSG channels. This
+			behaviour, for whatever reason, is required to make the insta-shield sound effect from Sonic 3 & Knuckles work correctly.</li>
 		<li><b>FEATURE_SFX_MASTERVOL</b> — When enabled, sound effect channels will be affected by <a href="#part6">master volume.</a></li>
-		<li><b>FEATURE_MODULATION</b> — When enabled, <a href="#part5_1">software modulation</a> can be used. This allows
-			the programmer to define a linear change for frequency over time, which can also go back and forth between
-			rising and falling.</li>
-		<li><b>FEATURE_PORTAMENTO</b> — When enabled, <a href="#part5_2">the portamento command</a> can be used. Portamento
-			makes the notes smoothly change over specified number of frames (or 0 frames which disables this effect).</li>
-		<li><b>FEATURE_MODENV</b> — When enabled, <a href="#part5">modulation envelopes</a> can be used. Similarly to
-			volume envelopes (also known as PSG instruments or PSG tones), they can be used to create more complex patterns
-			for changing channel frequency. Every frame a value is read from a list specified by the modulation envelope ID,
-			and that is used to calculate the frequency displacement.</li>
-		<li><b>FEATURE_DACFMVOLENV</b> — When enabled, <a href="#part6_1">volume envelopes</a> can be used in DAC and FM
-			channels along with PSG channels. They can be used to create more complex patterns for changing channel volume.
-			Every frame a value is read from a list specified by the volume envelope ID, which is then used to calculate the
-			volume displacement.</li>
-		<li><b>FEATURE_UNDERWATER</b> — When enabled, <a href="#part6_2">underwater mode</a> is enabled. This makes it so that
-			68k can request underwater mode to be activated, and when it is, all FM voices will sound slightly muffled. This is intended
-			to emulate how music would sound if it were played underwater. Although the effect is not perfect, it creates an
-			additional "depth" to how your game will sound when implemented right.</li>
-		<li><b>FEATURE_BACKUP</b> — When enabled, music can be <a href="#part4_2">"backed up"</a> so it can be later started from
-			the same place. This is useful if you have a temporary song you want to play for a small moment, but don't want the
-			previous song to start from the beginning again. In Sonic games this is commonly used for the 1-UP sound. The one big downside of
-			this flag is that it requires nearly double the amount of RAM as the driver regularly needs.</li>
+		<li><b>FEATURE_MODULATION</b> — When enabled, <a href="#part5_1">software modulation</a> can be used. This allows he programmer to define a linear change for frequency over time, which can also
+			go back and forth between rising and falling.</li>
+		<li><b>FEATURE_PORTAMENTO</b> — When enabled, <a href="#part5_2">the portamento command</a> can be used. Portamento makes the notes smoothly change over specified number of frames.</li>
+		<li><b>FEATURE_MODENV</b> — When enabled, <a href="#part5">modulation envelopes</a> can be used. Similarly to volume envelopes (also known as PSG instruments or PSG tones), they can be used to
+			create more complex patterns for changing channel frequency. Every frame a value is read from a list specified by the modulation envelope ID, and that is used to calculate the frequency
+			displacement.</li>
+		<li><b>FEATURE_DACFMVOLENV</b> — When enabled, <a href="#part6_1">volume envelopes</a> can be used in DAC and FM channels along with PSG channels. They can be used to create more complex
+			patterns for changing channel volume. Every frame a value is read from a list specified by the volume envelope ID, which is then used to calculate the volume displacement.</li>
+		<li><b>FEATURE_UNDERWATER</b> — Allows, <a href="#part6_2">underwater mode</a> to be enabled. This makes it so that the program can request underwater mode to be activated, and when it is, all
+			FM voices will sound slightly muffled. This is intended to emulate how music would sound if it were played underwater. Although the effect is not perfect, it creates an additional "depth" to
+			how your program will sound when implemented right.</li>
+		<li><b>FEATURE_BACKUP</b> — When enabled, music can be <a href="#part4_2">"backed up"</a> so it can be later started from the same place. This is useful if you have a temporary music you want to
+			play for a small moment, but don't want the previous music to start from the beginning again. In Sonic games this is commonly used for the 1-UP sound. The one big downside of this flag is
+			that it requires nearly double the amount of RAM as the driver regularly needs.</li>
 		<li><b>FEATURE_BACKUPNOSFX</b> — When enabled, this prevents sound effects from playing when a song is backed up.</li>
-		<li><b>FEATURE_FM6</b> — When enabled, FM6 can be used as a music channel in addition to DAC1 and DAC2 as sample channels.
-			Because FM6 and DAC cannot play at the same time, whenever <b>any</b> DAC is playing in any channel, FM6 is temporarily
-			disabled. FM6 keeps playing as normal in the background, but no sound is output. This feature is useful when you want
-			to use FM6 for any song, but still want to have access to DAC channels too.</li>
+		<li><b>FEATURE_FM6</b> — When enabled, FM6 can be used as a music channel in addition to DAC1 and DAC2 as sample channels. Because FM6 and DAC cannot play at the same time, whenever <b>any</b>
+			DAC is playing in any channel, FM6 is temporarily disabled. FM6 keeps playing as normal in the background, but no sound is output. This feature is useful when you want to use FM6 for any
+			song, but still want to have access to DAC channels too.</li>
 	</ul>
 	<p>
-		AMPS also uses additional data, such as volume and modulation envelope data, sample tables, and other miscellaneous
-		include files. This data is all defined in the <b>code/Data.asm</b> file, which is the file you will be editing most.
-		Additionally, <b>AMPS Includer.exe</b> is used to pre-process this file so it works correctly in both ASM68K and AS. There
-		are also a number of customizable things, such as volume fades, frequency tables, and PCM volume filters.
+		AMPS also uses additional data, such as volume and modulation envelope data, sample tables, and other miscellaneous include files. This data is all defined in the <b>code/Data.asm</b> file,
+		which is the file you will be editing most. Additionally, <b>AMPS Includer.exe</b> is used to pre-process this file so it works correctly in both ASM68K and AS. There are also a number of
+		customizable things, such as volume fades, frequency tables, and PCM volume filters.
 	</p>
 
 	<h1 id="part3" class="bd">3 — Sound System</h1>
@@ -1030,7 +1017,7 @@
 	<p>
 		This command is skipped when condition is false.
 	</p>
-	<h4>$F0 — ssMod68k &lt;wait&gt; &lt;speed&gt; &lt;step&gt; &lt;count&gt;</h4>
+	<h4>$F0 — sModAMPS &lt;wait&gt; &lt;speed&gt; &lt;step&gt; &lt;count&gt;</h4>
 	<p>
 		Initializes software frequency modulation. Modulation is useful for creating an effect where frequency moves up and/or down repeatedly, which can be used either for detuning on
 		instruments or for custom effects. They are often used for sound effects to make them sound interesting, realistic or fun. They are also use in music to create bigger immersion.
@@ -1138,7 +1125,7 @@
 	</p>
 	<h4>$FD — sGate &lt;frames&gt;</h4>
 	<p>
-		Sets the game timeout to <b>&lt;frames&gt;</b>. Value of 0 disables this effect. Gate cuts the sound out after a specific number of frames (not ticks!), commencing regular note off behaviour for
+		Sets the gate timeout to <b>&lt;frames&gt;</b>. Value of 0 disables this effect. Gate cuts the sound out after a specific number of frames (not ticks!), commencing regular note off behaviour for
 		the channel. This is very useful when you have a lot of notes that should stop few frames/ticks before the actual note length. Instead of placing a bunch of notes with delays, and rests with delays,
 		you can optimize it to use sGate instead. Not only is this faster, but also more space-efficient. This command is not available for sound effects, and trying to use it is considered undefined behaviour. This command is skipped when condition is false.
 	</p>
@@ -1277,6 +1264,7 @@
 	</p>
 	<table border="1">
 		<tr><td>PSG command</td><td>$E0</td><td>$E1</td><td>$E2</td><td>$E3</td><td>$E4</td><td>$E5</td><td>$E6</td><td>$E7</td></tr>
+		<tr><td>Equate name</td><td>snPeri10</td><td>snPeri20</td><td>snPeri40</td><td>snPeriPSG3</td><td>snWhite10</td><td>snWhite20</td><td>snWhite40</td><td>snWhitePSG3</td></tr>
 		<tr><td>Mode</td><td colspan="4">Periodic noise</td><td colspan="4">White noise</td></tr>
 		<tr><td>Frequency</td><td>$0010</td><td>$0020</td><td>$0040</td><td>PSG3</td><td>$0010</td><td>$0020</td><td>$0040</td><td>PSG3</td></tr>
 	</table>
@@ -1592,6 +1580,10 @@
 		4 operators that need updating, and the fact we've got to take time from Dual PCM for a while. AMPS optimizes this but at the cost of more 68k time. Avoid updating volume unless it
 		is necessary!
 	</p>
+	<p>
+		Below you can see a chart comparing the effective loudness for each volume level for all the channel types. This is only an approximation, as there are many factors effecting effective and
+		perceived volume. This chart is meant to illustrate the differences of how each channel sonds at different volume levels (Thanks to Markeyjester!):
+	</p>
 
 	<h3 id="part6_2" class="bd">6.2 — Underwater Mode</h3>
 	<p>
@@ -1665,14 +1657,14 @@
 
 	<h1 id="part8" class="bd">8 — Communication Bytes</h1>
 	<p>
-		AMPS allows trackers to communicate with the game program using communications bytes. By default, 8 bytes are defined that are accessible to both read & write from
+		AMPS allows trackers to communicate with the program using communications bytes. By default, 8 bytes are defined that are accessible to both read & write from
 		the tracker. You can conditionally execute tracker code when checking the communications byte with a condition mode. Whenever condition is set to false, number of
 		commands are skipped instead of executing them. This can be used to skip commands, for example jumping or changing voice, to split the single path into multiple paths.
 		This could be used for all kinds of neat effects, dynamic songs, songs that have ending point as opposed to just fading out, things like this. It is entirely up to the
 		programmer on how they decide to accomplish this. <a href="#part4_1">This earlier part also lists which commands will be skipped.</a>
 	</p>
 	<p>
-		The 8 bytes can be acessed through mComm to mComm+7. The game program is free to manipulate these in any way and the programmer is responsible for deciding which
+		The 8 bytes can be acessed through mComm to mComm+7. The program is free to manipulate these in any way and the programmer is responsible for deciding which
 		communications bytes are used for what purpose. Communications bytes are not initialized to any specific value, so relying on them being, for example, 0 is not adviced.
 		Communication bytes do not get reset ever with AMPS, so sharing them between songs, sound effects or other is possible. It is a good idea to reset all the communications
 		bytes you intend to use for songs with tracker code. Here is an example of reading and writing to the communications flags:
@@ -1904,6 +1896,70 @@
 	</ul>
 
 	<h1 id="part12" class="bd">12 — Installing AMPS</h1>
+	<p>
+		This part will not tell you how to install AMPS into a pre-existing ROM hack or fully completed project, as the method for converting a pre-existing sound driver to be AMPS instead is difficult
+		to estimate or give advice on. There are reference implementations available for many of the most common disassemblies already. Instead, this tutorial will cover the basics you need to know to
+		successfully implement AMPS into a new project of yours. This could be a homebrew game or an application for example.
+	</p>
+	<p>
+		There are a few files you need to include into the main assembly file. This part will use ASM68K syntax but should be easily applicable to AS too. These following files need to exist at the very
+		start of assembly (beginning of your main asm file):
+	</p>
+	<asm>	<mac>include</mac> <str>"AMPS/code/smps2asm.asm"</str>	<cmt>; code related to AMPS' SMPS2ASM macro set</cmt>
+	<mac>include</mac> <str>"AMPS/code/macro.asm"</str>		<cmt>; various macros and equates that make AMPS possible</cmt>
+	<mac>include</mac> <str>"AMPS/lang.asm"</str>			<cmt>; Z80 macro language to assemble Dual PCM. DO NOT USE FOR AS</cmt></asm>
+	<p>
+		The following code includes AMPS itself and an uncompressed version of Dual PCM. To use compression, you have to come up with your own solution:
+	</p>
+	<asm>	<mac>include</mac> <str>"AMPS/code/68k.asm"</str>		<cmt>; include main code for AMPS, including all the different various files</cmt>
+
+<lbl>DualPCM:</lbl>	<mac>z80prog</mac> <val>0</val>			<cmt>; initialize Z80 language program</cmt>
+		<mac>include</mac> <str>"AMPS/code/z80.asm"</str>	<cmt>; include the Dual PCM driver code</cmt>
+<lbl>DualPCM_sz:</lbl>	<mac>z80prog</mac>				<cmt>; end the Z80 language program</cmt></asm>
+	<p>
+		This is the equivalent code for AS:
+	</p>
+	<asm>	<mac>include</mac> <str>"AMPS/code/68k.asm"</str>		<cmt>; include main code for AMPS, including all the different various files</cmt>
+
+<lbl>DualPCM:</lbl>
+	<mac>save</mac>					<cmt>; save processor flags</cmt>
+	<mac>org</mac>	<val>0</val>				<cmt>; go to address 0 in Z80 ROM</cmt>
+	<mac>cpu</mac>	<equ>z80undoc</equ>			<cmt>; use Z80 with (broken) undocumented instructions support</cmt>
+	<mac>include</mac> <str>"AMPS/code/z80.asm"</str>		<cmt>; include the Dual PCM driver code</cmt>
+
+<lbl>DualPCM_sz:</lbl>
+	<mac>cpu</mac>	<equ>68000</equ>				<cmt>; switch back to 68000</cmt>
+	<mac>restore</mac>					<cmt>; restore processor flags</cmt></asm>
+	<p>
+		<b>code/macro.asn</b> needs to be edited in order for the installation to be successful. Specifically, you can toggle the various flags at the top to enable the features you want, and you need
+		to scroll down to the line starting with <b>mFlags</b>. The line above it may have a RAM address or an equate, that you need to change to suit your software. This will redefine the RAM addressing
+		for AMPS so that it uses a desired slot of RAM for its operations. You will need to be aware, that any RAM address below $FF8040 is not valid for AMPS because of short addressing requirements.
+	</p>
+	<p>
+		Finally, your build scripts need to be updated. First, you need this line at the beginning:
+	</p>
+	<asm><str>"AMPS\Includer.exe"</str> <equ>ASM68K AMPS</equ> <lbl>AMPS\.Data</lbl></asm>
+	<p>
+		And this at the end:
+	</p>
+	<asm><mac>del</mac> <lbl>AMPS\.Data</lbl></asm>
+	<p>
+		For AS, simply change <b>ASM68K</b> to <b>AS</b>. Now, your project should build correctly. If it does not, you may have to figure out the bug report by yourself or ask for help in for example,
+		Discord.
+	</p>
+	<p>
+		Next, we need to enable AMPS running. When the program initializes, we must load Dual PCM into memory. Simply, call <b>LoadDualPCM</b> from the initialization code when you are sure Z80 can be
+		started correctly. If the driver is compressed or the initialization code needs to be changed, open <b>code/68k Initialize.asn</b>. Finally, we need to run AMPS during vertical interrupt. Simply,
+		calling <b>UpdateAMPS</b>. This should NOT be done at the beginning of vertical interrupt handler however; Due to various reasons, Dual PCM needs to finish completing various tasks to let AMPS
+		run correctly. Attempting to run AMPS before this is complete is a dangerous idea. Doing a small DMA transfer before this should be enough however. Also, there is an equate we need to load a
+		value to. <b>ConsoleRegion</b> needs to have the region bits from register <b>$A10001</b> loaded into it. AMPS only cares about bits 6 and 7, and will not attempt to read any other bits. If your
+		program already stores the region somewhere, you can make <b>ConsoleRegion</b> point to this variable safely.
+	</p>
+	<p>
+		It is possible, while playing music, that AMPS does not actually work correctly. It is a good idea to first run the <b>mus_Stop</b> command, as this ensures that driver memory gets cleared
+		correctly before any music is played. While in reality this should not be necessary, its good to be safe than sorry. Additionally, checking that there is no RAM collisions or any suspicious
+		behaviour is a good idea. If the driver still does not work and you can not figure out some error, contact the developers for help.
+	</p>
 
 	<h1 id="part13" class="bd">13 — Frequent Questions & Answers</h1>
 	<h3>Do you have a Discord server?</h3>
@@ -1913,7 +1969,7 @@
 	</p>
 	<h3>Where should I report bugs?</h3>
 	<p>
-		Preferably, you should submit an issue to the Github page of the project. However, you can also report them on our Discord or by directly messaging Natsumi on SSRG, Retro, or Discord.
+		Preferably, you should submit an issue to the Github page of the project. However, you can also report them on our Discord or by directly messaging Aurora on SSRG, Retro, or Discord.
 	</p>
 	<h3>I have a good idea! But how should I ask for it to get implemented?</h3>
 	<p>
@@ -1923,7 +1979,7 @@
 	<h3>Why is there no installation tutorial for my preferred disassembly?</h3>
 	<p>
 		It would be impossible to make tutorials for every single possible disassembly. Instead, there are pre-made disassemblies available for many common setups. IT is adviced to follow the
-		commits for these disassemblies to port the sound driver to your specific setup. If no pre-made disassembly exists for your setup, you may request for it to be created by messaging Natsumi.
+		commits for these disassemblies to port the sound driver to your specific setup. If no pre-made disassembly exists for your setup, you may request for it to be created by messaging Aurora.
 	</p>
 	<h3>How often is AMPS updated?</h3>
 	<p>
