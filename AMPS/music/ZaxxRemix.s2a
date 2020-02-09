@@ -408,7 +408,7 @@ Zaxx_FM1_Dbl1:
 
 Zaxx_FM2:
 	;sJump		.out1
-	ssMod68k	$03, $01, $0A, $08
+	sModAMPS	$03, $01, $0A, $08
 	sVoice		$02
 	sCall		Zaxx_FM23_Intro1
 	saVol		$FB
@@ -461,7 +461,7 @@ Zaxx_FM2:
 
 Zaxx_FM24_Ver1:
 	sVoice		$03
-.ver2	ssMod68k	$00, $01, -$14, $FF
+.ver2	sModAMPS	$00, $01, -$14, $FF
 
 .ver1	dc.b nE2, $08
 	saVol		$08
@@ -473,7 +473,7 @@ Zaxx_FM24_Ver1:
 	sLoop		$00, $06, .ver1
 
 	saDetune	$08*$06
-	ssMod68k	$00, $01, -$20, $18
+	sModAMPS	$00, $01, -$20, $18
 
 	ssLFO		$F8,1,2, spLeft
 	dc.b nD3, $03
@@ -514,12 +514,12 @@ Zaxx_FM24_Ver1:
 	ssLFO		$00,spCenter
 	sLoop		$01, $03, .ver2
 
-	ssMod68k	$03, $01, $0A, $08
+	sModAMPS	$03, $01, $0A, $08
 	sRet
 
 Zaxx_FM24_Out1:
 	sVoice		$03
-	ssMod68k	$00, $01, -$20, $18
+	sModAMPS	$00, $01, -$20, $18
 
 .loop	ssLFO		$F8,1,2, spCentre
 	dc.b nC3, $0C
@@ -549,7 +549,7 @@ Zaxx_FM24_Out1:
 	sLoop		$01, $02, .loop
 
 	ssLFO		$00,spCenter
-	ssMod68k	$03, $01, $0A, $08
+	sModAMPS	$03, $01, $0A, $08
 	saVol		-$08
 	sRet
 
@@ -597,7 +597,7 @@ Zaxx_FM24_Lite1:
 Zaxx_FM4:
 	;sJump		.out1
 	dc.b nRst, $60, $60, $60, $60
-	ssMod68k	$03, $01, $0A, $08
+	sModAMPS	$03, $01, $0A, $08
 	sVoice		$03
 	ssDetune	$FB
 ; ---------------------------------------------------------------------------
@@ -680,7 +680,7 @@ Zaxx_PSG1:
 ; ---------------------------------------------------------------------------
 ; versus section
 
-.ver2	ssMod68k	$00, $01, -$06, $FF
+.ver2	sModAMPS	$00, $01, -$06, $FF
 
 .ver1	dc.b nE2, $08
 	saVol		$18
@@ -728,11 +728,11 @@ Zaxx_PSG1:
 ; subroutines
 
 Zaxx_PSG12_DblOut1:
-	ssMod68k	$01, $01, $FF, $01
+	sModAMPS	$01, $01, $FF, $01
 .loop	dc.b nE1, $60, sHold, $60
 	sLoop		$00, $04, .loop
 
-	ssMod68k	$03, $01, $02, $03
+	sModAMPS	$03, $01, $02, $03
 	sRet
 
 Zaxx_PSG12_Lite1:	; <- actually same as Zaxx_FM24_Lite1
@@ -747,7 +747,7 @@ Zaxx_PSG12_Lite1:	; <- actually same as Zaxx_FM24_Lite1
 
 Zaxx_FM3:
 	sVoice		$02
-	ssMod68k	$10, $01, $10, $07
+	sModAMPS	$10, $01, $10, $07
 	;sJump		.out1
 	sCall		Zaxx_FM23_Intro1
 	saVol		$FB
@@ -846,7 +846,7 @@ Zaxx_PSG3:
 ; ---------------------------------------------------------------------------
 ; double section
 
-	sNoisePSG	$E7
+	sNoisePSG	snWhitePSG3
 	sCall		Zaxx_PSG3_DblDark1
 ; ---------------------------------------------------------------------------
 ; light section
@@ -864,11 +864,11 @@ Zaxx_PSG3:
 .out1	sCall		Zaxx_PSG3_LiteOut1
 	sLoop		$00, $04, .out1
 
-	ssMod68k	$08, $04, $01, $04
+	sModAMPS	$08, $04, $01, $04
 	sVolEnv		vZaxx04
 	dc.b nRst, $30
 	dc.b nAb6, $60
-	ssMod68k	$00, $01, $01, $04
+	sModAMPS	$00, $01, $01, $04
 
 .out2	dc.b sHold, $06
 	saVol		$08
@@ -876,7 +876,7 @@ Zaxx_PSG3:
 	saVol		-$40
 
 	dc.b nRst, $60, $60, $30
-	ssMod68k	$08, $04, $01, $04
+	sModAMPS	$08, $04, $01, $04
 
 .out3	dc.b nAb6, $60
 	sLoop		$00, $05, .out3
@@ -996,7 +996,7 @@ Zaxx_DAC1:
 	sLoop		$00, $02, .out1
 
 	sPan		spCentre, $00
-	ssMod68k	$01, $01, $10, $FF
+	sModAMPS	$01, $01, $10, $FF
 	dc.b dZaxxEYO, $18
 	sModOff
 	sLoop		$01, $02, .out1

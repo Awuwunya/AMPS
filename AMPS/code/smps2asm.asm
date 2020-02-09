@@ -385,13 +385,13 @@ ssLFO		macro reg, ams, fms, pan
 	endif
     endm
 
-; F0xxzzwwyy - Modulation
+; F0xxzzwwyy - Modulation (AMPS algorithm)
 ;  ww: wait time
 ;  xx: modulation speed
 ;  yy: change per step
 ;  zz: number of steps
 ; (MOD_SETUP)
-ssMod68k	macro wait, speed, step, count
+sModAMPS	macro wait, speed, step, count
 	dc.b $F0
 	sModData \wait,\speed,\step,\count
     endm
@@ -556,4 +556,13 @@ sCheck		macro
 		dc.b $FF,$44
 	endif
     endm
+; ---------------------------------------------------------------------------------------------
+; equates for sNoisePSG
+; ---------------------------------------------------------------------------------------------
+
+snOff =		$00			; disables PSG3 noise mode.
+
+_num =		$E0
+	enum snPeri10, snPeri20, snPeri40, snPeriPSG3
+	enum snWhite10,snWhite20,snWhite40,snWhitePSG3
 

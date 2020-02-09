@@ -223,12 +223,12 @@ ChoosePath_Header:
 	spTotalLv	$60, $60, $60, $60
 
 ChoosePath_FM1:
-	ssMod68k	$01, $01, $E5, $FF
+	sModAMPS	$01, $01, $E5, $FF
 	saVol		$03
 	sVoice		$04
 	dc.b nRst, $06
 	dc.b nC3, $0C
-	ssMod68k	$27, $01, $10, $03
+	sModAMPS	$27, $01, $10, $03
 	dc.b nAb2, $24, nRst, $04, nAb2, nAb2, nBb2, $24
 	dc.b nRst, $04, nBb2, nBb2
 
@@ -261,14 +261,14 @@ ChoosePath_Loop3:
 ChoosePath_FM2:
 	dc.b nRst, $09
 	sPan		spRight, $00
-	ssMod68k	$01, $01, $E5, $FF
+	sModAMPS	$01, $01, $E5, $FF
 	ssDetune	$02
 	sVoice		$08
 	saVol		$04
 	dc.b nC2, $09
 	saVol		$FC
 	;sPanAni		$01, $02, $01, $03, $02
-	ssMod68k	$27, $01, $10, $03
+	sModAMPS	$27, $01, $10, $03
 	ssDetune	$00
 	sVoice		$08
 	ssPortamento	$02
@@ -304,13 +304,13 @@ ChoosePath_Call1:
 ChoosePath_FM3:
 	dc.b nRst, $06
 	sPan		spCenter, $00
-	ssMod68k	$01, $01, $E5, $FF
+	sModAMPS	$01, $01, $E5, $FF
 	ssDetune	$02
 	sVoice		$08
 	saVol		$02
 	dc.b nC2, $0C
 	saVol		$FE
-	ssMod68k	$27, $01, $10, $03
+	sModAMPS	$27, $01, $10, $03
 	dc.b nRst, $01
 	sVoice		$02
 	;sPanAni		$01, $03, $02, $03, $03
@@ -337,7 +337,7 @@ ChoosePath_Jump3:
 
 ChoosePath_FM4:
 	dc.b nRst, $14
-	ssMod68k	$27, $01, $10, $03
+	sModAMPS	$27, $01, $10, $03
 	ssDetune	$02
 	sVoice		$03
 	;sPanAni		$03, $03, $03, $03, $02
@@ -364,12 +364,12 @@ ChoosePath_Jump4:
 
 ChoosePath_FM5:
 	dc.b nRst, $09
-	ssMod68k	$01, $01, $E5, $FF
+	sModAMPS	$01, $01, $E5, $FF
 	sPan		spLeft, $00
 	ssDetune	$01
 	sVoice		$04
 	dc.b nC3, $09
-	ssMod68k	$27, $01, $10, $03
+	sModAMPS	$27, $01, $10, $03
 	sVoice		$02
 	saTranspose	$E8
 	sPan		spCenter, $00
@@ -447,7 +447,7 @@ ChoosePath_Jump8:
 
 ChoosePath_PSG2:
 	dc.b nRst, $06
-	ssMod68k	$02, $01, $02, $03
+	sModAMPS	$02, $01, $02, $03
 	dc.b nRst, $01
 	ssDetune	$02
 	dc.b nRst, $0C
@@ -455,7 +455,7 @@ ChoosePath_PSG2:
 
 ChoosePath_PSG1:
 	dc.b nRst, $06, nRst, $0C
-	ssMod68k	$02, $01, $02, $03
+	sModAMPS	$02, $01, $02, $03
 
 ChoosePath_Jump7:
 	ssPortamento	$02
@@ -489,7 +489,7 @@ ChoosePath_Loop10:
 	sRet
 
 ChoosePath_PSG3:
-	sNoisePSG	$E7
+	sNoisePSG	snWhitePSG3
 	dc.b nRst, $06, nRst, $0C
 
 ChoosePath_Loop11:

@@ -755,6 +755,22 @@ AMPS_Debug_PlayCmd	macro
 ; Tracker address handlers
 ; ---------------------------------------------------------------------------
 
+AMPS_Debug_SoundID	macro
+	cmp.b	#SFXlast,d1	; check if this is a valid sound id
+	blo.s	.ok		; if yes, branch
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+		RaiseError "Sound ID %<.b d1> is not a valid sound!", AMPS_Debug_Console_Main
+	else
+		bra.w	*
+	endif
+.ok
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Tracker address handlers
+; ---------------------------------------------------------------------------
+
 AMPS_Debug_PlayTrackMus	macro
 	cmp.l	#musaddr,d2	; check if this is valid tracker
 	blo.s	.fail\@		; if no, branch

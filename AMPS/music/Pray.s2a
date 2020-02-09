@@ -264,7 +264,7 @@ Pray_FM1:
 	sPan		spCentre, $00
 ;	saTempoPAL	$1B-$15
 	;sNoteTimeIn	$00
-	ssMod68k	$01, $01, $00, $00
+	sModAMPS	$01, $01, $00, $00
 	sGate		$03
 	sVoice		$04
 
@@ -286,7 +286,7 @@ Pray_Jump8:
 
 Pray_FM2:
 	sPan		spLeft, $00
-	ssMod68k	$01, $01, $00, $00
+	sModAMPS	$01, $01, $00, $00
 	sPan		spCenter, $00
 	sVoice		$04
 	sGate		$03
@@ -309,7 +309,7 @@ Pray_Jump7:
 
 Pray_FM3:
 	sPan		spCentre, $00
-	ssMod68k	$01, $01, $00, $00
+	sModAMPS	$01, $01, $00, $00
 ;	saVol		$04
 ;	sPan		spCenter, $00
 	sVoice		$04
@@ -323,7 +323,7 @@ Pray_FM3:
 	dc.b $04
 	sGate		$00
 	sVoice		$05
-	ssMod68k	$0F, $01, $07, $03
+	sModAMPS	$0F, $01, $07, $03
 	sPan		spLeft, $00
 	saTranspose	$0C
 	sCall		Pray_Call2
@@ -331,7 +331,7 @@ Pray_FM3:
 	dc.b sHold, $30, sHold, $30, nRst, $30, nRst
 	saTranspose	$F4
 	sPan		spCenter, $00
-	ssMod68k	$01, $01, $00, $00
+	sModAMPS	$01, $01, $00, $00
 
 Pray_Cond6:
 	saVol		$FC
@@ -387,7 +387,7 @@ Pray_Jump5:
 	dc.b nRst, $08, nF4, $04, nRst, $08, nA4, $04
 	dc.b nC5, $0C, nBb4, $30, sHold, $18
 	sVoice		$03
-	ssMod68k	$09, $01, $05, $03
+	sModAMPS	$09, $01, $05, $03
 	saTranspose	$FB
 	sCall		Pray_Call2
 	saTranspose	$05
@@ -416,7 +416,7 @@ Pray_Jump5:
 	saVol		$F6
 	sPan		spCenter, $00
 	dc.b nG5, $30, sHold, $30, sHold, $30, sHold, $30
-	ssMod68k	$01, $01, $00, $00
+	sModAMPS	$01, $01, $00, $00
 	sJump		Pray_Jump5
 
 Pray_FM5:
@@ -503,7 +503,7 @@ Pray_Jump4:
 
 Pray_PSG1:
 	dc.b nRst, $7F, $7F, $69
-	ssMod68k	$0B, $01, $03, $02
+	sModAMPS	$0B, $01, $03, $02
 	saTranspose	$F4
 	sVolEnv		vRistar07
 	sCall		Pray_Call2
@@ -512,7 +512,7 @@ Pray_PSG1:
 	dc.b sHold, $30, sHold, $30, nRst, $30, nRst
 
 Pray_Cond3:
-	ssMod68k	$0D, $01, $03, $02
+	sModAMPS	$0D, $01, $03, $02
 	saTranspose	$F4
 	saVol		-$08
 	sVolEnv		vRistar1D
@@ -539,7 +539,7 @@ Pray_PSG2:
 
 Pray_Cond2:
 	saVol		-$08
-	ssMod68k	$0E, $01, $02, $02
+	sModAMPS	$0E, $01, $02, $02
 	saTranspose	$F4
 	sVolEnv		vRistar1D
 
@@ -553,8 +553,8 @@ Pray_Jump2:
 	sJump		Pray_Jump2
 
 Pray_PSG3:
-	sNoisePSG	$E7
-	ssMod68k	$01, $01, $00, $00
+	sNoisePSG	snWhitePSG3
+	sModAMPS	$01, $01, $00, $00
 	dc.b nRst, $70, $70, $7F, $20
 
 Pray_Loop4:

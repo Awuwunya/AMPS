@@ -252,7 +252,7 @@ MysticCave_Call2:
 MysticCave_FM1:
 	dc.b nRst, $60
 	sVoice		$02
-	ssMod68k	$18, $01, $0A, $04
+	sModAMPS	$18, $01, $0A, $04
 
 MysticCave_Jump1:
 	sCall		MysticCave_Call1
@@ -366,7 +366,7 @@ MysticCave_Loop9:
 	sJump		MysticCave_Loop8
 
 MysticCave_FM3:
-	ssMod68k	$18, $01, $03, $04
+	sModAMPS	$18, $01, $03, $04
 	sVoice		$06
 	dc.b nA2, $14, nB2, $04, nC3, $04, nRst, $08
 	dc.b nE3, $04, nRst, $08, nEb3, $04, nRst, $08
@@ -517,7 +517,7 @@ MysticCave_FM45DAC2_1:
 	sRet
 
 MysticCave_PSG3:
-	sNoisePSG	$E7
+	sNoisePSG	snWhitePSG3
 	dc.b nRst, $60
 
 MysticCave_Jump5:
@@ -549,7 +549,7 @@ MysticCave_DAC2:
 	dc.b nEb4, $0C, nE4, $0C, nG4, $08, nE4, $10
 
 .loop	sVoice		dWooh
-	ssMod68k	$18, $01, $0A, $04
+	sModAMPS	$18, $01, $0A, $04
 	ssTranspose	-$18
 	sCall		MysticCave_Call1
 	saTranspose	$02

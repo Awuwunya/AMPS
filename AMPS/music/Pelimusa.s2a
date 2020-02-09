@@ -249,7 +249,7 @@ Pelimusa_DAC2:
 ; ---------------------------------------------------------------------------
 
 Pelimusa_DAC12_Main:
-;	ssMod68k	$01, $02, $01, $05
+;	sModAMPS	$01, $02, $01, $05
 	sCall		Pelimusa_SetDACNormal
 	Pelimusa_Kaiku nA5, $0C
 	sVoice		dKaiku5
@@ -540,7 +540,7 @@ Pelimusa_FM3:
 
 .jousi	ssVol		$16
 	sVoice		pJousi
-	ssMod68k	$06, $01, $04, $02
+	sModAMPS	$06, $01, $04, $02
 	ssPortamento	$00
 
 .jousi2	dc.b nE5, $30
@@ -586,7 +586,7 @@ Pelimusa_FM34_Volume2	macro volume
 
 Pelimusa_FM3_Pattern8:
 	sVoice		pMelodia
-	ssMod68k	$01, $01, -$02, $08
+	sModAMPS	$01, $01, -$02, $08
 	ssPortamento	$00
 
 .loop	Pelimusa_FM34_Volume nA4, 64, 8, 32, 8, 48, 8, 32, 8
@@ -626,7 +626,7 @@ Pelimusa_FM4:
 
 .jousi	ssVol		$17
 	sVoice		pJousi
-	ssMod68k	$04, $01, $04, $03
+	sModAMPS	$04, $01, $04, $03
 	ssPortamento	$00
 
 .jousi2	dc.b nA4, $60
@@ -640,7 +640,7 @@ Pelimusa_FM4:
 
 Pelimusa_FM4_Pattern8:
 	sVoice		pMelodia
-	ssMod68k	$02, $01, -$03, $08
+	sModAMPS	$02, $01, -$03, $08
 	ssPortamento	$02
 
 .loop	dc.b nRst, $06
@@ -679,7 +679,7 @@ Pelimusa_FM5:
 	sJump		.loop
 ; ---------------------------------------------------------------------------
 
-.jousi	ssMod68k	$03, $01, $03, $02
+.jousi	sModAMPS	$03, $01, $03, $02
 	ssPortamento	$0A
 
 .jousi2	dc.b nC5, $60
@@ -728,7 +728,7 @@ Pelimusa_PSG2:
 Pelimusa_PSG3_State =	-1
 Pelimusa_PSG3_Hat	macro	len
 	if Pelimusa_PSG3_State<>0
-		sNoisePSG	$E7
+		sNoisePSG	snWhitePSG3
 		ssVol		$00
 
 Pelimusa_PSG3_State = 0
@@ -743,7 +743,7 @@ Pelimusa_PSG3_State = 0
 
 Pelimusa_PSG3_Bell	macro	len
 	if Pelimusa_PSG3_State<>1
-		sNoisePSG	$00
+		sNoisePSG	snOff
 		ssVol		$30
 
 Pelimusa_PSG3_State = 1

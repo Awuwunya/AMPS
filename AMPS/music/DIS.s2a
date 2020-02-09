@@ -632,11 +632,11 @@ Dis_Loop7:
 Dis_Loop8:
 	sVoice		$02
 	saVol		$05
-	ssMod68k	$01, $01, $04, $05
+	sModAMPS	$01, $01, $04, $05
 	dc.b nRst, $1E, nG5, $12
 	sVoice		$03
 	saVol		$FB
-	ssMod68k	$00, $00, $00, $00
+	sModAMPS	$00, $00, $00, $00
 	dc.b nRst, $06, nC3, nD3
 	saVol		$0A
 	dc.b $06
@@ -647,11 +647,11 @@ Dis_Loop8:
 	saVol		$F6
 	sVoice		$02
 	saVol		$05
-	ssMod68k	$01, $01, $04, $05
+	sModAMPS	$01, $01, $04, $05
 	dc.b nRst, $1E, nG5, $12
 	sVoice		$03
 	saVol		$FB
-	ssMod68k	$00, $00, $00, $00
+	sModAMPS	$00, $00, $00, $00
 	dc.b nRst, $06, nD3, nE3
 	saVol		$0A
 	dc.b $06
@@ -663,12 +663,12 @@ Dis_Loop8:
 	dc.b nB3
 	sVoice		$02
 	saVol		$05
-	ssMod68k	$01, $01, $04, $05
+	sModAMPS	$01, $01, $04, $05
 	dc.b nRst, $06, nA4, $18, nB4, nC5, nD5, nG4
 	dc.b nG5, nF5, nE5, $12
 	sVoice		$03
 	saVol		$FB
-	ssMod68k	$00, $00, $00, $00
+	sModAMPS	$00, $00, $00, $00
 	dc.b nA3, $12
 	saVol		$0A
 	dc.b $06
@@ -1023,13 +1023,13 @@ Dis_Call4:
 Dis_Call5:
 	sPan		spLeft, $00
 	saVol		$05
-	ssMod68k	$01, $01, $04, $05
+	sModAMPS	$01, $01, $04, $05
 	dc.b nRst, $06, nRst, $18, nG5, nRst, $30, nRst
 	dc.b $18, nG5, nRst, $30, nRst, $18, nG5, nRst
 	dc.b $30, nRst, $18, nG5, nRst, nG5, $12
 	sPan		spCenter, $00
 	saVol		$FB
-	ssMod68k	$00, $00, $00, $00
+	sModAMPS	$00, $00, $00, $00
 	sRet
 
 Dis_Call6:
@@ -1117,7 +1117,7 @@ Dis_Call11:
 	sRet
 
 Dis_PSG2:
-	ssMod68k	$05, $01, $02, $04
+	sModAMPS	$05, $01, $02, $04
 	dc.b nRst, $0C
 
 Dis_PSG1:
@@ -1176,7 +1176,7 @@ Dis_Call13:
 	sRet
 
 Dis_PSG3:
-	sNoisePSG	$E7
+	sNoisePSG	snWhitePSG3
 	sCall		Dis_Call14
 	sCall		Dis_Call15
 

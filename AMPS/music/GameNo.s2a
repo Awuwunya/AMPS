@@ -154,7 +154,7 @@ GameNo_DAC2:
 GameNo_FM1:
 ;	;sRawFreq	$00
 ;	;sPitchSlide	$00
-	ssMod68k	$0C, $01, $03, $02
+	sModAMPS	$0C, $01, $03, $02
 	sVoice		$05
 	ssDetune	$03
 
@@ -186,7 +186,7 @@ GameNo_Call1:
 GameNo_FM2:
 	;sRawFreq	$00
 	;sPitchSlide	$00
-	ssMod68k	$0C, $01, $03, $02
+	sModAMPS	$0C, $01, $03, $02
 	sVoice		$06
 	sPan		spLeft, $00
 
@@ -240,7 +240,7 @@ GameNo_Call5:
 GameNo_FM3:
 	;sRawFreq	$00
 	;sPitchSlide	$00
-	ssMod68k	$0C, $01, $03, $02
+	sModAMPS	$0C, $01, $03, $02
 	sVoice		$06
 	sPan		spRight, $00
 
@@ -297,7 +297,7 @@ GameNo_FM6:
 	;sRawFreq	$00
 	;sPitchSlide	$00
 	dc.b nRst, $08
-	ssMod68k	$0C, $01, $03, $02
+	sModAMPS	$0C, $01, $03, $02
 	sVoice		$05
 	ssDetune	$FD
 	sJump		GameNo_Jump1
@@ -305,7 +305,7 @@ GameNo_FM6:
 GameNo_PSG1:
 	;sRawFreq	$00
 	;sPitchSlide	$00
-	ssMod68k	$0C, $01, $01, $04
+	sModAMPS	$0C, $01, $01, $04
 	sVolEnv		vGameNo01
 
 GameNo_Jump6:
@@ -347,7 +347,7 @@ GameNo_Call17:
 GameNo_PSG2:
 	;sRawFreq	$00
 	;sPitchSlide	$00
-	ssMod68k	$0C, $01, $01, $04
+	sModAMPS	$0C, $01, $01, $04
 	sVolEnv		vGameNo01
 
 GameNo_Jump7:
@@ -396,7 +396,7 @@ GameNo_FM4:
 	;sPitchSlide	$00
 
 GameNo_Jump4:
-	ssMod68k	$0C, $01, $03, $02
+	sModAMPS	$0C, $01, $03, $02
 	sVoice		$04
 	sCall		GameNo_Call11
 	dc.b nE1, $03, nFs1, nAb1, nE1, nRst, $0C, nE1
@@ -478,7 +478,7 @@ GameNo_Call12:
 	sRet
 
 GameNo_Call13:
-	ssMod68k	$01, $01, $E2, $30
+	sModAMPS	$01, $01, $E2, $30
 	sPan		spCenter, $00
 	sVoice		$00
 	dc.b nA2, $06

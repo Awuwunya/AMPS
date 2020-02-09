@@ -188,6 +188,10 @@ dPlaySnd:
 		beq.s	locret_Unpause		; if 0, no sounds were queued, return
 
 .found
+	if safe=1
+		AMPS_Debug_SoundID		; check if the sound ID is valid
+	endif
+
 		clr.b	-1(a4)			; clear the slot we are processing
 		cmpi.b	#SFXoff,d1		; check if this sound was a sound effect
 		bhs.w	dPlaySnd_SFX		; if so, handle it

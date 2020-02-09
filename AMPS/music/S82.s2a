@@ -255,7 +255,7 @@ TIMB82:
 ;================================================;
 TAB820:
 	sVoice		$00
-	ssMod68k	$0A, $01, $03, $03
+	sModAMPS	$0A, $01, $03, $03
 
 T8200:
 	sCall		SUB8200
@@ -299,7 +299,7 @@ T820A:
 	sGate		$00
 	dc.b nBb4, nAb4, nFs4
 	dc.b nAb4, nFs4
-	ssMod68k	$01, $01, $05, $FF
+	sModAMPS	$01, $01, $05, $FF
 	dc.b nA4, $06-1, sHold
 	sModOff
 	dc.b nBb4, $06+1
@@ -346,7 +346,7 @@ T820A:
 	sGate		$00
 	dc.b nBb4, nAb4, nFs4
 	dc.b nAb4, nFs4
-	ssMod68k	$01, $01, $05, $FF
+	sModAMPS	$01, $01, $05, $FF
 	dc.b nA4, $06-1, sHold
 	sModOff
 	dc.b nBb4, $06+1
@@ -378,7 +378,7 @@ T820A:
 ;	PUBLIC  T820B
 T820B:
 	saTranspose	-$0C
-	ssMod68k	$0B, $01, $08, $04
+	sModAMPS	$0B, $01, $08, $04
 	sPan		spLeft
 	dc.b nBb5, $06, $06+$0C, nRst, $18
 	dc.b nBb5, $06, $06+$0C, nRst, $0C+$06
@@ -423,7 +423,7 @@ SUB8200:
 TAB821:
 	saTranspose	$0C
 	sVoice		$00
-	ssMod68k	$14, $01, $02, $01
+	sModAMPS	$14, $01, $02, $01
 
 T8210:
 	sCall		SUB8200
@@ -472,7 +472,7 @@ T821B:
 ;================================================;
 TAB822:
 	sVoice		$08
-	ssMod68k	$0A, $01, $03, $03
+	sModAMPS	$0A, $01, $03, $03
 	sPan		spRight
 	sCall		SUB8200
 	dc.b nRst, $12
@@ -481,7 +481,7 @@ TAB822:
 T8220:
 	sPan		spRight
 	saTranspose	$0C
-	ssMod68k	$05, $01, $02, $08
+	sModAMPS	$05, $01, $02, $08
 	sVoice		$03
 	sGate		$01
 	saVol		$01
@@ -511,7 +511,7 @@ T8220:
 	sGate		$00
 	saVol		-$06
 	dc.b nCs3, $06
-	ssMod68k	$1D, $01, $FC, $20
+	sModAMPS	$1D, $01, $FC, $20
 	dc.b nAb2, $06+$18
 	sModOff
 
@@ -540,7 +540,7 @@ T8220:
 	sGate		$00
 	saVol		-$06
 	dc.b nCs3, $06
-	ssMod68k	$2C, $01, $FC, $FF
+	sModAMPS	$2C, $01, $FC, $FF
 	dc.b nAb2, $06+$18
 	sModOff
 
@@ -582,7 +582,7 @@ T822A:
 T822B:
 	sVoice		$06
 	saTranspose	-$0C
-	ssMod68k	$0B, $01, $08, $04
+	sModAMPS	$0B, $01, $08, $04
 	saVol		$09
 	dc.b nRst, $18, nFs5, $06, $06+$0C
 	dc.b nRst, $18, nF5, $06, $0C
@@ -615,21 +615,21 @@ T822B:
 ;================================================;
 TAB824:
 	sVoice		$07
-	ssMod68k	$0A, $01, $03, $03
+	sModAMPS	$0A, $01, $03, $03
 	sPan		spLeft
 
 	sCall		SUB8200
 	dc.b nRst, $12
 
 	saVol		$05
-	ssMod68k	$05, $01, $01, $03
+	sModAMPS	$05, $01, $01, $03
 
 T8240:
 	saVol		-$02
 	saTranspose	$0C
 	sPan		spLeft
 
-	ssMod68k	$05, $01, $02, $08
+	sModAMPS	$05, $01, $02, $08
 	sVoice		$03
 	sGate		$01
 	dc.b nFs3, 3, 3, 3, 3
@@ -658,7 +658,7 @@ T8240:
 	sGate		$00
 	saVol		-$06
 	dc.b nF3, $06
-	ssMod68k	$1D, $01, $FC, $20
+	sModAMPS	$1D, $01, $FC, $20
 	dc.b nCs3, $06+$18
 	sModOff
 
@@ -687,7 +687,7 @@ T8240:
 	sGate		$00
 	saVol		-$06
 	dc.b nF3, $06
-	ssMod68k	$2C, $01, $FC, $FF
+	sModAMPS	$2C, $01, $FC, $FF
 	dc.b nCs3, $06+$18
 	sModOff
 
@@ -740,7 +740,7 @@ T824B:
 ;================================================;
 TAB825:
 	sVoice		$09
-	ssMod68k	$05, $01, $01, $05
+	sModAMPS	$05, $01, $01, $05
 
 T8250:
 	ssDetune	$02
@@ -781,7 +781,7 @@ T825A:
 	sGate		$00
 	dc.b nBb4, nAb4, nFs4
 	dc.b nAb4, nFs4
-	ssMod68k	$01, $01, $05, $FF
+	sModAMPS	$01, $01, $05, $FF
 	dc.b nA4, $06-1, sHold
 	sModOff
 	dc.b nBb4, $06+1
@@ -829,7 +829,7 @@ T825A:
 	sGate		$00
 	dc.b nBb4, nAb4, nFs4
 	dc.b nAb4, nFs4
-	ssMod68k	$01, $01, $05, $FF
+	sModAMPS	$01, $01, $05, $FF
 	dc.b nA4, $06-1, sHold
 	sModOff
 	dc.b nBb4, $06+1
@@ -861,7 +861,7 @@ T825A:
 T825B:
 	sVoice		$06
 	saTranspose	-$0C
-	ssMod68k	$0B, $01, $08, $04
+	sModAMPS	$0B, $01, $08, $04
 	sPan		spRight
 	saVol		-$03
 	dc.b nBb5, $06, $06+$0C, nRst, $18
@@ -898,7 +898,7 @@ T825B:
 ;                    PSG 80ch                    ;
 ;================================================;
 TAB828:
-	ssMod68k	$1A, $01, $01, $05
+	sModAMPS	$1A, $01, $01, $05
 	dc.b nRst, $06
 	dc.b nRst, $30+$30, nRst, nRst, nRst
 
@@ -917,7 +917,7 @@ T828B:
 ;                    PSG A0ch                    ;
 ;================================================;
 TAB82A:
-	ssMod68k	$1A, $01, $01, $05
+	sModAMPS	$1A, $01, $01, $05
 	dc.b nRst, $30+$30, nRst, nRst, nRst
 	dc.b nRst, $06
 
@@ -936,7 +936,7 @@ T82AB:
 ;                    PSG C0ch                    ;
 ;================================================;
 TAB82C:
-	sNoisePSG	$E7
+	sNoisePSG	snWhitePSG3
 	dc.b nRst, $06
 
 T82CA:

@@ -647,13 +647,13 @@ TowerPuppet_FM1:
 	saVol		$02
 	sVoice		$1B
 	ssLFO		$F9, $0B|spCentre
-	ssMod68k	$14, $02, $05, $02
+	sModAMPS	$14, $02, $05, $02
 	dc.b nC5, $02, nD5, $0C, nRst, $04, nC5, $18
 	dc.b nRst, $06, nA4, $01, nB4, $0C, nRst, $05
 	dc.b nC5, $18, nRst, $06, nD5, $0C, nRst, $06
 	dc.b nC5, $18, nRst, $06
 	saVol		$FE
-	ssMod68k	$14, $02, $02, $06
+	sModAMPS	$14, $02, $02, $06
 	saVol		$FB
 	sVoice		$06
 	saVol		$FF
@@ -681,7 +681,7 @@ TowerPuppet_FM1:
 	dc.b nE5, $02, nRst, $04
 	saVol		$FF
 	saVol		$05
-	ssMod68k	$14, $02, $05, $02
+	sModAMPS	$14, $02, $05, $02
 	saVol		$02
 	sVoice		$1B
 	dc.b nC5, $01, nD5, $0C, nRst, $05, nC5, $18
@@ -689,7 +689,7 @@ TowerPuppet_FM1:
 	dc.b nRst, $06, nC5, $01, nD5, $0C, nRst, $05
 	dc.b nC5, $18, nRst, $06
 	saVol		$FE
-	ssMod68k	$14, $02, $02, $06
+	sModAMPS	$14, $02, $02, $06
 	sPan		spRight, $00
 	sVoice		$1D
 	dc.b nG5, $02, nRst, $07, nFs5, $02, nRst, $07
@@ -872,7 +872,7 @@ TowerPuppet_FM2:
 TowerPuppet_FM3:
 	saVol		$02
 	ssLFO		$08, $0C|spCentre
-	ssMod68k	$16, $02, $03, $04
+	sModAMPS	$16, $02, $03, $04
 	sVoice		$1A
 	dc.b nBb4, $0C, nRst, $06, nA4, $18, nRst, $06
 	dc.b nAb4, $0C, nRst, $06, nA4, $18, nRst, $06
@@ -892,7 +892,7 @@ TowerPuppet_FM3:
 	saTranspose	$0C
 	dc.b nRst, $18
 	saVol		$F8
-	ssMod68k	$11, $01, $04, $05
+	sModAMPS	$11, $01, $04, $05
 	sPan		spRight, $00
 	sVoice		$0A
 
@@ -975,9 +975,9 @@ TowerPuppet_Loop7:
 	saVol		$F4
 	dc.b nRst
 	sLoop		$00, $07, TowerPuppet_Loop7
-	ssMod68k	$05, $01, $04, $05
+	sModAMPS	$05, $01, $04, $05
 	dc.b nB3, $06
-	ssMod68k	$0A, $01, $04, $05
+	sModAMPS	$0A, $01, $04, $05
 
 TowerPuppet_Loop8:
 	dc.b nC4, $02, nRst
@@ -1011,9 +1011,9 @@ TowerPuppet_Loop10:
 	saVol		$F4
 	dc.b nRst
 	sLoop		$00, $06, TowerPuppet_Loop10
-	ssMod68k	$05, $01, $04, $05
+	sModAMPS	$05, $01, $04, $05
 	dc.b nB3, $06
-	ssMod68k	$0A, $01, $04, $05
+	sModAMPS	$0A, $01, $04, $05
 
 TowerPuppet_Loop11:
 	dc.b nBb3, $02, nRst
@@ -1354,7 +1354,7 @@ TowerPuppet_FM4:
 	sPan		spLeft, $00
 	saVol		$F0
 	sVoice		$07
-	ssMod68k	$0C, $01, $A1, $CA
+	sModAMPS	$0C, $01, $A1, $CA
 	dc.b nF3, nRst, nF3
 	sModOff
 	saVol		$10
@@ -1366,7 +1366,7 @@ TowerPuppet_FM4:
 	sPan		spLeft, $00
 	saVol		$F0
 	sVoice		$07
-	ssMod68k	$0C, $01, $A1, $CA
+	sModAMPS	$0C, $01, $A1, $CA
 	dc.b nF3, $06
 	sModOff
 	saVol		$10
@@ -1378,7 +1378,7 @@ TowerPuppet_FM4:
 	sPan		spLeft, $00
 	saVol		$F0
 	sVoice		$07
-	ssMod68k	$0C, $01, $A1, $CA
+	sModAMPS	$0C, $01, $A1, $CA
 	dc.b nF3, $06
 	sModOff
 	saVol		$10
@@ -1390,7 +1390,7 @@ TowerPuppet_FM4:
 	sLoop		$00, $04, TowerPuppet_FM4
 	dc.b nRst, $18
 	saVol		$F9
-	ssMod68k	$10, $01, $04, $05
+	sModAMPS	$10, $01, $04, $05
 	sVoice		$1C
 	sPan		spLeft, $00
 
@@ -1431,7 +1431,7 @@ TowerPuppet_Loop16:
 	saTranspose	$F4
 	ssLFO		$0C, $0C|spCentre
 	sVoice		$00
-	ssMod68k	$11, $02, $04, $04
+	sModAMPS	$11, $02, $04, $04
 	dc.b nD5, $18, sHold, nD5, $1E, nCs5, $06, nD5
 	dc.b nG5, sHold, nG5, nFs5, $0C, nE5, $18, nCs5
 	dc.b $12, nD5, $0C, nA5, $18, sHold, nA5, $06
@@ -1596,7 +1596,7 @@ TowerPuppet_Loop16:
 	saVol		$02
 	saVol		$09
 	sPan		spCenter, $00
-	ssMod68k	$0C, $01, $A1, $CA
+	sModAMPS	$0C, $01, $A1, $CA
 	saVol		$01
 	sVoice		$05
 	saTranspose	$18
@@ -1624,7 +1624,7 @@ TowerPuppet_PSG1:
 	sVolEnv		vNone
 	saVol		$08
 	saTranspose	$F4
-	ssMod68k	$13, $02, $02, $02
+	sModAMPS	$13, $02, $02, $02
 
 TowerPuppet_Loop17:
 	dc.b nA5, $02, nRst, $10, nAb5, $03, nRst, nRst
@@ -1664,7 +1664,7 @@ TowerPuppet_Loop17:
 	dc.b nF5, $04, nRst, $02, nG5, $04, nRst, $02
 	dc.b nRst, $0C
 	sVolEnv		vNone
-	ssMod68k	$14, $02, $02, $02
+	sModAMPS	$14, $02, $02, $02
 	dc.b nD5, $18, sHold, nD5, $1E, nCs5, $06, nD5
 	dc.b nG5, sHold, nG5, nFs5, $0C, nE5, $16, nRst
 	dc.b $02, nCs5, $12, nD5, $0B, nRst, $01, nA5
@@ -1682,7 +1682,7 @@ TowerPuppet_Loop17:
 	dc.b nE5, $12, nA5, $03, nE6, sHold, nE6, $0C
 	dc.b nE5, $09, nRst, $03, nE5, $12, nA5, $03
 	dc.b nE6, sHold, nE6, $0C, nE5, $09, nRst, $03
-	ssMod68k	$04, $01, $02, $08
+	sModAMPS	$04, $01, $02, $08
 	dc.b nE5, nA5, nE6, nE5, nA5, nE6, nE5, nA5
 	dc.b nE6, nE5, nA5, nE6, nE5, nA5, nE6, nE5
 	dc.b nA5, nB5, nD6, nA5, nAb5, nA5, nD6, nFs5
@@ -1694,7 +1694,7 @@ TowerPuppet_PSG2:
 	dc.b nRst, $30, nRst, nRst, nRst, nRst, nRst, nRst
 	dc.b nRst, nRst, $18
 	saVol		$10
-	ssMod68k	$14, $02, $02, $02
+	sModAMPS	$14, $02, $02, $02
 
 TowerPuppet_Loop18:
 	dc.b nF5, $02, nRst, $04
@@ -1733,7 +1733,7 @@ TowerPuppet_Loop19:
 	dc.b nF5, nC6, nE5, nF5, nC6, nRst, $0C
 	sLoop		$00, $08, TowerPuppet_Loop19
 	saTranspose	$0C
-	ssMod68k	$16, $02, $02, $02
+	sModAMPS	$16, $02, $02, $02
 	dc.b nA5, $04, nRst, $02, nB5, $04, nRst, $02
 	dc.b nCs6, $04, nRst, $02, nE6, $0C, nD6, $04
 	dc.b nRst, $02, nCs6, $04, nRst, $02, nCs6, $0C
@@ -1754,14 +1754,14 @@ TowerPuppet_Loop19:
 	dc.b nA4, nCs5, nE5, nRst, $0C, nCs5, $06, nA4
 	dc.b nCs5, nB4, nRst, nCs5, nEb5, nRst
 	saTranspose	$0C
-	ssMod68k	$14, $02, $02, $02
+	sModAMPS	$14, $02, $02, $02
 	dc.b nB5, $24, nE5, $0C, nB5, $12, nA5, nD6
 	dc.b $0C, nE6, $60
 	saVol		-$08
 	sJump		TowerPuppet_PSG2
 
 TowerPuppet_PSG3:
-	sNoisePSG	$E7
+	sNoisePSG	snWhitePSG3
 
 TowerPuppet_Loop20:
 	sGate		$01
