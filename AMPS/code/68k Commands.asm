@@ -96,7 +96,7 @@ dCommands:
 ; Command handlers for false condition execution
 ; ---------------------------------------------------------------------------
 
-.skip	macro amount
+dcskip	macro amount
 	if \amount=0
 		rts
 	else
@@ -106,37 +106,37 @@ dCommands:
    endm
 
 .false
-	.skip	1		; E0 - Panning, AMS, FMS (PANAFMS - PAFMS_PAN)
-	.skip	1		; E1 - Add xx to channel frequency displacement (DETUNE)
-	.skip	1		; E2 - Add xx to channel frequency displacement (DETUNE)
-	.skip	1		; E3 - Set channel pitch to xx (TRANSPOSE - TRNSP_SET)
-	.skip	1		; E4 - Add xx to channel pitch (TRANSPOSE - TRNSP_ADD)
-	.skip	1		; E5 - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
-	.skip	1		; E6 - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
+	dcskip	1		; E0 - Panning, AMS, FMS (PANAFMS - PAFMS_PAN)
+	dcskip	1		; E1 - Add xx to channel frequency displacement (DETUNE)
+	dcskip	1		; E2 - Add xx to channel frequency displacement (DETUNE)
+	dcskip	1		; E3 - Set channel pitch to xx (TRANSPOSE - TRNSP_SET)
+	dcskip	1		; E4 - Add xx to channel pitch (TRANSPOSE - TRNSP_ADD)
+	dcskip	1		; E5 - Set channel tick multiplier to xx (TICK_MULT - TMULT_CUR)
+	dcskip	1		; E6 - Set global tick multiplier to xx (TICK_MULT - TMULT_ALL)
 	bra.w	dcHold		; E7 - Do not allow note on/off for next note (HOLD)
-	.skip	1		; E8 - Add xx to music tempo (TEMPO - TEMPO_ADD)
-	.skip	1		; E9 - Set music tempo to xx (TEMPO - TEMPO_SET)
-	.skip	1		; EA - Set Voice/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
-	.skip	0		; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
-	.skip	0		; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
-	.skip	1		; ED - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
-	.skip	1		; EE - Set channel volume to xx (VOLUME - VOL_CN_ABS)
-	.skip	1		; EF - Set LFO (SET_LFO - LFO_AMSEN)
-	.skip	4		; F0 - Modulation (MOD_SETUP)
-	.skip	1		; F1 - Portamento enable/disable flag (PORTAMENTO)
-	.skip	1		; F2 - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
-	.skip	1		; F3 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
-	.skip	0		; F4 - Do a continuous SFX loop (CONT_SFX)
-	.skip	0		; F5 - End of channel (TRK_END - TEND_STD)
-	.skip	2		; F6 - Jump to xxxx (GOTO)
-	.skip	4		; F7 - Loop back to zzzz yy times, xx being the loop index (LOOP)
-	.skip	2		; F8 - Call pattern at xxxx, saving return point (GOSUB)
-	.skip	0		; F9 - Return (RETURN)
+	dcskip	1		; E8 - Add xx to music tempo (TEMPO - TEMPO_ADD)
+	dcskip	1		; E9 - Set music tempo to xx (TEMPO - TEMPO_SET)
+	dcskip	1		; EA - Set Voice/voice/sample to xx (INSTRUMENT - INS_C_FM / INS_C_PSG / INS_C_DAC)
+	dcskip	0		; EB - Use sample DAC mode (DAC_MODE - DACM_SAMP)
+	dcskip	0		; EC - Use pitch DAC mode (DAC_MODE - DACM_NOTE)
+	dcskip	1		; ED - Add xx to channel volume (VOLUME - VOL_CN_FM / VOL_CN_PSG / VOL_CN_DAC)
+	dcskip	1		; EE - Set channel volume to xx (VOLUME - VOL_CN_ABS)
+	dcskip	1		; EF - Set LFO (SET_LFO - LFO_AMSEN)
+	dcskip	4		; F0 - Modulation (MOD_SETUP)
+	dcskip	1		; F1 - Portamento enable/disable flag (PORTAMENTO)
+	dcskip	1		; F2 - Set volume envelope to xx (INSTRUMENT - INS_C_PSG) (FM_VOLENV / DAC_VOLENV)
+	dcskip	1		; F3 - Set modulation envelope to xx (MOD_ENV - MENV_GEN)
+	dcskip	0		; F4 - Do a continuous SFX loop (CONT_SFX)
+	dcskip	0		; F5 - End of channel (TRK_END - TEND_STD)
+	dcskip	2		; F6 - Jump to xxxx (GOTO)
+	dcskip	4		; F7 - Loop back to zzzz yy times, xx being the loop index (LOOP)
+	dcskip	2		; F8 - Call pattern at xxxx, saving return point (GOSUB)
+	dcskip	0		; F9 - Return (RETURN)
 	bra.w	dcsComm		; FA - Set communications byte yy to xx (SET_COMM - SPECIAL)
 	bra.w	dcCond		; FB - Get comms byte y, and compare zz using condition x (COMM_CONDITION)
 	bra.w	dcResetCond	; FC - Reset condition (COND_RESET)
-	.skip	1		; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL
-	.skip	1		; FE - YM command (YMCMD)
+	dcskip	1		; FD - Stop note after xx frames (NOTE_STOP - NSTOP_NORMAL
+	dcskip	1		; FE - YM command (YMCMD)
 	bra.w	.metacall	; FF - META
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -356,11 +356,11 @@ dcaTempoCur:
 ; ---------------------------------------------------------------------------
 
 dcNoisePSG:
+		move.b	(a2)+,d3		; load PSG4 status to d3
 	if safe=1
 		AMPS_Debug_dcNoisePSG		; check if this is a PSG3 channel
 	endif
 
-		move.b	(a2)+,d3		; load PSG4 status to d3
 		move.b	d3,cStatPSG4(a1)	; save status
 		beq.s	.psg3			; if disabling PSG4 mode, branch
 		move.b	#ctPSG4,cType(a1)	; make PSG3 act on behalf of PSG4

@@ -521,6 +521,10 @@
 		}
 
 		@media screen and (max-width: 600px){
+			html {
+				padding: 0;
+			}
+
 			body {
 				border: .2vw solid gray;
 				border-radius: 0;
@@ -1730,7 +1734,7 @@
 		Due to the difficulty of porting music from non-SMPS games, it will not be covered here at all. Although I could cover it, it would be massively complicated and largely unhelpful. Instead, this
 		part will list the kind of information you need to port music. Since AMPS is SMPS2ASM format exclusive, this tutorial will only talk about the aspects of SMPS2ASM. For more information to
 		correctly converting music, see <a href="http://sonicresearch.org/community/index.php?threads/md-music-player-scriptable-smps2asm.4354/">MDMusicPlayer</a>. Since AMPS uses a custom version of
-		the standard SMPS2ASM format created by Natsumi, using older versions (Cinossu's S1SMPS2ASM or Flamewing's SMPS2ASM) is not recommended, as those require manual conversion into AMPS format.
+		the standard SMPS2ASM format created by Aurora, using older versions (Cinossu's S1SMPS2ASM or Flamewing's SMPS2ASM) is not recommended, as those require manual conversion into AMPS format.
 		Unlike most SMPS drivers, AMPS does not generally use separate tracker commands for adjusting various things about channels (for example, no adding FM or PSG volume with different commands), so
 		these are to be converted by hand. Here is a full list of common commands and their conversions, and various notes about other commands:
 	</p>
@@ -1738,7 +1742,7 @@
 		<tr><td>SMPS command</td><td>AMPS command</td><td>Additional notes</td></tr>
 		<tr><td>saVolFM</td><td>saVol</td><td></td></tr>
 		<tr><td>saVolPSG</td><td>saVol</td><td>You must remember to multiply the volume by $08 for every instance.</td></tr>
-		<tr><td>ssVolS3K</td><td>ssVol</td><td>Volume is negated in a strange way in S3K, but Natsumi's SMPS2ASM will disassemble it correctly. If the volume sounds weird, it may be an older file without correct conversion applied.</td></tr>
+		<tr><td>ssVolS3K</td><td>ssVol</td><td>Volume is negated in a strange way in S3K, but Aurora's SMPS2ASM will disassemble it correctly. If the volume sounds weird, it may be an older file without correct conversion applied.</td></tr>
 		<tr><td>sPatFM</td><td>sVoice</td><td></td></tr>
 		<tr><td>sVolEnvPSG</td><td>sVolEnv</td><td>Previously, this would have been converted as sVoice, but since FEATURE_FMDACVOLENV was implemented, it should no longer be used.</td></tr>
 		<tr><td>ssMod68k</td><td>sModAMPS</td><td>The resulting modulation will be slightly different. See <a href="#part5_1">documentation about modulation for more info</a>.</td></tr>

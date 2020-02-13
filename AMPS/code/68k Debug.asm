@@ -554,6 +554,20 @@ AMPS_Debug_dcGate	macro
 ; ---------------------------------------------------------------------------
 
 AMPS_Debug_dcNoisePSG	macro
+	beq.s	.ckch		; branch if value is 0
+	cmp.b	#snPeri10,d3	; check if the value is below valid range
+	blo.s	.fail		; branch if yes
+	cmp.b	#snWhitePSG3,d3	; check if the value is above valid range
+	bls.s	.ckch		; branch if not
+
+.fail
+	if def(RaiseError)	; check if Vladik's debugger is active
+		RaiseError "sNoisePSG with an invalid value: %<.b d3>", AMPS_Debug_Console_Channel
+	else
+		bra.w	*
+	endif
+
+.ckch
 	cmp.b	#ctPSG3,cType(a1); check if this is PSG3 or PSG4 channel
 	bhs.s	.ok		; if not, branch
 
@@ -752,7 +766,7 @@ AMPS_Debug_PlayCmd	macro
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; Tracker address handlers
+; Sound ID check
 ; ---------------------------------------------------------------------------
 
 AMPS_Debug_SoundID	macro

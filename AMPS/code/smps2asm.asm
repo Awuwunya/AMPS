@@ -32,8 +32,14 @@ nHiHat =	nA6
 ; Header Macros
 ; ---------------------------------------------------------------------------------------------
 
+; Header - Initialize a music file
 sHeaderInit	macro
 sPatNum =	0
+    endm
+
+; Header - Initialize a sound effect file
+sHeaderInitSFX	macro
+
     endm
 
 ; Header - Set up Channel Usage

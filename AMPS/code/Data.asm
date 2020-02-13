@@ -1,10 +1,21 @@
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Flags section. None of this is required, but I added it here to
-; make it easier to debug built ROMS! If you would like easier
-; assistance from Natsumi, please keep this section intact!
+; make it easier to debug built ROMs! If you would like easier
+; assistance from Aurora, please keep this section intact!
 ; ---------------------------------------------------------------------------
-	dc.b "AMPS-v1.1 "		; ident str
+	dc.b "AMPS-v1.1"		; ident str
+
+	if safe
+		dc.b "s"		; safe mode enabled
+
+	else
+		dc.b " "		; safe mode disabled
+	endif
+
+	if FEATURE_FM6
+		dc.b "F6"		; FM6 enabled
+	endif
 
 	if FEATURE_SFX_MASTERVOL
 		dc.b "SM"		; sfx ignore master volume
@@ -97,9 +108,9 @@ SampleList:
 	sample $0100, Kc87, Stop		; 97 - Not really sure? (Knuckles Chaotix)
 	sample $0100, KcCrash, Stop		; 98 - Crash Cymbal (Knuckles Chaotix)
 
-	sample $0100, Meow, Stop	; AVG	; 9) - Meow (Meow Mix - Cyriak)
-	sample $0100, Wooh, WoohLoop	; AVG	; 9A - Wooh (The Amazing Atheist)
-	sample $0100, Lazer, Stop	; AVG	; 9B - Lazer (R2D2 bird)
+	sample $0100, Meow, Stop		; 99 - Meow (Meow Mix - Cyriak)
+	sample $0100, Wooh, WoohLoop		; 9A - Wooh (The Amazing Atheist)
+	sample $0100, Lazer, Stop		; 9B - Lazer (R2D2 bird)
 
 	sample $0100, Kaiku1, Stop		; 9C - Kaiku (Wings - Pelimusa)
 	sample $0100, Kaiku2, Stop		; 9D - Kaiku (Wings - Pelimusa)

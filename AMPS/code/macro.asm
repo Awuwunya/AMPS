@@ -9,7 +9,7 @@
 ;   d1 - Various things read from the tracker, scratch
 ;   d2 - Volume or pitch when calculating it
 ;   d3-d6 - Scatch, use lower number when possible
-
+;   d7 - Never used for anything.
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Various assembly flags
@@ -543,7 +543,7 @@ WriteYM2	macro reg, value
 
 CheckCue	macro
 	if safe=1
-		AMPS_Debug_CuePtr Gen		; check if cue pointer is valid
+		AMPS_Debug_CuePtr Gen	; check if cue pointer is valid
 	endif
     endm
 ; ===========================================================================
@@ -610,13 +610,13 @@ SWFR_\file 	dcb.b Z80E_Read*(MaxPitch/$100),$00; add end markers (for Dual PCM)
 ; ---------------------------------------------------------------------------
 
 sample		macro freq, start, loop, name
-	if narg=4		; if we have 4 arguments, we'd like a custom name
-d\name =	__samp		; use the extra argument to create SMPS2ASM equate
+	if narg=4			; if we have 4 arguments, we'd like a custom name
+d\name =	__samp			; use the extra argument to create SMPS2ASM equate
 	else
-d\start =	__samp		; else, use the first one!
+d\start =	__samp			; else, use the first one!
 	endif
 
-__samp =	__samp+1	; increase sample ID
+__samp =	__samp+1		; increase sample ID
 ; create offsets for the sample normal, reverse, loop normal, loop reverse.
 	if strcmp("\start","Stop")|strcmp("\start","STOP")|strcmp("\start","stop")
 		dcb.b 6, 0
@@ -632,8 +632,8 @@ __samp =	__samp+1	; increase sample ID
 		dc.b (SWFR_\loop-1)&$FF,(((SWFR_\loop-1)>>$08)&$7F)|$80,((SWFR_\loop-1)>>$0F)&$FF
 	endif
 
-	dc.w \freq-$100		; sample frequency (actually offset, so we remove $100)
-	dc.w 0			; unused!
+	dc.w \freq-$100			; sample frequency (actually offset, so we remove $100)
+	dc.w 0				; unused!
     endm
 ; ===========================================================================
 	opt ae-
