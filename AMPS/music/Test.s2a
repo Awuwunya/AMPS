@@ -52,11 +52,7 @@ Test_FM1:
 Test_DAC1:
 	sVoice		dMeow
 	sModePitchDAC
-	dc.b $B1, $60
-
-.loop
-	dc.b sHold, $60
-	sJump	.loop
+	dc.b $B1, $08
 
 Test_DAC2:
 	sStop

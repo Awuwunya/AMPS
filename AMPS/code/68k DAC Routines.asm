@@ -69,6 +69,26 @@ dAMPSnextDAC:
 		jmp	dAMPSdoFM(pc)		; after that, process FM channels
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Routine for hardware muting a DAC channel
+;
+; input:
+;   a1 - Channel to operate on
+;   a3 - Sample table to use
+; thrash:
+;   a2 - Used to select the data to send
+;   a4 - Destination address for sample write
+;   a5 - Address to tell Z80 sample is updated
+; ---------------------------------------------------------------------------
+
+dMuteDACmus:
+		btst	#cfbInt,(a1)		; check if this is a SFX channel
+		bne.s	locret_dNoteOnDAC2	; if yes, do not update
+
+dMuteDACsfx:
+		move.l	a3,a2			; copy sample table to a2
+		bra.s	dNoteOnDAC5		; continue to play mute sample
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; Write DAC sample information to Dual PCM
 ;
 ; input:
@@ -84,6 +104,8 @@ dAMPSnextDAC:
 dNoteOnDAC2:
 		btst	#cfbInt,(a1)		; is the channel interrupted by SFX?
 		beq.s	dNoteOnDAC3		; if not, process note
+
+locret_dNoteOnDAC2:
 		rts
 
 dNoteOnDAC:
@@ -99,8 +121,9 @@ dNoteOnDAC:
 dNoteOnDAC3:
 		lsl.w	#4,d3			; multiply sample ID by $10 (size of each entry)
 		lea	(a3,d3.w),a2		; get sample data to a2
-
 		pea	dUpdateFreqOffDAC(pc)	; update frequency after loading sample
+
+dNoteOnDAC5:
 		btst	#ctbPt2,cType(a1)	; check if this channel is DAC1
 		beq.s	dNoteWriteDAC1		; if is, branch
 ; ---------------------------------------------------------------------------
