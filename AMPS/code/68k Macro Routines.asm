@@ -388,6 +388,7 @@ dKeyOnFM	macro
 		btst	#cfbInt,(a1)		; check if overridden by sfx
 		bne.s	.k			; if so, do not note on
 	endif
+
 		btst	#cfbHold,(a1)		; check if note is held
 		bne.s	.k			; if so, do not note on
 		btst	#cfbRest,(a1)		; check if channel is resting

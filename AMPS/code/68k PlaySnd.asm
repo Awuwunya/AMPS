@@ -74,7 +74,6 @@ dMuteDAC:
 		move.b	(a5)+,(a4)+		; send sample data to Dual PCM
 	endr
 
-
 		lea	SampleList(pc),a5	; load address for the stop sample data into a2
 		lea	dZ80+PCM2_Sample,a4	; load addresses for PCM 2 sample to a1
 
@@ -117,8 +116,8 @@ dPlaySnd_Unpause:
 		moveq	#Mus_FM-1,d0		; load the number of music FM channels to d0
 		moveq	#cSize,d3		; get the size of each music channel to d3
 
-		CheckCue			; check that we have a valid YM cue
-		stopZ80
+	CheckCue				; check that we have a valid YM cue
+	stopZ80
 
 .musloop
 		tst.b	(a1)			; check if the channel is running a tracker
@@ -126,7 +125,6 @@ dPlaySnd_Unpause:
 		btst	#cfbInt,(a1)		; is the channel interrupted by SFX?
 		bne.s	.skipmus		; if is, do not update
 
-	CheckCue				; check that we have cue is valid
 	InitChYM				; prepare to write to YM
 	WriteChYM	#$B4, cPanning(a1)	; Panning and LFO: read from channel
 
@@ -141,7 +139,6 @@ dPlaySnd_Unpause:
 .sfxloop
 		tst.b	(a1)			; check if the channel is running a tracker
 		bpl.s	.skipsfx		; if not, do not update
-
 	InitChYM				; prepare to write to YM
 	WriteChYM	#$B4, cPanning(a1)	; Panning and LFO: read from channel
 
@@ -256,6 +253,10 @@ dPlaySnd_Music:
 .backup
 		move.l	(a4)+,(a3)+		; back up data for every channel
 		dbf	d3, .backup		; loop for each longword
+
+	if (mSFXDAC1-mBackUpArea)&2
+		move.w	(a4)+,(a3)+		; back up data for every channel
+	endif
 
 		mvnbt.q	cfbInt, cfbVol, d3	; each other bit except interrupted and volume update bits
 

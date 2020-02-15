@@ -252,16 +252,17 @@ dAMPSdoDACSFX:
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
+
 .pcnote
 	dProcNote 1, -1				; reset necessary channel memory
-        	tst.b    d4            		; check if channel was resting
-        	bmi.s    .rest            	; if yes, we do not want to note on anymore
-        	bsr.w    dNoteOnDAC        	; do hardware note-on behavior
-        	bra.s    .ckvol
+		tst.b	d4			; check if channel was resting
+		bmi.s	.rest			; if yes, we do not want to note on anymore
+		bsr.w	dNoteOnDAC		; do hardware note-on behavior
+		bra.s	.ckvol
 
 .rest
-        	moveq    #0,d3            	; play stop sample
-        	bsr.w    dNoteOnDAC2        	; ''
+		moveq	#0,d3			; play stop sample
+		bsr.w	dNoteOnDAC2		; ''
 
 .ckvol
 	if FEATURE_DACFMVOLENV=0
