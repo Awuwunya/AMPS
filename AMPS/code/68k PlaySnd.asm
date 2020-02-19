@@ -145,7 +145,6 @@ dPlaySnd_Unpause:
 .skipsfx
 		adda.w  d3,a1			; go to next channel
 		dbf     d0,.sfxloop		; repeat for all SFX FM channels
-	;	st 	(a0)
 ; ---------------------------------------------------------------------------
 ; Since the DAC channels have or based panning behavior, we need this
 ; piece of code to update its panning
@@ -510,7 +509,6 @@ dPlaySnd_SFX:
 		move.l	d2,a2			; to show the address correctly. Move ptr back to a2
 		AMPS_Debug_PlayTrackSFX		; check if this was valid sound effect
 	endif
-
 ; ---------------------------------------------------------------------------
 ; Continous SFX is a very special type of sound effect. Unlike other
 ; sound effects, when a continous SFX is played, it will run a loop
@@ -799,6 +797,7 @@ dStopMusic:
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Routine for muting all PSG channels
+;
 ; thrash:
 ;   a4 - PSG address
 ; ---------------------------------------------------------------------------

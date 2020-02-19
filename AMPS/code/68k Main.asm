@@ -323,7 +323,8 @@ dUpdateAllAMPS:
 ; play at the exact right speed, instead of slightly too slow.
 ; ---------------------------------------------------------------------------
 
-.chkregion	btst	#6,ConsoleRegion.w	; is this PAL system?
+.chkregion
+		btst	#6,ConsoleRegion.w	; is this PAL system?
 		beq.s	.driver			; if not, branch
 		subq.b	#1,mCtrPal.w		; decrease PAL frame counter
 		bgt.s	.driver			; if hasn't become 0 (or lower!), branch

@@ -161,7 +161,7 @@ VoiceRegs =	29		; total number of registers inside of a voice
 VoiceTL =	VoiceRegs-4	; location of voice TL levels
 
 MaxPitch =	$1000		; this is the maximum pitch Dual PCM is capable of processing
-Z80E_Read =	$00018		; this is used by Dual PCM internally but we need this for macros
+Z80E_Read =	$0018		; this is used by Dual PCM internally but we need this for macros
 
 ; NOTE: There is no magic trick to making Dual PCM play samples at higher rates.
 ; These values are only here to allow you to give lower pitch samples higher
@@ -392,7 +392,7 @@ res =			res|$FFFFFF00	; must be negative value
 ;   block - Size of clear block
 ;
 ; thrashes:
-;   d6 - Set to $0000FFFF
+;   d6 - Set to $xxxxFFFF
 ;   a4 - Destination address
 ; ---------------------------------------------------------------------------
 

@@ -121,7 +121,6 @@ dModEnvCommand:
 ; ---------------------------------------------------------------------------
 
 dVolEnvProg:
-
 	if safe=1
 		AMPS_Debug_VolEnvID		; check if volume envelope ID is valid
 	endif
