@@ -780,8 +780,8 @@ dcVoice:
 ; This routine is speed optimized in a way that allows Dual PCM
 ; to only be stopped for as long as it must be. This will waste
 ; some cycles for 68000, but it will help improve DAC quality.
-; ---------------------------------------------------------------------------	;
-
+; ---------------------------------------------------------------------------
+;
 ; input:
 ;   a1 - Channel to operate on
 ;   d4 - Voice ID to use

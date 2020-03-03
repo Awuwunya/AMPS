@@ -2020,7 +2020,13 @@
 	</p>
 	<h3>Can you make a custom version of AMPS for me?</h3>
 	<p>
-		No I cannot. The source code is documented there for you can figure it out by yourself.
+		No I cannot. The source code is documented there for you, so you can figure it out by yourself.
+	</p>
+	<h3>Why does AMPS use so much ROM space?</h3>
+	<p>
+		AMPS code is highly efficient, and therefore a lot of code is actually repeated multiple times in order to save on processor cycles. This means that a lot more ROM space is used to
+		save on processor cycles. Additionally, Dual PCM requires data for volume tables, samples, the driver itself, and various other things in order to function efficiently. AMPS
+		attempts to reduce on ROM space requirements at times, but rarely at the cost of extra processor cycles.
 	</p>
 </body>
 </html>
