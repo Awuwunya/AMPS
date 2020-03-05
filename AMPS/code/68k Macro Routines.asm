@@ -17,7 +17,8 @@ dNoteToutHandler	macro
 dNoteToutDAC	macro
 	dNoteToutHandler			; include timeout handler
 		moveq	#0,d3			; play stop sample
-		bra.w	dNoteOnDAC2		; ''
+		bsr.w	dNoteOnDAC2		; ''
+		bra.s	.next
 .endt
     endm
 ; ===========================================================================
