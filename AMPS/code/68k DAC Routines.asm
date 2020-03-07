@@ -311,14 +311,17 @@ dAMPSdoDACSFX:
 dUpdateVolDAC_SFX:
 	if FEATURE_SFX_MASTERVOL=0
 		move.b	cVolume(a1),d1		; get channel volume to d1
+		ext.w	d1			; extend to a word
 		bra.s	dUpdateVolDAC3		; do not add master volume
 	endif
 
 dUpdateVolDAC:
-		move.b	cVolume(a1),d1		; get channel volume to d3
-		add.b	mMasterVolDAC.w,d1	; add master volume to it
-		bpl.s	dUpdateVolDAC3		; if positive (in range), branch
-		moveq	#-$80,d1		; force volume to mute ($80 is the last valid volume)
+		move.b	mMasterVolDAC.w,d1	; load DAC master volume to d1
+		ext.w	d1			; extend to word
+
+		move.b	cVolume(a1),d4		; load channel volume to d4
+		ext.w	d4			; extend to word
+		add.w	d4,d1			; add channel volume to d1
 
 dUpdateVolDAC3:
 	if FEATURE_DACFMVOLENV
@@ -341,6 +344,12 @@ dUpdateVolDAC2:
 		btst	#cfbInt,(a1)		; is the channel interrupted by SFX?
 		bne.s	locret_VolDAC		; if yes, do not update
 
+		cmp.w	#$80,d1			; check if volume is out of range
+		bls.s	.nocap			; if not, branch
+		spl	d1			; if positive (above $7F), set to $FF. Otherwise, set to $00
+		and.b	#$80,d1			; change volume of $FF to $80 (this mutes DAC)
+
+.nocap
 	StopZ80					; wait for Z80 to stop
 		move.b	#$D2,dZ80+PCM_ChangeVolume; set volume change flag
 

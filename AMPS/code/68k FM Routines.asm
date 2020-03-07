@@ -79,6 +79,7 @@ dUpdateVolFM_SFX:
 		endif
 
 		move.b	cVolume(a1),d1		; load FM channel volume to d1
+		ext.w	d1			; extend it to word
 		bra.s	dUpdateVolFM3		; do NOT add the master volume!
 	endif
 
@@ -88,10 +89,12 @@ dUpdateVolFM:
 		bne.s	locret_MuteFM		; if is, do not update anything
 	endif
 
-		move.b	cVolume(a1),d1		; load FM channel volume to d1
-		add.b	mMasterVolFM.w,d1	; add master FM volume to d1
-		bpl.s	dUpdateVolFM3		; if we did not overflow, branch
-		moveq	#$7F,d1			; cap to silent volume
+		move.b	mMasterVolFM.w,d1	; load FM master volume to d1
+		ext.w	d1			; extend to word
+
+		move.b	cVolume(a1),d4		; load channel volume to d4
+		ext.w	d4			; extend to word
+		add.w	d4,d1			; add channel volume to d1
 
 dUpdateVolFM3:
 	if FEATURE_DACFMVOLENV
@@ -120,7 +123,7 @@ dUpdateVolFM2:
 	dCALC_VOICE				; get address of the specific voice to a4
 
 	if FEATURE_UNDERWATER
-		moveq	#0,d6			; clear d6 (so no underwater by default)
+		clr.w	d6			; clear d6 (so no underwater by default)
 
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
 		beq.s	.uwdone			; if not, skip
@@ -131,10 +134,7 @@ dUpdateVolFM2:
 		move.b	(a5,d4.w),d4		; get the value from table
 		move.b	d4,d6			; copy to d6
 		and.w	#7,d4			; mask out extra stuff
-
-		add.b	d4,d1			; add algorithm to Total Level carrier offset
-		bpl.s	.uwdone			; if we did not overflow, branch
-		moveq	#$7F,d1			; cap to silent volume
+		add.w	d4,d1			; add algorithm to Total Level carrier offset
 
 .uwdone
 	endif
@@ -146,21 +146,26 @@ dUpdateVolFM2:
 
 .tlloop
 		move.b	(a4)+,d5		; get Total Level value from voice to d5
+		ext.w	d5			; extend to word
 		bpl.s	.noslot			; if slot operator bit was not set, branch
 
-		add.b	d1,d5			; add carrier offset to loaded value
-		bmi.s	.slot			; if we did not overflow, branch
-		moveq	#-1,d5			; cap to silent volume
+		and.w	#$7F,d5			; get rid of sign bit (ugh)
+		add.w	d1,d5			; add carrier offset to loaded value
 	if FEATURE_UNDERWATER
 		bra.s	.slot
 	endif
 
 .noslot
 	if FEATURE_UNDERWATER
-		add.b	d6,d5			; add modulator offset to loaded value
+		add.w	d6,d5			; add modulator offset to loaded value
 	endif
 
 .slot
+		cmp.w	#$7F,d5			; check if volume is out of range
+		bls.s	.nocap			; if not, branch
+		spl	d5			; if positive (above $7F), set to $FF. Otherwise, set to $00
+
+.nocap
 		move.b	d5,-(a5)		; write total level to stack
 		dbf	d3,.tlloop		; repeat for each Total Level operator
 

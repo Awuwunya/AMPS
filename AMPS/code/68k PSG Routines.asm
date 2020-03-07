@@ -202,6 +202,7 @@ dEnvelopePSG_SFX:
 		bne.s	locret_UpdateFreqPSG	; if is, do not update anything
 
 		move.b	cVolume(a1),d1		; load channel volume to d1
+		ext.w	d1			; extend to a word
 		bra.s	dEnvelopePSG2		; do not add master volume
 	endif
 
@@ -209,10 +210,12 @@ dEnvelopePSG:
 		btst	#cfbRest,(a1)		; check if channel is resting
 		bne.s	locret_UpdateFreqPSG	; if is, do not update anything
 
-		move.b	mMasterVolPSG.w,d1	; load PSG master volume to d5
-		add.b	cVolume(a1),d1		; add channel volume to d5
-		bpl.s	dEnvelopePSG2		; branch if volume did not overflow
-		moveq	#$7F,d1			; set to maximum volume
+		move.b	mMasterVolPSG.w,d1	; load PSG master volume to d1
+		ext.w	d1			; extend to word
+
+		move.b	cVolume(a1),d4		; load channel volume to d4
+		ext.w	d4			; extend to word
+		add.w	d4,d1			; add channel volume to d1
 
 dEnvelopePSG2:
 		moveq	#0,d4
@@ -255,9 +258,10 @@ dUpdateVolPSG:
 		beq.s	locret_UpdVolPSG	; if is, do not update
 
 .send
-		cmpi.b	#$7F,d1			; check if volume is out of range
+		cmp.w	#$7F,d1			; check if volume is out of range
 		bls.s	.nocap			; if not, branch
-		moveq	#$7F,d1			; cap volume to silent
+		spl	d1			; if positive (above $7F), set to $FF. Otherwise, set to $00
+		lsr.b	#1,d1			; shift value down by 1 bit ($FF -> $7F)
 
 .nocap
 		lsr.b	#3,d1			; divide volume by 8

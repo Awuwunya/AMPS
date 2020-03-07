@@ -142,11 +142,8 @@ dVolEnvProg2:
 
 .value
 		addq.b	#1,cEnvPos(a1)		; increment envelope position
-		add.b	d4,d1			; add envelope volume to d5
-		bpl.s	.nocap			; branch if volume did not overflow
-		moveq	#$7F,d1			; set volume to maximum
-
-.nocap
+		ext.w	d4			; extend volume to a word
+		add.w	d4,d1			; add envelope volume to d1
 		moveq	#1,d4			; set Z flag to 0
 
 locret_VolEnvProg:

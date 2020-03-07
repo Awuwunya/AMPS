@@ -843,19 +843,20 @@ dUpdateVoiceFM:
 
 		moveq	#4-1,d1			; prepare 4 operators to d1
 		move.b	cVolume(a1),d3		; load FM channel volume to d3
+		ext.w	d3			; extend to word
 
 	if FEATURE_SFX_MASTERVOL=0
 		cmpa.w	#mSFXDAC1,a1		; is this a SFX channel
 		bhs.s	.noover			; if so, do not add master volume!
 	endif
 
-		add.b	mMasterVolFM.w,d3	; add master FM volume to d3
-		bpl.s	.noover			; if volume did not overflow, skip
-		moveq	#$7F,d3			; force FM volume to silence
+		move.b	mMasterVolFM.w,d6	; load master FM volume to d6
+		ext.w	d6			; extend to word
+		add.w	d6,d3			; add to volume
 
 .noover
 	if FEATURE_UNDERWATER
-		moveq	#0,d6			; no underwater 4 u
+		clr.w	d6			; no underwater 4 u
 
 		btst	#mfbWater,mFlags.w	; check if underwater mode is enabled
 		beq.s	.uwdone			; if not, skip
@@ -865,10 +866,7 @@ dUpdateVoiceFM:
 		move.b	(a2,d4.w),d4		; get the value from table
 		move.b	d4,d6			; copy to d6
 		and.w	#7,d4			; mask out extra stuff
-
-		add.b	d4,d3			; add algorithm to Total Level carrier offset
-		bpl.s	.uwdone			; if volume did not overflow, skip
-		moveq	#$7F,d3			; force FM volume to silence
+		add.w	d4,d3			; add algorithm to Total Level carrier offset
 
 .uwdone
 	endif
@@ -877,21 +875,26 @@ dUpdateVoiceFM:
 
 .tlloop
 		move.b	(a4)+,d5		; get Total Level value from voice to d5
+		ext.w	d5			; extend to word
 		bpl.s	.noslot			; if slot operator bit was not set, branch
 
-		add.b	d3,d5			; add carrier offset to loaded value
-		bmi.s	.slot			; if we did not overflow, branch
-		moveq	#-1,d5			; cap to silent volume
+		and.w	#$7F,d5			; get rid of sign bit (ugh)
+		add.w	d3,d5			; add carrier offset to loaded value
 	if FEATURE_UNDERWATER
 		bra.s	.slot
 	endif
 
 .noslot
 	if FEATURE_UNDERWATER
-		add.b	d6,d5			; add modulator offset to loaded value
+		add.w	d6,d5			; add modulator offset to loaded value
 	endif
 
 .slot
+		cmp.w	#$80,d5			; check if volume is out of range
+		bls.s	.nocap			; if not, branch
+		spl	d5			; if positive (above $7F), set to $FF. Otherwise, set to $00
+
+.nocap
 		move.b	d5,(a5)+		; save the Total Level value
 		move.b	(a2)+,d4		; load register to d4
 		or.b	d2,d4			; add channel offset to register
