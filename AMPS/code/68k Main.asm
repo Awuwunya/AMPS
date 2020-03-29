@@ -87,6 +87,10 @@ dPlaySnd_FadeOut:
 		lea	dFadeOutDataLog(pc),a4	; prepare stock fade out program to a4
 
 dLoadFade:
+		if safe=1
+			AMPS_Debug_FadeAddr
+		endif
+
 		move.b	mMasterVolFM.w,d3	; load FM master volume to d3
 		tst.b	mFadeAddr+1.w		; check if a fade program is already executing
 		beq.s	.nofade			; if not, load fade as is

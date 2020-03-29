@@ -227,6 +227,23 @@ AMPS_Debug_Console_Main:
 	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
+; Invalid fade address handler
+; ---------------------------------------------------------------------------
+
+AMPS_Debug_FadeAddr	macro
+	cmp.l	#$10000,a4	; check if the address is in 16-bit range
+	bhs.s	.ok		; if not, continue to work
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+		RaiseError2 "Fade data must be after address $10000but was at: %<pal0>%<.l a4 sym|split>%<pal2,symdisp>", AMPS_Debug_Console_Channel
+	else
+		bra.w	*
+	endif
+
+.ok
+    endm
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; Invalid fade command handler
 ; ---------------------------------------------------------------------------
 
