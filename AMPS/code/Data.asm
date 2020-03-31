@@ -102,7 +102,7 @@ SampleList:
 	sample $0100, KcTom, Stop		; 91 - Tom (Knuckles Chaotix)
 	sample $00C0, KcTom, Stop, KcLowTom	; 92 - Low Tom (Knuckles Chaotix)
 	sample $0080, KcTom, Stop, KcFloorTom	; 93 - Floor Tom (Knuckles Chaotix)
-	sample $0100, kcCymbal, Stop		; 94 - Cymbal? (Knuckles Chaotix)
+	sample $0100, KcCymbal, Stop		; 94 - Cymbal? (Knuckles Chaotix)
 	sample $0100, KcSnare, Stop		; 95 - Snare (Knuckles Chaotix)
 	sample $0100, KcTamb, Stop		; 96 - Tambourine? (Knuckles Chaotix)
 	sample $0100, Kc87, Stop		; 97 - Not really sure? (Knuckles Chaotix)

@@ -110,7 +110,7 @@ RaiseError2 &
 Console &
 	macro
 
-	if strcmp("\0","write")|strcmp("\0","writeline")
+	if strcmp("\0","Write")|strcmp("\0","WriteLine")|strcmp("\0","write")|strcmp("\0","writeline")
 		move.w	sr, -(sp)
 		__FSTRING_GenerateArgumentsCode \1
 		movem.l	a0-a2/d7, -(sp)
@@ -132,26 +132,26 @@ Console &
 		even
 	.instr_end\@:
 
-	elseif strcmp("\0","run")
+	elseif strcmp("\0","Run")|strcmp("\0","run")
 		jsr		ErrorHandler.__extern__console_only
 		jsr		\1
 		if narg<=1		; HACK
 			bra.s	*
 		endif
 
-	elseif strcmp("\0","setxy")
+	elseif strcmp("\0","SetXY")|strcmp("\0","setxy")
 		move.w	sr, -(sp)
 		movem.l	d0-d1, -(sp)
 		move.w	\2, -(sp)
 		move.w	\1, -(sp)
-		jsr		ErrorHandler.__global__console_setposasxy_stack
+		jsr		ErrorHandler.__global__console_SetPosAsXY_stack
 		addq.w	#4, sp
 		movem.l	(sp)+, d0-d1
 		move.w	(sp)+, sr
 
-	elseif strcmp("\0","breakline")
+	elseif strcmp("\0","BreakLine")|strcmp("\0","breakline")
 		move.w	sr, -(sp)
-		jsr		ErrorHandler.__global__console_startnewline
+		jsr		ErrorHandler.__global__console_StartNewLine
 		move.w	(sp)+, sr
 
 	else

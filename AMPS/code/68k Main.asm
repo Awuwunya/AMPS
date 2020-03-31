@@ -138,7 +138,7 @@ dLoadFade:
 dSetFilter:
 		lea	dZ80+SV_VolumeBank.l,a4	; load volume bank instructions address to a1
 		moveq	#$74,d5			; prepare the "ld  (hl),h" instruction to d1
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 ; ---------------------------------------------------------------------------
 ; addx in Motorola 68000 is much like adc in Z80. It allows us to add
 ; a register AND the carry to another register. What this means, is if
@@ -155,7 +155,7 @@ dSetFilter:
 		move.b	d6,(a4)+		; save instruction into Z80 memory
 	endr
 
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 
 locret_SetFilter:
 		rts

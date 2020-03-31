@@ -608,10 +608,10 @@ Pray_Loop2:
 ; 9F - Ristar laughs
 ; A1 - Ristar sound
 
-d9C = nrst
-d9D = nrst
-d9F = nrst
-dA1 = nrst
+d9C = nRst
+d9D = nRst
+d9F = nRst
+dA1 = nRst
 d97 = dSnare
 d87 = dClap
 d88 = dClap
