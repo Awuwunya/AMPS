@@ -486,6 +486,9 @@ dPlaySnd_SFX:
 		btst	#mfbBacked,mFlags.w	; check if a song has been queued
 		bne.s	locret_PlaySnd		; branch if so
 	endif
+
+;	cmp.b	#sfx_switch,d1
+;	beq.w	*
 ; ---------------------------------------------------------------------------
 ; To save few cycles, we don't directly substract the SFX offset from
 ; the ID, and instead offset the table position. In practice this will
@@ -567,26 +570,26 @@ dPlaySnd_SFX:
 ; ---------------------------------------------------------------------------
 
 		moveq	#0,d0
-		move.b	(a2)+,d5		; load sound effect priority to d5
+		move.b	(a2)+,d2		; load sound effect priority to d2
 		move.b	(a2)+,d0		; load number of SFX channels to d0
 		moveq	#cSizeSFX,d6		; prepare SFX channel size to d6
 
 .loopSFX
 		moveq	#0,d3
 		move.b	1(a2),d3		; load sound effect channel type to d3
-		move.b	d3,d4			; copy type to d4
+		move.b	d3,d5			; copy type to d5
 		bmi.s	.chPSG			; if channel is a PSG channel, branch
 
 		and.w	#$07,d3			; get only the necessary bits to d3
 		add.w	d3,d3			; double offset (each entry is 1 word in size)
 
 		move.w	-4(a4,d3.w),a1		; get the SFX channel we are trying to load to
-		cmp.b	cPrio(a1),d5		; check if this sound effect has higher priority
+		cmp.b	cPrio(a1),d2		; check if this sound effect has higher priority
 		blo.s	.skip			; if not, we can not override it
 
 		move.w	-4(a5,d3.w),a3		; get the music channel we should override
 		bset	#cfbInt,(a3)		; override music channel with sound effect
-		moveq	#1,d2			; prepare duration of 0 frames to d2
+		moveq	#1,d4			; prepare duration of 0 frames to d4
 		bra.s	.clearCh
 ; ---------------------------------------------------------------------------
 
@@ -605,36 +608,36 @@ dPlaySnd_SFX:
 .chPSG
 		lsr.w	#4,d3			; make it easier to reference the right offset in the table
 		move.w	(a4,d3.w),a1		; get the SFX channel we are trying to load to
-		cmp.b	cPrio(a1),d5		; check if this sound effect has higher priority
+		cmp.b	cPrio(a1),d2		; check if this sound effect has higher priority
 		blo.s	.skip			; if not, we can not override it
 
 		move.w	(a5,d3.w),a3		; get the music channel we should override
 		bset	#cfbInt,(a3)		; override music channel with sound effect
-		moveq	#2,d2			; prepare duration of 1 frames to d2
+		moveq	#2,d4			; prepare duration of 1 frames to d4
 
-		ori.b	#$1F,d4			; add volume update and max volume to channel type
-		move.b	d4,dPSG			; send volume mute command to PSG
+		ori.b	#$1F,d5			; add volume update and max volume to channel type
+		move.b	d5,dPSG			; send volume mute command to PSG
 
-		cmpi.b	#ctPSG3|$1F,d4		; check if we sent command about PSG3
+		cmpi.b	#ctPSG3|$1F,d5		; check if we sent command about PSG3
 		bne.s	.clearCh		; if not, skip
 		move.b	#ctPSG4|$1F,dPSG	; send volume mute command for PSG4 to PSG
 ; ---------------------------------------------------------------------------
 
 .clearCh
 		move.w	a1,a3			; copy sound effect channel RAM pointer to a3
-		moveq	#cSizeSFX/4-1,d3	; prepare SFX channel size / 4 to d3
-.clear
+
+	rept cSizeSFX/4				; repeat by the number of long words for channel data
 		clr.l	(a3)+			; clear 4 bytes of channel data
-		dbf	d3,.clear		; clear the entire channel
+	endr
 
 	if cSizeSFX&2
-		clr.w	(a3)			; if channel size can not be divided by 4, clear extra word
+		clr.w	(a3)+			; if channel size can not be divided by 4, clear extra word
 	endif
 ; ---------------------------------------------------------------------------
 
 		move.w	(a2)+,(a1)		; load channel flags and type
-		move.b	d5,cPrio(a1)		; set channel priority
-		move.b	d2,cDuration(a1)	; reset channel duration
+		move.b	d2,cPrio(a1)		; set channel priority
+		move.b	d4,cDuration(a1)	; reset channel duration
 
 		move.l	a2,a3			; load music header position to a3
 		add.w	(a2)+,a3		; add tracker offset to a3
@@ -644,7 +647,7 @@ dPlaySnd_SFX:
 	endif
 
 		move.w	(a2)+,cPitch(a1)	; load pitch offset and channel volume
-		tst.b	d4			; check if this channel is a PSG channel
+		tst.b	d5			; check if this channel is a PSG channel
 		bmi.s	.loop			; if is, skip over this
 		moveq	#$FFFFFFC0,d3		; set panning to centre
 		move.b	d3,cPanning(a1)		; save to channel memory too

@@ -294,7 +294,7 @@ musend
 ; Include samples and filters
 ; ---------------------------------------------------------------------------
 
-		align	$8000		; must be aligned to bank... By the way, these are also used in Z80.asm. Be sure to check it out.
+		align	$8000		; must be aligned to bank... By the way, these are also used in Z80.asm. Be sure to check it out
 fLog:		incbin "AMPS/filters/Logarithmic.dat"	; logarithmic filter (no filter)
 ;fLinear:	incbin "AMPS/filters/Linear.dat"	; linear filter (no filter)
 

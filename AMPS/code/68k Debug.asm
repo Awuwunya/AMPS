@@ -866,11 +866,11 @@ AMPS_Debug_PlayTrackSFX	macro
     endm
 
 AMPS_Debug_PlayTrackSFX2	macro
-	move.l	a3,d2
-	and.l	#$FFFFFF,d2	; remove high byte
-	cmp.l	#sfxaddr,d2	; check if this is valid tracker
+	move.l	a3,d4
+	and.l	#$FFFFFF,d4	; remove high byte
+	cmp.l	#sfxaddr,d4	; check if this is valid tracker
 	blo.s	.fail\@		; if no, branch
-	cmp.l	#musaddr,d2	; check if this is valid tracker
+	cmp.l	#musaddr,d4	; check if this is valid tracker
 	blo.s	.ok\@		; if is, branch
 
 .fail\@
