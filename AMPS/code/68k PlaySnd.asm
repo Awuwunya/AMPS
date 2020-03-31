@@ -66,7 +66,7 @@ dPlaySnd_Pause:
 ; ---------------------------------------------------------------------------
 
 dMuteDAC:
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 		lea	SampleList(pc),a5	; load address for the stop sample data into a2
 		lea	dZ80+PCM1_Sample,a4	; load addresses for PCM 1 sample to a1
 
@@ -83,7 +83,7 @@ dMuteDAC:
 
 		move.b	#$CA,dZ80+PCM1_NewRET	; activate sample switch (change instruction)
 		move.b	#$CA,dZ80+PCM2_NewRET	; activate sample switch (change instruction)
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 
 locret_MuteDAC:
 		rts

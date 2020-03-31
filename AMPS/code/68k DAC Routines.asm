@@ -143,13 +143,13 @@ dNoteWriteDAC1:
 		lea	dZ80+PCM1_NewRET,a4	; ''
 
 dNoteOnDAC4:
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 	rept 12
 		move.b	(a2)+,(a5)+		; send sample data to Dual PCM
 	endr
 
 		move.b	#$DA,(a4)		; activate sample switch (change instruction)
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 
 locret_dNoteOnDAC4:
 		rts
@@ -214,21 +214,21 @@ dUpdateFreqDAC3:
 		btst	#ctbPt2,cType(a1)	; check if DAC1
 		beq.s	dFreqDAC1		; if is, branch
 
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 		move.b	d2,dZ80+PCM2_PitchHigh+1
 		move.b	d3,dZ80+PCM2_PitchLow+1
 		move.b	#$D2,dZ80+PCM2_ChangePitch; change "JP C" to "JP NC"
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 
 locret_UpdFreqDAC;
 		rts
 
 dFreqDAC1:
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 		move.b	d2,dZ80+PCM1_PitchHigh+1
 		move.b	d3,dZ80+PCM1_PitchLow+1
 		move.b	#$D2,dZ80+PCM1_ChangePitch; change "JP C" to "JP NC"
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -350,18 +350,18 @@ dUpdateVolDAC2:
 		and.b	#$80,d1			; change volume of $FF to $80 (this mutes DAC)
 
 .nocap
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 		move.b	#$D2,dZ80+PCM_ChangeVolume; set volume change flag
 
 		btst	#ctbPt2,cType(a1)	; check if this channel is DAC1
 		beq.s	.dac1			; if is, branch
 		move.b	d1,dZ80+PCM2_Volume+1	; save volume for PCM 1
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 		rts
 
 .dac1
 		move.b	d1,dZ80+PCM1_Volume+1	; save volume for PCM 2
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 
 locret_VolDAC:
 		rts

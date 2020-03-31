@@ -919,7 +919,7 @@ dUpdateVoiceFM:
 	if safe=1
 		AMPS_Debug_CuePtr 0		; make sure cue is valid
 	endif
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 
 .write
 	rept VoiceRegs+1
@@ -929,7 +929,7 @@ dUpdateVoiceFM:
 	endr
 
 	;	st	(a0)			; mark as end of the cue
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 		move.l	a5,sp			; fix stack pointer
 		bclr	#cfbVol,(a1)		; reset volume update request flag
 		move.l	(sp)+,a2		; load the tracker address from stack
