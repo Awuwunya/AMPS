@@ -232,16 +232,21 @@ AMPS_Debug_Console_Main:
 
 AMPS_Debug_FadeAddr	macro
 	cmp.l	#$10000,a4	; check if the address is in 16-bit range
-	bhs.s	.ok		; if not, continue to work
+	bhs.s	.ok2		; if not, continue to work
 
 	if def(RaiseError)	; check if Vladik's debugger is active
-		RaiseError2 "Fade data must be after address $10000but was at: %<pal0>%<.l a4 sym|split>%<pal2,symdisp>", AMPS_Debug_Console_Channel
+		jsr	AMPS_DebugR_FadeAddr
 	else
 		bra.w	*
 	endif
 
-.ok
+.ok2
     endm
+
+	if def(RaiseError)	; check if Vladik's debugger is active
+AMPS_DebugR_FadeAddr:
+		RaiseError2 "Fade data must be after address $10000but was at: %<pal0>%<.l a4 sym|split>%<pal2,symdisp>", AMPS_Debug_Console_Channel
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Invalid fade command handler
@@ -424,7 +429,7 @@ AMPS_Debug_dcInvalid	macro
 
 AMPS_Debug_dcPortamento	macro
 	if def(RaiseError)	; check if Vladik's debugger is active
-		RaiseError "Portamento feature is disabled. Set FEATURE_PORTAMENTO to 1 to enable.", AMPS_Debug_Console_Channel
+		RaiseError "Portamento feature is disabled. Set   FEATURE_PORTAMENTO to 1 to enable.", AMPS_Debug_Console_Channel
 	else
 		bra.w	*
 	endif
@@ -445,7 +450,7 @@ AMPS_Debug_dcModulate	macro
 	if FEATURE_MODULATION=0
 	if def(RaiseError)	; check if Vladik's debugger is active
 AMPS_DebugR_dcModulate:
-		RaiseError "Modulation feature is disabled. Set FEATURE_MODULATION to 1 to enable.", AMPS_Debug_Console_Channel
+		RaiseError "Modulation feature is disabled. Set   FEATURE_MODULATION to 1 to enable.", AMPS_Debug_Console_Channel
 	endif
 	endif
 ; ===========================================================================

@@ -1,9 +1,7 @@
-; ---------------------------------------------------------------------------------------------
-; AMPS - SMPS2ASM macro & equate file.
-;
-; Based on Flamewing's SMPS2ASM, and S1SMPS2ASM by Marc (AKA Cinossu)
-; Reworked and improved by Natsumi
-; ---------------------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; AMPS - SMPS2ASM macro & equate file
+; ---------------------------------------------------------------------------
 
 ; this macro is created to emulate enum in AS
 enum		macro lable
@@ -13,9 +11,10 @@ _num =		_num+1
 	shift
 	endr
     endm
-; ---------------------------------------------------------------------------------------------
-; Note Equates
-; ---------------------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Note equates
+; ---------------------------------------------------------------------------
 
 _num =		$80
 	enum nRst
@@ -28,9 +27,10 @@ _num =		$80
 	enum nC6,nCs6,nD6,nEb6,nE6,nF6,nFs6,nG6,nAb6,nA6,nBb6,nB6
 	enum nC7,nCs7,nD7,nEb7,nE7,nF7,nFs7,nG7,nAb7,nA7,nBb7
 nHiHat =	nA6
-; ---------------------------------------------------------------------------------------------
-; Header Macros
-; ---------------------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Header macros
+; ---------------------------------------------------------------------------
 
 ; Header - Initialize a music file
 sHeaderInit	macro
@@ -42,7 +42,7 @@ sHeaderInitSFX	macro
 
     endm
 
-; Header - Set up Channel Usage
+; Header - Set up channel usage
 sHeaderCh	macro fm,psg
 	if narg=2
 		dc.b \psg-1, \fm-1
@@ -64,17 +64,17 @@ sHeaderCh	macro fm,psg
 	endif
     endm
 
-; Header - Set up Tempo and Tick Multiplier
+; Header - Set up tempo and tick multiplier
 sHeaderTempo	macro tmul,tempo
 	dc.b \tempo,\tmul-1
     endm
 
-; Header - Set priority leve
+; Header - Set priority level
 sHeaderPrio	macro prio
 	dc.b \prio
     endm
 
-; Header - Set up DAC Channel
+; Header - Set up a DAC channel
 sHeaderDAC	macro loc,vol,samp
 	dc.w \loc-*
 
@@ -90,30 +90,30 @@ sHeaderDAC	macro loc,vol,samp
 	endif
     endm
 
-; Header - Set up FM Channel
+; Header - Set up an FM channel
 sHeaderFM	macro loc,pitch,vol
 	dc.w \loc-*
 	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
 
-; Header - Set up PSG Channel
+; Header - Set up a PSG channel
 sHeaderPSG	macro loc,pitch,vol,detune,volenv
 	dc.w \loc-*
 	dc.b (\pitch)&$FF,(\vol)&$FF,(\detune)&$FF,\volenv
     endm
 
-; Header - Set up SFX Channel
+; Header - Set up an SFX channel
 sHeaderSFX	macro flags,type,loc,pitch,vol
 	dc.b \flags,\type
 	dc.w \loc-*
 	dc.b (\pitch)&$FF,(\vol)&$FF
     endm
-; ---------------------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
 ; Macros for FM instruments
-; Patches - Feedback
-; ---------------------------------------------------------------------------------------------
+; ---------------------------------------------------------------------------
 
-; Patches - Algorithm
+; Patches - Algorithm and patch name
 spAlgorithm	macro val, name
 	if (sPatNum<>0)&(safe=0)
 		; align the patch
@@ -130,6 +130,7 @@ sPatNum =	sPatNum+1
 spAl =		\val
     endm
 
+; Patches - Feedback
 spFeedback	macro val
 spFe =		\val
     endm
@@ -207,7 +208,7 @@ spRR4 =		\op4
     endm
 
 ; Patches - SSG-EG
-spSSGEG	macro op1,op2,op3,op4
+spSSGEG		macro op1,op2,op3,op4
 spSS1 =		\op1
 spSS2 =		\op2
 spSS3 =		\op3
@@ -246,7 +247,7 @@ spTLMask1 =	((spAl=7)<<7)
     endm
 
 ; Patches - Total Level (for broken total level masks)
-spTotalLv2 macro op1,op2,op3,op4
+spTotalLv2	macro op1,op2,op3,op4
 spTL1 =		\op1
 spTL2 =		\op2
 spTL3 =		\op3
@@ -265,18 +266,20 @@ spTL4 =		\op4
 		dc.b 'NAT'	; align the patch
 	endif
     endm
-; ---------------------------------------------------------------------------------------------
-; Command Flag Macros and Equates. Based on the original s1smps2asm, and Flamewing's smps2asm
-; ---------------------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Equates for sPan
+; ---------------------------------------------------------------------------
 
 spNone =	$00
 spRight =	$40
 spLeft =	$80
 spCentre =	$C0
 spCenter =	$C0
-; ---------------------------------------------------------------------------------------------
-; tracker commands
-; ---------------------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Tracker commands
+; ---------------------------------------------------------------------------
 
 ; E0xx - Panning, AMS, FMS (PANAFMS - PAFMS_PAN)
 sPan		macro pan, ams, fms
@@ -562,9 +565,10 @@ sCheck		macro
 		dc.b $FF,$44
 	endif
     endm
-; ---------------------------------------------------------------------------------------------
-; equates for sNoisePSG
-; ---------------------------------------------------------------------------------------------
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Equates for sNoisePSG
+; ---------------------------------------------------------------------------
 
 snOff =		$00			; disables PSG3 noise mode.
 

@@ -24,6 +24,7 @@ dAMPSnextPSGSFX:
 .next
 		dbf	d0,dAMPSnextPSGSFX	; make sure to run all the channels
 		jmp	dCheckTracker(pc)	; after that, check tracker and end loop
+; ---------------------------------------------------------------------------
 
 .update
 		and.b	#$FF-(1<<cfbHold)-(1<<cfbRest),(a1); clear hold and rest flags
@@ -32,13 +33,14 @@ dAMPSnextPSGSFX:
 		bpl.s	.timer			; if not, it must be a timer. Branch
 
 	dGetFreqPSG				; get PSG frequency
-		move.b	(a2)+,d1		; check if next note is a timer
-		bpl.s	.timer			; if yes, handle timer
+		move.b	(a2)+,d1		; check if next byte is a timer
+		bpl.s	.timer			; if yes, handle is
 		subq.w	#1,a2			; else, undo the increment
 		bra.s	.pcnote			; do not calculate duration
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
+; ---------------------------------------------------------------------------
 
 .pcnote
 	dProcNote 1, 1				; reset necessary channel memory
@@ -70,13 +72,13 @@ dAMPSdoPSG:
 		lea	dFreqPSG(pc),a3		; load PSG frequency table for quick access to a3
 
 dAMPSnextPSG:
-		add.w	#cSize,a1		; go to the next channe
+		add.w	#cSize,a1		; go to the next channel
 		tst.b	(a1)			; check if channel is running a tracker
 		bpl.w	.next			; if not, branch
 		subq.b	#1,cDuration(a1)	; decrease note duration
 		beq.w	.update			; if timed out, update channel
 
-	dNoteToutPSG				; handle PSG-specific note timeout behavior
+	dGatePSG				; handle PSG-specific gate behavior
 	dCalcFreq				; calculate channel base frequency
 	dModPorta .endm, -1, -1			; run modulation + portamento code
 		bsr.w	dUpdateFreqPSG2		; if frequency needs changing, do it
@@ -85,29 +87,31 @@ dAMPSnextPSG:
 		jsr	dEnvelopePSG(pc)	; run envelope program
 
 .next
-		dbf	d0,dAMPSnextPSG		; make sure to run all the channels
+		dbf	d0,dAMPSnextPSG		; make sure to run all the PSG channels
 		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
+; ---------------------------------------------------------------------------
 
 .update
 		and.b	#$FF-(1<<cfbHold)-(1<<cfbRest),(a1); clear hold and rest flags
 	dDoTracker				; process tracker
 		tst.b	d1			; check if note is being played
-		bpl.s	.timer			; if not, it must be a timer. branch
+		bpl.s	.timer			; if not, it must be a timer. Branch
 
 	dGetFreqPSG				; get PSG frequency
-		move.b	(a2)+,d1		; check if next note is a timer
-		bpl.s	.timer			; if yes, handle timer
+		move.b	(a2)+,d1		; check if next byte is a timer
+		bpl.s	.timer			; if yes, handle it
 		subq.w	#1,a2			; else, undo the increment
 		bra.s	.pcnote			; do not calculate duration
 
 .timer
 		jsr	dCalcDuration(pc)	; calculate duration
+; ---------------------------------------------------------------------------
 
 .pcnote
 	dProcNote 0, 1				; reset necessary channel memory
 		bsr.s	dUpdateFreqPSG		; update hardware frequency
 		jsr	dEnvelopePSG(pc)	; run envelope program
-		dbf	d0,dAMPSnextPSG		; make sure to run all the channels
+		dbf	d0,dAMPSnextPSG		; make sure to run all the PSG channels
 		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -125,6 +129,7 @@ dUpdateFreqPSG:
 		bpl.s	.detune			; if it was not rest frequency, branch
 		bset	#cfbRest,(a1)		; set channel resting flag
 		rts
+; ---------------------------------------------------------------------------
 
 .detune
 		move.b	cDetune(a1),d6		; load detune value to d6
@@ -144,6 +149,7 @@ dUpdateFreqPSG:
 		beq.s	dUpdateFreqPSG2		; if not, branch
 		add.w	cModFreq(a1),d2		; add modulation frequency offset to d2
 	endif
+; ---------------------------------------------------------------------------
 
 dUpdateFreqPSG2:
 		btst	#cfbInt,(a1)		; is channel interrupted by sfx?
@@ -159,7 +165,7 @@ dUpdateFreqPSG3:
 		moveq	#$FFFFFF00|ctPSG3,d6	; load PSG3 type value instead
 
 .notPSG4
-		move.w	d2,d5			; copy frequency to d1
+		move.w	d2,d5			; copy frequency to d5
 		andi.b	#$F,d5			; get the low nibble of it
 		or.b	d5,d6			; combine with channel type
 ; ---------------------------------------------------------------------------
@@ -205,6 +211,7 @@ dEnvelopePSG_SFX:
 		ext.w	d1			; extend to a word
 		bra.s	dEnvelopePSG2		; do not add master volume
 	endif
+; ---------------------------------------------------------------------------
 
 dEnvelopePSG:
 		btst	#cfbRest,(a1)		; check if channel is resting
@@ -216,6 +223,7 @@ dEnvelopePSG:
 		move.b	cVolume(a1),d4		; load channel volume to d4
 		ext.w	d4			; extend to word
 		add.w	d4,d1			; add channel volume to d1
+; ---------------------------------------------------------------------------
 
 dEnvelopePSG2:
 		moveq	#0,d4
@@ -252,7 +260,7 @@ dUpdateVolPSG:
 		cmp.w	#mSFXDAC1,a1		; check if this is a SFX channel
 		bhs.s	.send			; if so, update volume
 
-		tst.b	cGateMain(a1)		; check if note timeout is active
+		tst.b	cGateMain(a1)		; check if gate is active
 		beq.s	.send			; if not, update volume
 		tst.b	cGateCur(a1)		; is note stopped already?
 		beq.s	locret_UpdVolPSG	; if is, do not update
@@ -313,3 +321,4 @@ dFreqPSG_:
 .x =			.x+$101
 		endr
 	endif
+; ---------------------------------------------------------------------------
