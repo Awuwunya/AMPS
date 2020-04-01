@@ -6,6 +6,7 @@ AMPS is a sound driver software package aimed at making Mega Drive audio develop
 [Sonic Stuff Research Group](http://sonicresearch.org/community/index.php?threads/amps-ample-music-playback-system.5634) - [Sonic Retro](https://forums.sonicretro.org/index.php?threads/amps-ample-music-playback-system.38583)
 
 # Example implmentations
+* [AMPS test program](https://github.com/NatsumiFox/AMPS)
 * [Sonic 1 2005 implementation](https://github.com/NatsumiFox/AMPS-Sonic-1-2005)
 * [Sonic 2 Git implementation](https://github.com/NatsumiFox/AMPS-Sonic-2)
 
