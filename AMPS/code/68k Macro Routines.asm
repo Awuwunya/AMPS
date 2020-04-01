@@ -120,24 +120,24 @@ dPortamento	macro jump,loop,type
 
 			and.w	#$7FF,d5	; get only the frequency offset
 			sub.w	#$25D,d5	; sub the lower bound
-			cmp.w	#$4C0-$25D,d5	; check if out of range of standard frequencies
+			cmp.w	#$4C0-$25D,d5	; check if out of range of safe frequencies
 			bls.s	.nowrap		; branch if not
 			bpl.s	.pos		; branch if negative
 
 			sub.w	d4,d2		; add frequency offset to d4
 			sub.w	d4,cPortaFreq(a1); fix portamento frequency also
-			bpl.s	.nowrap		; branch if overflow did not occur (positive to negative)
+			bpl.s	.nowrap		; branch if overflow did not occur
 			bra.s	.wrap2
 
 		.pos:
 			add.w	d4,d2		; add frequency offset to d4
 			add.w	d4,cPortaFreq(a1); fix portamento frequency also
-			bmi.s	.nowrap		; branch if overflow did not occur (negative to positive)
+			bmi.s	.nowrap		; branch if overflow did not occur
 
 		.wrap2:
-			move.w	cPortaFreq(a1),d4; get portamento frequency offset to d4 again
-			sub.w	d4,d2		; remove that offset from frequency
-			clr.w	cPortaFreq(a1)	; reset portamento frequency offset
+			move.w	cPortaFreq(a1),d4; get portamento to d4 again
+			sub.w	d4,d2		; fix frequency, again
+			clr.w	cPortaFreq(a1)	; reset portamento frequency
 		endif
 
 .nowrap

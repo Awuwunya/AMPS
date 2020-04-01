@@ -259,9 +259,9 @@ dUpdateAllAMPS:
 
 		move.l	mFadeAddr.w,a4		; get the fade porogram address to a4
 		addq.l	#3,mFadeAddr.w		; set the fade address to next group
-		if safe=1
-			AMPS_Debug_FadeAddr	; check whether this fade address is valid
-		endif
+	if safe=1
+		AMPS_Debug_FadeAddr		; check whether this fade address is valid
+	endif
 
 		moveq	#1<<cfbVol,d0		; prepare volume update to d0
 		moveq	#0,d2

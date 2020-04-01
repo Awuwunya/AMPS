@@ -142,13 +142,13 @@ dNoteWriteDAC1:
 		lea	dZ80+PCM1_NewRET,a4	; ''
 
 dNoteOnDAC4:
-	StopZ80					; wait for Z80 to stop
+	stopZ80					; wait for Z80 to stop
 	rept 12
 		move.b	(a2)+,(a5)+		; send sample data to Dual PCM
 	endr
 
 		move.b	#$DA,(a4)		; activate sample switch (change instruction)
-	StartZ80				; enable Z80 execution
+	startZ80				; enable Z80 execution
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

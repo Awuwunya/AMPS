@@ -37,9 +37,9 @@ FEATURE_FM6 =		1	; set to 1 to enable FM6 to be used in music
 
 TEMPO_ALGORITHM =	0
 
-; if safe mode is enabled (1), then the driver will attempt to find any issues.
-; if Vladik's error debugger is installed, then the error will be displayed.
-; else, the CPU is trapped.
+; if safe mode is enabled (1), then the driver will attempt to find any issues
+; if Vladik's error debugger is installed, then the error will be displayed
+; else, the CPU is trapped
 
 safe =	1
 ; ===========================================================================
@@ -193,7 +193,7 @@ sr3 =		$0040		; 1 Quarter sample rate	3500 Hz
 dZ80 =		$A00000		; quick reference to Z80 RAM
 dPSG =		$C00011		; quick reference to PSG port
 
-	rsset $FFFFF000		; Insert your sound driver RAM address here!
+	rsset $FFFFF000		; insert your sound driver RAM address here!
 mFlags		rs.b 1		; various driver flags, see below
 mCtrPal		rs.b 1		; frame counter fo 50hz fix
 mComm		rs.b 8		; communications bytes
@@ -414,7 +414,7 @@ dCLEAR_MEM	macro len, block
 	rept (\block)/4
 		clr.l	(a4)+		; clear driver and music channel memory
 	endr
-		dbf	d6, .c\@	; loop for each longword to clear it...
+		dbf	d6, .c\@	; loop for each longword to clear it
 
 	rept ((\len)%(\block))/4
 		clr.l	(a4)+		; clear extra longs of memory
@@ -481,6 +481,7 @@ dCALC_VOICE	macro off
 
 stopZ80 	macro
 	move.w	#$100,$A11100		; stop the Z80
+
 .loop\@
 	btst	#0,$A11100
 	bne.s	.loop\@			; loop until it says it's stopped
@@ -565,7 +566,7 @@ CheckCue	macro
 ; Macro for pausing music
 ; ---------------------------------------------------------------------------
 
-AMPS_MUSPAUSE	macro	; enable request pause and paused flags
+AMPS_MUSPAUSE	macro			; enable request pause and paused flags
 	move.b	#Mus_Pause,mQueue+2.w
     endm
 ; ===========================================================================
@@ -573,7 +574,7 @@ AMPS_MUSPAUSE	macro	; enable request pause and paused flags
 ; Macro for unpausing music
 ; ---------------------------------------------------------------------------
 
-AMPS_MUSUNPAUSE	macro	; enable request unpause flag
+AMPS_MUSUNPAUSE	macro			; enable request unpause flag
 	move.b	#Mus_Unpause,mQueue+2.w
     endm
 ; ===========================================================================
@@ -650,4 +651,5 @@ __samp =	__samp+1		; increase sample ID
 	dc.w 0				; unused!
     endm
 ; ---------------------------------------------------------------------------
+
 	opt ae-

@@ -159,8 +159,6 @@ dcSpRev:
 
 dcSpReset:
 		clr.b	mSpindash.w		; reset spindash rev counter
-
-Return_dcSpReset:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -177,7 +175,7 @@ dcPan:
 
 		moveq	#$37,d3			; prepare bits to keep
 		and.b	cPanning(a1),d3		; and with channel LFO settings
-		or.b	(a2)+,d3		; or panning value
+		or.b	(a2)+,d3		; OR panning value
 		move.b	d3,cPanning(a1)		; save as channel panning
 
 		btst	#ctbDAC,cType(a1)	; check if this is a DAC channel
@@ -206,7 +204,7 @@ dcPan:
 		move.b	mSFXDAC1+cPanning.w,d3	; read panning value from SFX DAC1
 
 .nodacsfx
-		or.b	mDAC2+cPanning.w,d3	; or the panning value from music DAC2
+		or.b	mDAC2+cPanning.w,d3	; OR the panning value from music DAC2
 	CheckCue				; check that YM cue is valid
 	stopZ80
 	WriteYM2	#$B6, d3		; Panning & LFO
@@ -822,12 +820,12 @@ dVoiceReg	macro	offset, reg
 			moveq	#$FFFFFF00|\reg,d3; load register to d3
 		endif
 
+		or.b	d2,d3			; add channel offset to register
+		move.b	d3,(a5)+		; write register to buffer
+
 		if .offs>1
 			addq.w	#.offs-1,a4	; offset a4 by specific amount
 		endif
-
-		or.b	d2,d3			; add channel offset to register
-		move.b	d3,(a5)+		; write register to buffer
 	shift
 	endr
     endm

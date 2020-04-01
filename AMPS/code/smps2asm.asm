@@ -117,9 +117,9 @@ sHeaderSFX	macro flags,type,loc,pitch,vol
 spAlgorithm	macro val, name
 	if (sPatNum<>0)&(safe=0)
 		; align the patch
-		dc.b (*^(sPatNum*spTL4))&$FF
-		dc.b ((*>>8)+(spDe3*spDR3))&$FF
-		dc.b ((*>>16)-(spTL1*spRR3))&$FF
+		dc.b ((*)^(sPatNum*spTL4))&$FF
+		dc.b (((*)>>8)+(spDe3*spDR3))&$FF
+		dc.b (((*)>>16)-(spTL1*spRR3))&$FF
 	endif
 
 	if narg>1
@@ -242,7 +242,7 @@ spTLMask1 =	((spAl=7)<<7)
 	dc.b spTL1|spTLMask1,  spTL3|spTLMask3,  spTL2|spTLMask2,  spTL4|spTLMask4
 
 	if safe=1
-		dc.b 'NAT'	; align the patch
+		dc.b "NAT"	; align the patch
 	endif
     endm
 
@@ -263,7 +263,7 @@ spTL4 =		\op4
 	dc.b spTL1,	       spTL3,		 spTL2,		   spTL4
 
 	if safe=1
-		dc.b 'NAT'	; align the patch
+		dc.b "NAT"	; align the patch
 	endif
     endm
 ; ===========================================================================
@@ -288,6 +288,7 @@ sPan		macro pan, ams, fms
 
 	elseif narg=2
 		dc.b $E0, \pan|\ams
+
 	else
 		dc.b $E0, \pan|(\ams<<4)|\fms
 	endif

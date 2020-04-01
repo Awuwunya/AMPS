@@ -15,7 +15,7 @@ dPlaySnd_Pause:
 		bne.w	locret_MuteDAC		; if was already paused, skip
 ; ---------------------------------------------------------------------------
 ; The following code will set channel panning to none for all FM channels.
-; This will ensure they are muted while we are pausing.
+; This will ensure they are muted while we are pausing
 ; ---------------------------------------------------------------------------
 
 		moveq	#3-1,d6			; 3 channels per YM2616 "part"
@@ -111,7 +111,7 @@ dPlaySnd_Unpause:
 ; by sound effects, and that each running sound effect channel gets
 ; updated. We do not handle key on's, since that could potentially
 ; cause issues if notes are half-done. The next time tracker plays
-; notes, they start being audible again.
+; notes, they start being audible again
 ; ---------------------------------------------------------------------------
 
 		lea	mFM1.w,a1		; start from FM1 channel
@@ -254,7 +254,7 @@ dPlaySnd_Music:
 
 .backup
 		move.l	(a4)+,(a3)+		; back up data for every channel
-		dbf	d3, .backup		; loop for each longword
+		dbf	d3,.backup		; loop for each longword
 
 	if (mSFXDAC1-mBackUpArea)&2
 		move.w	(a4)+,(a3)+		; back up data for every channel
@@ -418,7 +418,7 @@ dPlaySnd_Music:
 ; Unlike SMPS, AMPS does not have pointer to the voice table of
 ; a song. This may be limiting for some songs, but this allows AMPS
 ; to save 2 bytes for each music and sound effect file. This line
-; of code sets the music voice table address at the end of the header.
+; of code sets the music voice table address at the end of the header
 ; ---------------------------------------------------------------------------
 
 .finish
@@ -486,13 +486,10 @@ dPlaySnd_SFX:
 		btst	#mfbBacked,mFlags.w	; check if a song has been queued
 		bne.s	locret_PlaySnd		; branch if so
 	endif
-
-;	cmp.b	#sfx_switch,d1
-;	beq.w	*
 ; ---------------------------------------------------------------------------
 ; To save few cycles, we don't directly substract the SFX offset from
 ; the ID, and instead offset the table position. In practice this will
-; have the same effect, but saves us 8 cycles overall.
+; have the same effect, but saves us 8 cycles overall
 ; ---------------------------------------------------------------------------
 
 		lea	SoundIndex-(SFXoff*4)(pc),a1; get sfx pointer table with an offset to a1
@@ -503,7 +500,7 @@ dPlaySnd_SFX:
 ; This implements a system where the sound effect swaps every time its
 ; played. This in particular needed with Sonic 1 to 3K, where the ring SFX
 ; would every time change the panning by playing a different SFX ID. AMPS
-; extends this system to support any number of SFX following this same system.
+; extends this system to support any number of SFX following this same system
 ; ---------------------------------------------------------------------------
 
 		btst	#0,(a1,d1.w)		; check if sound effect has swapping behaviour
@@ -538,7 +535,7 @@ dPlaySnd_SFX:
 ; the same ID. Since there is no way to show any sfx is continous when
 ; its running, there is no way to fix this without doing it this way. If
 ; this breaks anything significant, let me know and I'll tackle this
-; problem once again.
+; problem once again
 ; ---------------------------------------------------------------------------
 
 		tst.b	(a1,d1.w)		; check if this sound effect is continously looping
@@ -566,7 +563,7 @@ dPlaySnd_SFX:
 ; It adds a delay of 1 frame to DAC and FM due to the YMCue, and PCM
 ; buffering to avoid quality loss from DMA's. This means that, since PSG
 ; is controlled by the 68000, we would be off by a single frame without
-; this fix.
+; this fix
 ; ---------------------------------------------------------------------------
 
 		moveq	#0,d0
@@ -671,7 +668,7 @@ dPlaySnd_SFX:
 ; The instant release for FM channels behavior was not in the Sonic 1
 ; SMPS driver by default, but it has been added since it fixes an
 ; issue with YM2612, where sometimes subsequent sound effect activations
-; would sound different over time. This fix will help to mitigate that.
+; would sound different over time. This fix will help to mitigate that
 ; ---------------------------------------------------------------------------
 
 .fm

@@ -128,6 +128,7 @@ SampleList:
 
 vNone =		$00
 __venv =	$01
+
 VolEnvs:
 	volenv Ristar02, Ristar07, Ristar10, Ristar18, Ristar1D, GameNo01
 	volenv S3K_02, S3K_01, S3K_08, S3K_0A, Phan3_05, Phan3_0A, Zaxx04
@@ -283,7 +284,7 @@ mdTest:		dc.b $08, eaSens, $01, eLoop, $00
 ; Include music, sound effects and voice bank
 ; ---------------------------------------------------------------------------
 
-	include "AMPS/Voices.s2a"	; include universal Voice bank
+	include "AMPS/Voices.s2a"	; include universal voice bank
 	opt ae-				; disable automatic evens
 
 sfxaddr	incSFX				; include all sfx
@@ -294,7 +295,7 @@ musend
 ; Include samples and filters
 ; ---------------------------------------------------------------------------
 
-		align	$8000		; must be aligned to bank... By the way, these are also used in Z80.asm. Be sure to check it out
+		align	$8000		; must be aligned to bank. By the way, these are also used in Z80.asm. Be sure to check it out
 fLog:		incbin "AMPS/filters/Logarithmic.dat"	; logarithmic filter (no filter)
 ;fLinear:	incbin "AMPS/filters/Linear.dat"	; linear filter (no filter)
 

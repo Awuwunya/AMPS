@@ -471,6 +471,7 @@ dFreqFM:dc.w								       $025E; Octave-1 - (80)
 	dc.w $3284,$32AB,$32D3,$32FE,$332D,$335C,$338F,$33C5,$33FF,$343C,$347C,$3A5E; Octave 6 - (C9 - D4)
 	dc.w $3A84,$3AAB,$3AD3,$3AFE,$3B2D,$3B5C,$3B8F,$3BC5,$3BFF,$3C3C,$3C7C	    ; Octave 7 - (D5 - DF)
 dFreqFM_:
+
 	if safe=1				; in safe mode, we have extra debug data
 .x =		$100|((dFreqFM_-dFreqFM)/2)	; to check if we played an invalid note
 		rept $80-((dFreqFM_-dFreqFM)/2)	; and if so, tell us which note it was

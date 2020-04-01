@@ -47,6 +47,7 @@ dAMPSnextPSGSFX:
 		bsr.w	dUpdateFreqPSG		; update hardware frequency
 		jsr	dEnvelopePSG_SFX(pc)	; run envelope program
 		dbf	d0,dAMPSnextPSGSFX	; make sure to run all the channels
+
 	; continue to check tracker and end loop
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -236,6 +237,7 @@ dEnvelopePSG2:
 .ckflag
 		btst	#cfbVol,(a1)		; test volume update flag
 		beq.s	locret_UpdVolPSG	; branch if no volume update was requested
+
 	; continue to update PSG volume
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -264,6 +266,7 @@ dUpdateVolPSG:
 		beq.s	.send			; if not, update volume
 		tst.b	cGateCur(a1)		; is note stopped already?
 		beq.s	locret_UpdVolPSG	; if is, do not update
+; ---------------------------------------------------------------------------
 
 .send
 		cmp.w	#$7F,d1			; check if volume is out of range
@@ -314,8 +317,9 @@ dFreqPSG:dc.w $03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03F7,$03BE,
 	dc.w  $001B,$001A,$0018,$0017,$0016,$0015,$0013,$0012,$0011		     ; Octave 8 - (B9 - D1)
 	dc.w  $0000								     ; Note (D2)
 dFreqPSG_:
+
 	if safe=1				; in safe mode, we have extra debug data
-.x = $100|((dFreqPSG_-dFreqPSG)/2)		; to check if we played an invalid note
+.x =		$100|((dFreqPSG_-dFreqPSG)/2)	; to check if we played an invalid note
 		rept $80-((dFreqPSG_-dFreqPSG)/2); and if so, tell us which note it was
 			dc.w .x
 .x =			.x+$101
