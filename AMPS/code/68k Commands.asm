@@ -575,15 +575,7 @@ dcPortamento:
 dcMod68K:
 	if FEATURE_MODULATION
 		move.l	a2,cMod(a1)		; set modulation data address
-		clr.w	cModFreq(a1)		; reset modulation frequency offset to 0
-		move.b	(a2)+,cModSpeed(a1)	; load modulation speed from tracker to channel
-
-		move.b	(a2)+,d3		; load modulation step count from tracker to d3
-		lsr.b	#1,d3			; halve it
-		move.b	d3,cModCount(a1)	; save as modulation step count to channel
-
-		move.b	(a2)+,cModDelay(a1)	; load modulation delay from tracker to channel
-		move.b	(a2)+,cModStep(a1)	; load modulation step offset from tracker to channel
+		addq.w	#4,a2			; skip all the modulation data
 	; continue to enabling modulation
 
 	elseif safe=1
