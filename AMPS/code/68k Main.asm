@@ -137,7 +137,7 @@ dLoadFade:
 ; ---------------------------------------------------------------------------
 
 dSetFilter:
-		lea	dZ80+SV_VolumeBank.l,a4	; load volume bank instructions address to a4
+		lea	dZ80+SV_VolumeBank,a4	; load volume bank instructions address to a4
 		moveq	#$74,d5			; prepare the "ld  (hl),h" instruction to d5
 	stopZ80					; wait for Z80 to stop
 ; ---------------------------------------------------------------------------

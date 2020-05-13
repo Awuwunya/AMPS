@@ -223,7 +223,7 @@ dPlaySnd_Music:
 		add.w	d1,d1			; quadruple music ID
 		add.w	d1,d1			; since each entry is 4 bytes in size
 		move.b	(a2,d1.w),d6		; load speed shoes tempo from the unused 8 bits into d6
-		movea.l	(a2,d1.w),a2		; get music header pointer from the table
+		move.l	(a2,d1.w),a2		; get music header pointer from the table
 
 	if safe=1
 		move.l	a2,d2			; copy pointer to d2
@@ -260,7 +260,7 @@ dPlaySnd_Music:
 		move.w	(a4)+,(a3)+		; back up data for every channel
 	endif
 
-		mvnbt.q	cfbInt, cfbVol, d3	; each other bit except interrupted and volume update bits
+		moveq	#$FF-(1<<cfbInt)|(1<<cfbVol),d3; each other bit except interrupted and volume update bits
 
 .ch =		mBackDAC1			; start at backup DAC1
 		rept Mus_Ch			; do for all music channels
@@ -311,7 +311,7 @@ dPlaySnd_Music:
 		moveq	#cSize,d6		; prepare channel size to d6
 		moveq	#1,d5			; prepare duration of 0 frames to d5
 
-		mvbit.q	cfbRun, cfbVol, d2	; prepare running tracker and volume flags into d2
+		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbVol),d2; prepare running tracker and volume flags into d2
 		moveq	#$FFFFFFC0,d1		; prepare panning value of centre to d1
 		move.w	#$100,d3		; prepare default DAC frequency to d3
 ; ---------------------------------------------------------------------------
@@ -354,7 +354,7 @@ dPlaySnd_Music:
 	endif
 
 		ext.w	d0			; convert byte to word (because of dbf)
-		mvbit.q	cfbRun, cfbRest, d2	; prepare running tracker and channel rest flags to d2
+		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbRest),d2; prepare running tracker and channel rest flags to d2
 
 .loopFM
 		move.b	d2,(a1)			; save channel flags
@@ -390,7 +390,7 @@ dPlaySnd_Music:
 		bmi.s	.finish			; if no PSG channels are loaded, branch
 	endif
 
-		mvbit.q	cfbRun, cfbVol, cfbRest, d2; prepare running tracker, resting and volume flags into d2
+		moveq	#$FFFFFF00|(1<<cfbRun)|(1<<cfbVol)|(1<<cfbRest),d2; prepare running tracker, resting and volume flags into d2
 		moveq	#2,d5			; prepare duration of 1 frames to d5
 		lea	dPSGtypeVals(pc),a4	; prepare PSG type value list into a4
 		lea	mPSG1.w,a1		; start from PSG1 channel
@@ -495,7 +495,7 @@ dPlaySnd_SFX:
 		lea	SoundIndex-(SFXoff*4)(pc),a1; get sfx pointer table with an offset to a1
 		add.w	d1,d1			; quadruple sfx ID
 		add.w	d1,d1			; since each entry is 4 bytes in size
-		movea.l	(a1,d1.w),a2		; get SFX header pointer from the table
+		move.l	(a1,d1.w),a2		; get SFX header pointer from the table
 ; ---------------------------------------------------------------------------
 ; This implements a system where the sound effect swaps every time its
 ; played. This in particular needed with Sonic 1 to 3K, where the ring SFX
@@ -508,7 +508,7 @@ dPlaySnd_SFX:
 		bchg	#mfbSwap,mFlags.w	; swap the flag and check if it was set
 		beq.s	.noswap			; if was not, do not swap sound effect
 		addq.w	#4,d1			; go to next SFX
-		movea.l	(a1,d1.w),a2		; get the next SFX pointer from the table
+		move.l	(a1,d1.w),a2		; get the next SFX pointer from the table
 
 .noswap
 	if safe=1
@@ -796,7 +796,7 @@ dPlaySnd_Stop:
 dStopMusic:
 		lea	mVctMus.w,a4		; load driver RAM start to a4
 		move.b	mMasterVolDAC.w,d5	; load DAC master volume to d5
-	dCLEAR_MEM	mChannelEnd-mVctMus, 32	; clear this block of memory with 32 byts per loop
+	dCLEAR_MEM	mChannelEnd-mVctMus, 32	; clear this block of memory with 32 bytes per loop
 
 	if safe=1
 		clr.b	msChktracker.w		; if in safe mode, also clear the check tracker variable!

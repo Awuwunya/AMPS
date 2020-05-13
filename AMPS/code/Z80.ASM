@@ -1737,8 +1737,8 @@ PCM_OverflwCalc:
 ; This SHOULD be at offset 1200 (Flood this space with FF's on 68k side...)
 ; ---------------------------------------------------------------------------
 
-YM_Buffer1 =		*
-YM_Buffer2 =		*+((02000h-*)/2)
+YM_Buffer1 =		offset(*)
+YM_Buffer2 =		offset(*)+((02000h-offset(*))/2)
 YM_BufferEnd =		02000h
 
 ; ===========================================================================
@@ -1746,14 +1746,14 @@ YM_BufferEnd =		02000h
 ; Warning stuff
 ; ---------------------------------------------------------------------------
 
-	if (PCM1_Switch)&0FFh>0F8h
+	if (offset(PCM1_Switch)&0FFh)>0F8h
 		inform 0," "
 		inform 0,"   Warning!  PCM1_Switch's instructions have crossed a boundary."
 		inform 0," "
 		inform 3," "
 	endif
 
-	if (PCM2_Switch)&0FFh>0F8h
+	if (offset(PCM2_Switch)&0FFh)>0F8h
 		inform 0," "
 		inform 0,"   Warning!  PCM2_Switch's instructions have crossed a boundary."
 		inform 0," "

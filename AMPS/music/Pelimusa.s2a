@@ -695,6 +695,7 @@ Pelimusa_FM5:
 
 Pelimusa_PSG1:
 	dc.b nRst, $01
+	sModEnv		mPeliBell2
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; PSG2: Kurzweil K2000
@@ -728,6 +729,7 @@ Pelimusa_PSG2:
 Pelimusa_PSG3_State =	-1
 Pelimusa_PSG3_Hat	macro	len
 	if Pelimusa_PSG3_State<>0
+		sModEnv		mNone
 		sNoisePSG	snWhitePSG3
 		ssVol		$00
 
@@ -743,6 +745,7 @@ Pelimusa_PSG3_State = 0
 
 Pelimusa_PSG3_Bell	macro	len
 	if Pelimusa_PSG3_State<>1
+		sModEnv		mPeliBell
 		sNoisePSG	snOff
 		ssVol		$30
 

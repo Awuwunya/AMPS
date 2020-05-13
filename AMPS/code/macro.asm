@@ -52,24 +52,24 @@ cFlags		rs.b 1		; various channel flags, see below
 cType		rs.b 1		; hardware type for the channel
 cData		rs.l 1		; tracker address for the channel
 	if FEATURE_DACFMVOLENV=0
-cEnvPos		rs.b 0		; volume envelope position. PSG only
+cEnvPos =	__rs		; volume envelope position. PSG only
 	endif
 cPanning	rs.b 1		; channel panning and LFO. FM and DAC only
-cDetune		rs.b 1		; frequency detune offset
+cDetune		rs.b 1		; frequency detune (offset)
 cPitch		rs.b 1		; pitch (transposition) offset
 cVolume		rs.b 1		; channel volume
 cTick		rs.b 1		; channel tick multiplier
 	if FEATURE_DACFMVOLENV=0
-cVolEnv		rs.b 0		; volume envelope ID. PSG only
+cVolEnv =	__rs		; volume envelope ID. PSG only
 	endif
-cSample		rs.b 0		; channel sample ID, DAC only
+cSample =	__rs		; channel sample ID, DAC only
 cVoice		rs.b 1		; YM2612 voice ID. FM only
 cDuration	rs.b 1		; current note duration
 cLastDur	rs.b 1		; last note duration
 cFreq		rs.w 1		; channel note frequency
 
 	if FEATURE_MODULATION
-cModDelay	rs.b 0		; delay before modulation starts
+cModDelay =	__rs		; delay before modulation starts
 cMod		rs.l 1		; modulation data address
 cModFreq	rs.w 1		; modulation frequency offset
 cModSpeed	rs.b 1		; number of frames til next modulation step
@@ -95,7 +95,8 @@ cModEnvSens	rs.b 1		; sensitivity of modulation envelope
 	endif
 
 cLoop		rs.b 3		; loop counter values
-cSizeSFX	rs.w 0		; size of each SFX track (this also sneakily makes sure the memory is aligned to word always. Additional loop counter may be added if last byte is odd byte)
+		rs.w 0
+cSizeSFX =	__rs		; size of each SFX track (this also sneakily makes sure the memory is aligned to word always. Additional loop counter may be added if last byte is odd byte)
 cPrio =		__rs-1		; sound effect channel priority. SFX only
 
 	if FEATURE_DACFMVOLENV
@@ -110,14 +111,15 @@ cGateMain	rs.b 1		; amount of frames for gate effect. Music only
 cStack		rs.b 1		; channel stack pointer. Music only
 		rs.b 1		; unused. Music only
 		rs.l 3		; channel stack data. Music only
-cSize		rs.w 0		; size of each music track
+		rs.w 0
+cSize =		__rs		; size of each music track
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Bits for cFlags
 ; ---------------------------------------------------------------------------
 
 	rsset 0
-cfbMode		rs.b 0		; set if in pitch mode, clear if in sample mode. DAC only
+cfbMode =	__rs		; set if in pitch mode, clear if in sample mode. DAC only
 cfbRest		rs.b 1		; set if channel is resting. FM and PSG only
 cfbInt		rs.b 1		; set if interrupted by SFX. Music only
 cfbHold		rs.b 1		; set if note is being held
@@ -193,11 +195,11 @@ sr3 =		$0040		; 1 Quarter sample rate	3500 Hz
 dZ80 =		$A00000		; quick reference to Z80 RAM
 dPSG =		$C00011		; quick reference to PSG port
 
-	rsset $FFFFF000		; insert your sound driver RAM address here!
+	rsset Drvmem		; insert your sound driver RAM address here!
 mFlags		rs.b 1		; various driver flags, see below
 mCtrPal		rs.b 1		; frame counter fo 50hz fix
 mComm		rs.b 8		; communications bytes
-mMasterVolFM	rs.b 0		; master volume for FM channels
+mMasterVolFM =	__rs		; master volume for FM channels
 mFadeAddr	rs.l 1		; fading program address
 mTempoMain	rs.b 1		; music normal tempo
 mTempoSpeed	rs.b 1		; music speed shoes tempo
@@ -211,10 +213,10 @@ mSpindash	rs.b 1		; spindash rev counter
 mContCtr	rs.b 1		; continous sfx loop counter
 mContLast	rs.b 1		; last continous sfx played
 mLastCue	rs.b 1		; last YM Cue the sound driver was accessing
-		rs.w 0		; align channel data
+		rs.w 0
 ; ---------------------------------------------------------------------------
 
-mBackUpArea	rs.b 0		; this is where the area to be backed up starts
+mBackUpArea =	__rs		; this is where the area to be backed up starts
 mDAC1		rs.b cSize	; DAC 1 data
 mDAC2		rs.b cSize	; DAC 2 data
 mFM1		rs.b cSize	; FM 1 data
@@ -235,11 +237,11 @@ mSFXFM5		rs.b cSizeSFX	; SFX FM 5 data
 mSFXPSG1	rs.b cSizeSFX	; SFX PSG 1 data
 mSFXPSG2	rs.b cSizeSFX	; SFX PSG 2 data
 mSFXPSG3	rs.b cSizeSFX	; SFX PSG 3 data
-mChannelEnd	rs.w 0		; used to determine where channel RAM ends
+mChannelEnd =	__rs		; used to determine where channel RAM ends
 ; ---------------------------------------------------------------------------
 
 	if FEATURE_BACKUP
-mBackUpLoc	rs.b 0		; this is where the area for loading a backed up song starts
+mBackUpLoc =	__rs		; this is where the area for loading a backed up song starts
 mBackDAC1	rs.b cSize	; back-up DAC 1 data
 mBackDAC2	rs.b cSize	; back-up DAC 2 data
 mBackFM1	rs.b cSize	; back-up FM 1 data
@@ -265,7 +267,8 @@ mBackVctMus	rs.l 1		; back-up address of voice table for music
 	if safe=1
 msChktracker	rs.b 1		; safe mode only: If set, bring up debugger
 	endif
-mSize		rs.w 0		; end of the driver RAM
+		rs.w 0
+mSize =		__rs		; end of the driver RAM
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Bits for mFlags
@@ -295,7 +298,7 @@ Mus_OutWater	rs.b 1		; disable underwater mode
 Mus_Pause	rs.b 1		; pause the music
 Mus_Unpause	rs.b 1		; unpause the music
 Mus_StopSFX	rs.b 1		; stop all sfx
-MusOff		rs.b 0		; first music ID
+MusOff =	__rs		; first music ID
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Condition modes
@@ -306,9 +309,9 @@ dcoT		rs.b 1		; condition T	; True
 dcoF		rs.b 1		; condition F	; False
 dcoHI		rs.b 1		; condition HI	; HIgher (unsigned)
 dcoLS		rs.b 1		; condition LS	; Less or Same (unsigned)
-dcoHS		rs.b 0		; condition HS	; Higher or Sane (unsigned)
+dcoHS =		__rs		; condition HS	; Higher or Sane (unsigned)
 dcoCC		rs.b 1		; condition CC	; Carry Clear (unsigned)
-dcoLO		rs.b 0		; condition LO	; LOwer (unsigned)
+dcoLO =		__rs		; condition LO	; LOwer (unsigned)
 dcoCS		rs.b 1		; condition CS	; Carry Set (unsigned)
 dcoNE		rs.b 1		; condition NE	; Not Equal
 dcoEQ		rs.b 1		; condition EQ	; EQual
@@ -334,7 +337,7 @@ eStop		rs.w 1		; 86 - Stop current note and envelope
 ; these next ones are only valid for modulation envelopes. These are ignored for volume envelopes.
 esSens		rs.w 1		; 88 - Set the sensitivity of the modulation envelope
 eaSens		rs.w 1		; 8A - Add to the sensitivity of the modulation envelope
-eLast		rs.w 0		; safe mode equate
+eLast =		__rs		; safe mode equate
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Fade out end commands
@@ -345,54 +348,7 @@ fEnd		rs.l 1		; 80 - Do nothing
 fStop		rs.l 1		; 84 - Stop all music
 fResVol		rs.l 1		; 88 - Reset volume and update
 fReset		rs.l 1		; 8C - Stop music playing and reset volume
-fLast		rs.l 0		; safe mode equate
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Enable multiple flags in target ea mode
-; ---------------------------------------------------------------------------
-
-mvbit		macro bits
-	local res			; local variable to hold result in
-res =	0
-
-	rept narg-1			; repeat for all bits
-res =		res|(1<<\bits)		; or the value of the bit
-	shift
-	endr
-
-	if ("\0"<>"q")&("\0"<>"Q")	; check for moveq
-		move.\0	#res,\bits	; save instruction
-	else
-		if res>$80		; fix for moveq bug
-res =			res|$FFFFFF00	; must be negative value
-		endif
-
-		moveq	#res,\bits	; moveq version
-	endif
-    endm
-; ---------------------------------------------------------------------------
-
-mvnbt		macro bits
-	local res			; local variable to hold result in
-res =	0
-
-	rept narg-1			; repeat for all bits
-res =		res|(1<<\bits)		; or the value of the bit
-	shift
-	endr
-
-	if ("\0"<>"q")&("\0"<>"Q")	; check for moveq
-		move.\0	#~res,\bits	; save instruction
-	else
-res =		(~res)&$FF		; not result but keep it in 8bits
-
-		if res>$80		; fix for moveq bug
-res =			res|$FFFFFF00	; must be negative value
-		endif
-
-		moveq	#res,\bits	; moveq version
-	endif
-    endm
+fLast =		__rs		; safe mode equate
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Quickly clear some memory in certain block sizes
@@ -410,11 +366,11 @@ res =			res|$FFFFFF00	; must be negative value
 dCLEAR_MEM	macro len, block
 		move.w	#((\len)/(\block))-1,d6; load repeat count to d6
 
-.c\@
+.loop\@
 	rept (\block)/4
 		clr.l	(a4)+		; clear driver and music channel memory
 	endr
-		dbf	d6, .c\@	; loop for each longword to clear it
+		dbf	d6, .loop\@	; loop for each longword to clear it
 
 	rept ((\len)%(\block))/4
 		clr.l	(a4)+		; clear extra longs of memory
@@ -445,19 +401,19 @@ dREAD_WORD	macro areg, dreg
 ; ---------------------------------------------------------------------------
 
 dCALC_BANK	macro off
-	lea	VoiceBank+off(pc),a4	; load sound effects voice table into a6
+	lea	VoiceBank+\off(pc),a4	; load sound effects voice table into a6
 	cmp.w	#mSFXDAC1,a1		; check if this is a SFX channel
 	bhs.s	.bank			; if so, branch
 	move.l	mVctMus.w,a4		; load music voice table into a1
 
 	if \off<>0
-		add.w	#off,a4		; add offset into a1
+		add.w	#\off,a4	; add offset into a1
 	endif
 .bank
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
-; used to calculate the address of the FM voice
+; Used to calculate the address of the FM voice
 ;
 ; input:
 ;   d4 - Voice ID
@@ -499,8 +455,8 @@ startZ80 	macro
 ; Initializes YM writes
 ;
 ; output:
-;  d6 - YM part
-;  d5 - channel type
+;   d6 - YM part
+;   d5 - channel type
 ; ---------------------------------------------------------------------------
 
 InitChYM	macro
@@ -583,7 +539,7 @@ AMPS_MUSUNPAUSE	macro			; enable request unpause flag
 ; ---------------------------------------------------------------------------
 
 volenv		macro name
-	rept narg			; repeate for all arguments
+	rept narg			; repeat for all arguments
 v\name =	__venv			; create SMPS2ASM equate
 		dc.l vd\name		; create pointer
 __venv =	__venv+1		; increase ID
@@ -625,13 +581,14 @@ SWFR_\file 	dcb.b Z80E_Read*(MaxPitch/$100),$00; add end markers (for Dual PCM)
 ; ---------------------------------------------------------------------------
 
 sample		macro freq, start, loop, name
-	if narg=4			; if we have 4 arguments, we'd like a custom name
-d\name =	__samp			; use the extra argument to create SMPS2ASM equate
+	if narg>3			; if we have 4 arguments, we'd like a custom name
+d\name equ	__samp			; use the extra argument to create SMPS2ASM equate
 	else
-d\start =	__samp			; else, use the first one!
+d\start equ	__samp			; else, use the first one!
 	endif
 
 __samp =	__samp+1		; increase sample ID
+
 ; create offsets for the sample normal, reverse, loop normal, loop reverse.
 	if strcmp("\start","Stop")|strcmp("\start","STOP")|strcmp("\start","stop")
 		dcb.b 6, 0

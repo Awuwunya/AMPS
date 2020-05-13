@@ -70,7 +70,8 @@ __sfx =		SFXoff
 ; ---------------------------------------------------------------------------
 
 SoundIndex:
-	ptrSFX	0, RingRight, RingLeft
+	ptrSFX	$01, RingRight
+	ptrSFX	0, RingLeft
 
 SFXcount =	__sfx-SFXoff		; number of intalled sound effects
 SFXlast =	__sfx
@@ -270,13 +271,20 @@ mNone =		$00
 __menv =	$01
 
 ModEnvs:
-	modenv Test
+	modenv Test, PeliBell, PeliBell2
 ModEnvs_End:
 ; ---------------------------------------------------------------------------
 
 	if FEATURE_MODENV
 ; just testin'
-mdTest:		dc.b $08, eaSens, $01, eLoop, $00
+mdTest:		dc.b  $08, eaSens, $01, eLoop, $00
+
+; bell for Pelimusa
+mdPeliBell:	dc.b  $00, $00, $02, $02, $02, $02
+		dc.b  $00,-$02,-$02,-$02, $00, $00, eHold
+
+mdPeliBell2:	dc.b  $00, $00, $00, $01, $01, $00
+		dc.b  $00,-$01,-$01,-$00, $00, $00, eReset
 		even
 	endif
 ; ===========================================================================

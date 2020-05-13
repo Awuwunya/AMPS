@@ -34,7 +34,7 @@ dAMPSnextPSGSFX:
 
 	dGetFreqPSG				; get PSG frequency
 		move.b	(a2)+,d1		; check if next byte is a timer
-		bpl.s	.timer			; if yes, handle is
+		bpl.s	.timer			; if yes, handle it
 		subq.w	#1,a2			; else, undo the increment
 		bra.s	.pcnote			; do not calculate duration
 
@@ -252,9 +252,9 @@ dEnvelopePSG2:
 
 dUpdateVolPSG:
 		bclr	#cfbVol,(a1)		; clear volume update flag
-		btst	#cfbRest,(a1)		; is this channel resting
-		bne.s	locret_UpdVolPSG	; if is, do not update
 		btst	#cfbInt,(a1)		; is channel interrupted by sfx?
+		bne.s	locret_UpdVolPSG	; if is, do not update
+		btst	#cfbRest,(a1)		; is this channel resting
 		bne.s	locret_UpdVolPSG	; if is, do not update
 
 		btst	#cfbHold,(a1)		; check if note is held
@@ -278,7 +278,7 @@ dUpdateVolPSG:
 		lsr.b	#3,d1			; divide volume by 8
 		or.b	cType(a1),d1		; combine channel type value with volume
 		or.b	#$10,d1			; set volume update bit
-		move.b	d1,dPSG.l		; write volume command to PSG port
+		move.b	d1,dPSG			; write volume command to PSG port
 
 locret_UpdVolPSG:
 		rts
@@ -314,8 +314,8 @@ dFreqPSG:dc.w $03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03F7,$03BE,
 	dc.w  $00D6,$00C9,$00BE,$00B4,$00A9,$00A0,$0097,$008F,$0087,$007F,$0078,$0071; Octave 5 - (A5 - B0)
 	dc.w  $006B,$0065,$005F,$005A,$0055,$0050,$004B,$0047,$0043,$0040,$003C,$0039; Octave 6 - (B1 - BC)
 	dc.w  $0036,$0033,$0030,$002D,$002B,$0028,$0026,$0024,$0022,$0020,$001F,$001D; Octave 7 - (BD - C8)
-	dc.w  $001B,$001A,$0018,$0017,$0016,$0015,$0013,$0012,$0011		     ; Octave 8 - (B9 - D1)
-	dc.w  $0000								     ; Note (D2)
+	dc.w  $001B,$001A,$0018,$0017,$0016,$0015,$0013,$0012,$0011,$0010	     ; Octave 8 - (B9 - D2)
+	dc.w  $0000								     ; Note (D3)
 dFreqPSG_:
 
 	if safe=1				; in safe mode, we have extra debug data

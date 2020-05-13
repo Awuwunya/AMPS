@@ -5,6 +5,24 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<title>AMPS v2.0 TECHNICAL DOCUMENTATION</title>
 	<script>
+		function init(){
+			document.body.addEventListener("click", (e) => {
+				if(e.target && e.target.matches("a") && e.target.hash){
+					e.preventDefault();
+					document.documentElement.scrollTop = document.getElementById(e.target.hash.substring(1)).getBoundingClientRect().y + document.documentElement.scrollTop;
+					showmenu(false);
+
+					// delay a little to prevent browser bugs
+					setTimeout(() => {
+						window.location.hash = e.target.hash;
+					}, 500);
+				}
+			});
+
+			refRAM();
+			showmenu(true);
+		}
+
 		const chantbl = [
 			{ size: 1, align: 1, name: "cFlags", },
 			{ size: 1, align: 1, name: "cType", },
@@ -209,6 +227,18 @@
 		function uhvte(e){
 			document.getElementById(e).classList.remove("volhi");
 		}
+
+		var menustate = false;
+
+		function showmenu(state){
+			if(state === null){
+				menustate = !menustate;
+
+			} else menustate = state;
+
+			document.getElementById("mainarrow").classList[menustate ? "add" : "remove"]("hide");
+			document.getElementById("mainwrap").classList[menustate ? "add" : "remove"]("mainhide");
+		}
 	</script>
 	<link href="https://fonts.googleapis.com/css?family=Noto+Sans&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Rubik:400,700&display=swap" rel="stylesheet">
@@ -216,17 +246,87 @@
 	<link href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap" rel="stylesheet">
 	<style>
 		html {
-			background: black;
+			background: #131313;
 			color: #C2C2C2;
 			padding: 1vh 2vw;
+			overflow-x: hidden;
+			scroll-behavior: smooth;
+			text-rendering: optimizeLegibility;
 		}
 
 		body {
+			margin: 0;
+		}
+
+		main {
 			background: #232323;
 			border: .16vw solid gray;
 			border-radius: 2vw;
 			margin: auto;
 			padding: 2vw;
+		}
+
+		#mainwrap {
+			width: 100%;
+			margin-left: 0;
+			transition: margin-left .5s ease-in-out;
+			position: relative;
+			z-index: 1;
+			box-shadow: -10px -10px 57px 40px black;
+			background: rgba(0,0,0,.95);
+		}
+
+		.mainhide {
+			margin-left: 50% !important;
+		}
+
+		#mainarrow {
+			position: fixed;
+			z-index: 10;
+			font: 3.5vw 'Noto Sans', sans-serif;
+			border: .15vw solid rgba(128,128,128,.5);
+			background: rgba(128,128,128,.7);
+			border-radius: 50%;
+			width: 5vw;
+			height: 5vw;
+			bottom: 1vw;
+			left: 1vw;
+			outline: 0;
+			padding: 0;
+			cursor: pointer;
+			transition: background-color .5s ease-in-out, border-color .5s ease-in-out, left .5s ease-in-out;
+		}
+
+		#mainarrow:hover {
+			background: rgba(144,144,144,.9);
+			border-color: rgba(192,192,192,.5);
+		}
+
+		#mainarrow:active {
+			background: rgba(255,144,144,1);
+			border-color: rgba(255,176,176,1);
+			transition: background-color 0s ease-in-out, border-color 0s ease-in-out;
+		}
+
+		#mainarrow:hover > svg, #mainarrow:active > svg {
+			opacity: 1;
+		}
+
+		#mainarrow > svg {
+			width: 70%;
+			height: 70%;
+			margin: 15%;
+			opacity: .6;
+			transform: rotate(180deg);
+			transition: transform .5s ease-in-out, opacity .5s ease-in-out;
+		}
+
+		#mainarrow.hide > svg {
+			transform: rotate(0deg);
+		}
+
+		#mainarrow.hide {
+			left: 43% !important;
 		}
 
 		img {
@@ -267,6 +367,14 @@
 		p > a:active, li > a:active, td > a:active {
 			color: #b57e79;
 			text-decoration: underline;
+		}
+
+		nav {
+			padding-left: .8vw;
+			height: 100%;
+			position: fixed;
+			z-index: 0;
+			top: 0;
 		}
 
 		tblcnt {
@@ -443,6 +551,7 @@
 
 		asm > math {
 			color: #FFC273;
+			display: inline-block;
 		}
 
 		asm > str {
@@ -517,9 +626,25 @@
 		}
 
 		@media screen and (max-width: 800px){
-			body {
+			main {
 				border: .2vw solid gray;
 				border-radius: 2.2vw;
+			}
+
+			.mainhide {
+				margin-left: 60% !important;
+			}
+
+			#mainarrow.hide {
+				left: 52% !important;
+			}
+
+			#mainarrow {
+				border-width: .22vw;
+				width: 6vw;
+				height: 6vw;
+				bottom: 1.2vw;
+				left: 1.2vw;
 			}
 
 			tblcnt {
@@ -625,12 +750,29 @@
 		@media screen and (max-width: 600px){
 			html {
 				padding: 0;
+				text-rendering: optimizeSpeed;
 			}
 
-			body {
+			main {
 				border: .2vw solid gray;
 				border-radius: 0;
 				padding: 1vw;
+			}
+
+			.mainhide {
+				margin-left: 65% !important;
+			}
+
+			#mainarrow.hide {
+				left: 56% !important;
+			}
+
+			#mainarrow {
+				border-width: .28vw;
+				width: 6.5vw;
+				height: 6.5vw;
+				bottom: 1.5vw;
+				left: 1.5vw;
 			}
 
 			tblcnt {
@@ -744,35 +886,45 @@
 		}
 	</style>
 </head>
-<body onload="refRAM();">
-	<h3 style='text-decoration: underline;'>AMPS v2.0 technical manual</h3>
-	<h1>Table of contents</h1>
-	<tblcnt><a href="#part1">1 — Introduction</a></tblcnt>
-	<tblcnt><a href="#part1_1">	1.1 — Undefined Behaviour</a></tblcnt>
-	<tblcnt><a href="#part2">2 — AMPS Overview</a></tblcnt>
-	<tblcnt><a href="#part3">3 — Sound System</a></tblcnt>
-	<tblcnt><a href="#part3_1">	3.1 — Music Files</a></tblcnt>
-	<tblcnt><a href="#part3_2">	3.2 — Sound Effect Files</a></tblcnt>
-	<tblcnt><a href="#part4">4 — Trackers</a></tblcnt>
-	<tblcnt><a href="#part4_1">	4.1 — Trackers Overview</a></tblcnt>
-	<tblcnt><a href="#part4_2">	4.2 — Tracker Commands</a></tblcnt>
-	<tblcnt><a href="#part4_3">	4.3 — SN76496</a></tblcnt>
-	<tblcnt><a href="#part4_4">	4.4 — YM2612</a></tblcnt>
-	<tblcnt><a href="#part4_5">	4.5 — Dual PCM</a></tblcnt>
-	<tblcnt><a href="#part5">5 — Frequency</a></tblcnt>
-	<tblcnt><a href="#part5_1">	5.1 — Modulation</a></tblcnt>
-	<tblcnt><a href="#part6">6 — Volume</a></tblcnt>
-	<tblcnt><a href="#part6_1">	6.1 — Channel Volumes</a></tblcnt>
-	<tblcnt><a href="#part6_2">	6.2 — Underwater mode</a></tblcnt>
-	<tblcnt><a href="#part6_3">	6.3 — Volume Fading</a></tblcnt>
-	<tblcnt><a href="#part7">7 — Envelopes</a></tblcnt>
-	<tblcnt><a href="#part8">8 — Communication Bytes</a></tblcnt>
-	<tblcnt><a href="#part9">9 — Memory Map</a></tblcnt>
-	<tblcnt><a href="#part10">10 — Creating Custom Music</a></tblcnt>
-	<tblcnt><a href="#part11">11 — Porting Music And Sound Effects</a></tblcnt>
-	<tblcnt><a href="#part12">12 — Installing AMPS</a></tblcnt>
-	<tblcnt><a href="#part13">13 — Frequent Questions & Answers</a></tblcnt>
-
+<body onload="init();">
+	<button id="mainarrow" onclick="showmenu(null)" aria-label="toggle table of contents">
+		<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><g><title>Layer 1</title><rect stroke="#fff" transform="rotate(45 118,171) " id="svg_2" height="24" width="150" y="159" x="43" stroke-width="0" fill="#ffffff"/><rect stroke="#fff" transform="rotate(-45 118,81) " id="svg_6" height="24" width="150" y="69" x="43" stroke-width="0" fill="#ffffff"/></g></svg>
+	</button>
+	<nav>
+		<h1>Table of contents</h1>
+		<tblcnt><a href="#part1">1 — Introduction</a></tblcnt>
+		<tblcnt><a href="#part1_1">	1.1 — Undefined Behaviour</a></tblcnt>
+		<tblcnt><a href="#part2">2 — AMPS Overview</a></tblcnt>
+		<tblcnt><a href="#part3">3 — Sound System</a></tblcnt>
+		<tblcnt><a href="#part3_1">	3.1 — Music Files</a></tblcnt>
+		<tblcnt><a href="#part3_2">	3.2 — Sound Effect Files</a></tblcnt>
+		<tblcnt><a href="#part4">4 — Trackers</a></tblcnt>
+		<tblcnt><a href="#part4_1">	4.1 — Trackers Overview</a></tblcnt>
+		<tblcnt><a href="#part4_2">	4.2 — Tracker Commands</a></tblcnt>
+		<tblcnt><a href="#part4_3">	4.3 — SN76496</a></tblcnt>
+		<tblcnt><a href="#part4_4">	4.4 — YM2612</a></tblcnt>
+		<tblcnt><a href="#part4_5">	4.5 — Dual PCM</a></tblcnt>
+		<tblcnt><a href="#part5">5 — Frequency</a></tblcnt>
+		<tblcnt><a href="#part5_1">	5.1 — Modulation</a></tblcnt>
+		<tblcnt><a href="#part6">6 — Volume</a></tblcnt>
+		<tblcnt><a href="#part6_1">	6.1 — Channel Volumes</a></tblcnt>
+		<tblcnt><a href="#part6_2">	6.2 — Underwater mode</a></tblcnt>
+		<tblcnt><a href="#part6_3">	6.3 — Volume Fading</a></tblcnt>
+		<tblcnt><a href="#part7">7 — Envelopes</a></tblcnt>
+		<tblcnt><a href="#part8">8 — Communication Bytes</a></tblcnt>
+		<tblcnt><a href="#part9">9 — Memory Map</a></tblcnt>
+		<tblcnt><a href="#part10">10 — Creating Custom Music</a></tblcnt>
+		<tblcnt><a href="#part11">11 — Porting Music And Sound Effects</a></tblcnt>
+		<tblcnt><a href="#part12">12 — Installing AMPS</a></tblcnt>
+		<tblcnt><a href="#part13">13 — Frequent Questions & Answers</a></tblcnt>
+		<tblcnt><a href="#part14">14 — Changelog</a></tblcnt>
+		<tblcnt><a href="#part14_1">	14.1 — AMPS v1.0</a></tblcnt>
+		<tblcnt><a href="#part14_2">	14.2 — AMPS v2.0</a></tblcnt>
+		<tblcnt><a href="#part14_3">	14.3 — AMPS v2.1</a></tblcnt>
+	</nav>
+<div id="mainwrap">
+<main>
+	<h1 style='text-decoration: underline;'>AMPS v2.0 technical manual</h1>
 	<h1 id="part1" class="bd">1 — Introduction</h1>
 	<p>
 		AMPS is a 68k-based, SMPS-like sound driver, designed to be used with ROM hacks and Sega Mega Drive software. Although similar to SMPS, AMPS is fundamentally different in many aspects. It is also heavily customized, RAM-efficient and cycle-efficient. AMPS is additionally powered by Dual PCM FlexEd, meaning that you can use 2 DAC sample channels with pitch and volume control. AMPS was designed to be a well-documented driver with a lot of capabilities so that the music created for the sound driver can sound better, and the program and music can interact with each other. To ensure this, AMPS has a very robust codebase built to allow future expansion and customized programming for program-specific circumstances.
@@ -1035,7 +1187,7 @@
 	</p>
 	<h4>$F0 — sModAMPS &lt;wait&gt; &lt;speed&gt; &lt;step&gt; &lt;count&gt;</h4>
 	<p>
-		Initializes software frequency modulation. Modulation is useful for creating an effect where frequency moves up and/or down repeatedly, which can be used either for detuning on instruments or for custom effects. They are often used for sound effects to make them sound interesting, realistic or fun. They are also use in music to create bigger immersion. Modulation in AMPS is slightly different from SMPS games, but in general it works similarly. The &lt;wait&gt; parameter delays the start of the modulation by that number of frames, where 0 frames means it starts immediately. &lt;speed&gt; is the number of frames to delay until the next step is executed. 0 frames is considered undefined behaviour. &lt;step&gt; is the frequency offset per step. Values are sign extended, so anything above $7F is a negative value. The resulting frequency offset is 16-bit and can also be negative. &lt;count&gt; is the number of steps to perform before negating the &lt;step&gt; parameter. 0 steps will behave as $100 steps. For a more in-depth explanation of the algorithm, <a href="#part5_1">see the next part</a>. This command is skipped when condition is false.
+		Updates software frequency modulation information. Modulation is useful for creating an effect where frequency moves up and/or down repeatedly, which can be used either for detuning on instruments or for custom effects. They are often used for sound effects to make them sound interesting, realistic or fun. They are also use in music to create bigger immersion. Modulation in AMPS is slightly different from SMPS games, but in general it works similarly. The &lt;wait&gt; parameter delays the start of the modulation by that number of frames, where 0 frames means it starts immediately. &lt;speed&gt; is the number of frames to delay until the next step is executed. 0 frames is considered invalid. &lt;step&gt; is the frequency offset per step. Values are sign extended, so anything above $7F is a negative value. The resulting frequency offset is 16-bit and can also be negative. &lt;count&gt; is the number of steps to perform before negating the &lt;step&gt; parameter. 0 steps will behave as infinite steps. For a more in-depth explanation of the algorithm, <a href="#part5_1">see the next part</a>. This command is skipped when condition is false.
 	</p>
 	<h4>$F1 — ssPortamento &lt;frames&gt;</h4>
 	<p>
@@ -1185,13 +1337,13 @@
 	<p>
 		Is used to play sound effects from tracker. The sound effect <b>&lt;id&gt;</b> will be placed in the first queue slot. Unless it is overridden before the next frame, it will be played.
 	</p>
-	<h4>$FF $28 — sFreqOn</h4>
+	<h4>$FF $28 — ssModFreq &lt;freq&gt;</h4>
 	<p>
-		Not implemented.
+		Sets modulation frequency offset to 16-bit value <b>&lt;freq&gt;</b>. This allows to make more interesting or complex modulation patterns.
 	</p>
-	<h4>$FF $2C — sFreqOff</h4>
+	<h4>$FF $2C — sModReset</h4>
 	<p>
-		Not implemented.
+		This command does the same as when note is played, where modulation parameters are loaded from the last sModAMPS command, and initialized. This is only really useful when notes are held, but this behaviour should be preserved, because as of v2.1, this does not happen in sModAMPS command anymore. This command replaces that behaviour.
 	</p>
 	<h4>$FF $30 — sSpecFM3</h4>
 	<p>
@@ -1246,7 +1398,7 @@
 <tr><td>3</td><td>$A5, $00D6</td><td>$A6, $00C9</td><td>$A7, $00BE</td><td>$A8, $00B4</td><td>$A9, $00A9</td><td>$AA, $00A0</td><td>$AB, $0097</td><td>$AC, $008F</td><td>$AD, $0087</td><td>$AE, $007F</td><td>$AF, $0078</td><td>$B0, $0071</td></tr>
 <tr><td>4</td><td>$B1, $006B</td><td>$B2, $0065</td><td>$B3, $005F</td><td>$B4, $005A</td><td>$B5, $0055</td><td>$B6, $0050</td><td>$B7, $004B</td><td>$B8, $0047</td><td>$B9, $0043</td><td>$BA, $0040</td><td>$BB, $003C</td><td>$BC, $0039</td></tr>
 <tr><td>5</td><td>$BD, $0036</td><td>$BE, $0033</td><td>$BF, $0030</td><td>$C0, $002D</td><td>$C1, $002B</td><td>$C2, $0028</td><td>$C3, $0026</td><td>$C4, $0024</td><td>$C5, $0022</td><td>$C6, $0020</td><td>$C7, $001F</td><td>$C8, $001D</td></tr>
-<tr><td>6</td><td>$C9, $001B</td><td>$CA, $001A</td><td>$CB, $0018</td><td>$CC, $0017</td><td>$CD, $0016</td><td>$CE, $0015</td><td>$CF, $0013</td><td>$D0, $0012</td><td>$D1, $0011</td><td>$D2, $0000</td><td colspan="2"></td></tr>
+<tr><td>6</td><td>$C9, $001B</td><td>$CA, $001A</td><td>$CB, $0018</td><td>$CC, $0017</td><td>$CD, $0016</td><td>$CE, $0015</td><td>$CF, $0013</td><td>$D0, $0012</td><td>$D1, $0011</td><td>$D2, $0010</td><td>$D3, $0000</td><td></td></tr>
 	</table>
 	<p>
 		Each of these notes can be converted to the following format: xy, where x is the identifier of the note (for example nEb), and y is the octave (for example 4). This would result in equate nEb4, which can directly be used in tracker. These note names are largely arbitrary and only theoretically correspond to real instruments. Indeed, many other sound drivers on the Mega Drive have different frequencies for the notes anyway. These frequencies and notes are heavily based on SMPS for consistency's sake, and for no real need to change them.
@@ -1368,16 +1520,16 @@
 
 	<h3 id="part5_1" class="bd">5.1 — Modulation</h3>
 	<p>
-		Software modulation in AMPS is similar but not quite the same to SMPS. In SMPS, the 68k versions and Z80 versions have a slightly different algorithm to each other, and AMPS is also slightly different in another way. The differences will be explained as I explain the algorithm. Modulation has 4 user-defined values: <b>wait</b>, <b>speed</b>, <b>step</b> & <b> count</b>. These help define the behaviour of the modulation process. There is also a flag that enables and disables modulation independent of setting it up, and can be controlled in tracker with sModOn and sModOff. These only set the state of the flag rather than modifying modulation data. Below is the explanation of the algorithm:
+		Software modulation in AMPS is similar but not quite the same to SMPS. In SMPS, the 68k versions and Z80 versions have a slightly different algorithm to each other, and AMPS is also slightly different in other ways. The differences will be noted as I explain the algorithm. Modulation has 4 user-defined values: <b>wait</b>, <b>speed</b>, <b>step</b> and <b>count</b>. These help define the behaviour of the modulation process. There is also a flag that enables and disables modulation independent of setting it up, and can be controlled in tracker with sModOn and sModOff. These only set the state of the flag rather than modifying modulation data. Additionally, sModReset will forcibly reset modulation parameters immediately. ssModFreq can be used to set modulation frequency offset to a specific value. Below is the explanation of the algorithm:
 	</p>
 	<p>
-		There can be some delay before the modulation starts. If <b>wait</b> is not 0, the modulation gets delayed by that many frames instead. The <b>speed</b> parameter defines how often modulation is stepped forwards. Value of $00 actually represents $100, and $01 is the minimum amount (gets stepped every frame). When a step occurs, <b>step</b> is added to the modulation frequency offset (which is later added to channel frequency!). This value is a signed 8-bit value, -$80 to $7F, and gets extended to a 16-bit value for the purposes of the frequency offsetting. This allows for a great dynamic frequency range with relatively little effort. There is also the <b>count</b> variable that is the number of steps. When modulation is initialized, this value is halved (rounded down) and set as the initial value. This allows the modulation to go back and forth around the channel frequency, however it doesn't have to. When the <b>count</b> is 0, the modulation speed is negated, and step counter is reloaded. This makes the frequency offset go backwards, to approximately the negative value of it.
-	</p>
-	<p>
-		There is also a trick many games use to make modulation only up/down. You can set <b>count</b> to $FF, in order to have enough steps to not run out of them. This results in a sequence where the <b>step</b> is never negated. If your note is very long, this might happen, but it's rarely going to be that long in any real situation. If the <b>count</b> parameter is $00, it will act as $100. However, at the same time, this is undefined behaviour as of writing this tutorial.
+		There can be some delay before the modulation starts. If <b>wait</b> is not 0, the modulation gets delayed by that many frames instead. The <b>speed</b> parameter defines how often modulation is stepped forwards. Value of $00 is invalid, and $01 is the minimum amount (gets stepped every frame). When a step occurs, <b>step</b> is added to the modulation frequency offset (which is later added to channel frequency!). This value is a signed 8-bit value, -$80 to $7F, and gets extended to a 16-bit value for the purposes of the frequency offset. This allows for a great dynamic frequency range with relatively little effort. There is also the <b>count</b> variable that is the number of steps. When modulation is initialized, this value is halved (rounded down) and set as the initial value. This allows the modulation to go back and forth around the channel frequency, however it doesn't have to. When the <b>count</b> is 0, the modulation speed is negated, and <b>step</b> is reloaded. This makes the frequency offset go backwards, to approximately the negative value of it. There is an exception, if <b>count</b> parameter has value of $00, <b>step</b> is not negated.
 	</p>
 	<p>
 		There are few interesting differences between SMPS versions and AMPS. In SMPS 68k, after the <b>count</b> parameter is reloaded, the rest of the modulation code is skipped. This includes decrementing the counter and processing frequency. This makes it so that the last step lasts 2 frames and the modulation is slightly longer. This can be simply fixed by adding 1 to the <b>count</b> parameter in your tracker code. SMPS Z80 is a bit more difficult. For some odd reason, it decrements modulation step counter every frame (after modulation wait delay has passed), and therefore can negate the direction even in the middle of the step. Also, the <b>step</b> parameter is therefore multiplied by the <b>speed</b> parameter. This is a problem particularly because its technically impossible to correctly recreate all modulation from SMPS Z80 games. In practice, this does not matter because you don't have to get the modulation matching 100% to be good enough.
+	</p>
+	<p>
+		There is also a difference between how SMPS Z80 and SMPS 68k handle modulation when note is held. If the sModAMPS command (or driver equivalent) is used, SMPS 68k will immediately reload modulation parameters, also resetting modulation frequency offset. SMPS Z80, and AMPS, do not do this, meaning that if sModAMPS, some values are reloaded and some are not. SMPS Z80 will not load any values, meaning that <b>wait</b> and <b>step</b> are ignored, <b>speed</b> and <b>count</b> are only reloaded when these values count down completely. In AMPS, <b>wait</b> and <b>step</b> are reloaded when the command is used. To help emulate SMPS 68k behaviour, sModReset can be used right after sModAMPS.
 	</p>
 
 
@@ -1687,10 +1839,13 @@
 	<ul>
 		<li>There are minor differences between frequency tables between 68k SMPS, Z80 SMPS and AMPS. Most of the time this does not matter but can lead to some unintended glitches.</li>
 		<li>In Z80 SMPS, playing a <b>note, rest, delay, delay</b> will play the note again at the last delay. In AMPS and 68k SMPS, rest will be played twice.</li>
-		<li>AMPS, 68k SMPS and Z80 SMPS all have different modulation algorithms.</li>
 		<li>Tick multiplier only affects delays in 68k SMPS and AMPS, but also affects gate in Z80 SMPS.</li>
+		<li>In SMPS 68k and SMPS Z80, volumes between $80 and $FF are treated as the maximum channel volume, while in AMPS is treated as a negative (minimum) volume.</li>
 		<li>Modulation envelope sensitivity is signed in AMPS and 68k SMPS, but unsigned in Z80 SMPS. Additionally, in AMPS and Z80 SMPS, the multiplier is from 1 to $100, while in 68k SMPS it is 0 to $FF.</li>
 		<li>The bit 7 (value greater than or equal to $80) is used to determine the slot operators for total level values in AMPS and Z80 SMPS, while in 68k SMPS uses another table to determine it.</li>
+		<li>AMPS, 68k SMPS and Z80 SMPS all have different modulation algorithms.</li>
+		<li>Modulation parameters are not reset in SMPS Z80, in AMPS only <b>&lt;wait&gt;</b> is reset, and in SMPS 68k all are reset when the modulation command (sModAMPS, ssMod68k or ssModZ80) is played. This makes a difference when modulation command is used when note is held. While normally, the parameters eventually get reset anyway, in SMPS 68k, they are also reset when note is held.</li>
+		<li>When <b>&lt;count&gt;</b> is $00 in AMPS, the length of modulation is infinite. The <b>&lt;count&gt;</b> is never negated, which makes the modulation only go in one direction.</li>
 	</ul>
 
 	<h1 id="part12" class="bd">12 — Installing AMPS</h1>
@@ -1780,5 +1935,32 @@
 	<p>
 		AMPS code is highly efficient, and therefore a lot of code is actually repeated multiple times in order to save on processor cycles. This means that a lot more ROM space is used to save on processor cycles. Additionally, Dual PCM requires data for volume tables, samples, the driver itself, and various other things in order to function efficiently. AMPS attempts to reduce on ROM space requirements at times, but rarely at the cost of extra processor cycles.
 	</p>
+
+	<h1 id="part14" class="bd">14 — Changelog</h1>
+	<p>
+		This section contains information about what changes were done between different AMPS and this document revisions. This should help users be informed regarding what differences there are between any release, such as for updating their AMPS release and navigating this document to see what changes they wish to learn about.
+	</p>
+	<h3 id="part14_1" class="bd">14.1 — AMPS v1.0</h3>
+	<p>
+		Initial AMPS release.
+	</p>
+	<h3 id="part14_2" class="bd">14.2 — AMPS v2.0</h3>
+	<p>
+		Second major AMPS release. Info to be added here.
+	</p>
+	<h3 id="part14_3" class="bd">14.3 — AMPS v2.1</h3>
+	<p>
+		Revision to AMPS v2.0. This change fixes various bugs, and changes the modulation algorithm to allow a bit more freedom for music creators, and to be (nearly) compatible with SMPS Z80. Here is a list of changes:
+	</p>
+	<ul>
+		<li>sFreqOn and sFreqOff are no longer tracker commands.</li>
+		<li>New tracker commands: ssModFreq and sModReset.</li>
+		<li>Changes to sModAMPS: Only the <b>&lt;wait&gt;</b> is loaded initially. This only makes a difference when note is held. The modulation parameters are not reset, which allows the user to change how modulation works mid-note without resetting the offset. In order for the old behaviour to work, sModReset can be used after sModAMPS is used. The <b>&lt;count&gt;</b> is also changed. Now, the value is subtracted before being checked, meaning value of $00 will correctly not start by negating the <b>&lt;step&gt;</b>. Additionally, now it is treated as infinite, meaning modulation up and down is possible for unlimited time. If <b>&lt;count&gt;</b> is $01, the value initially is set to $01 instead of $00, making short modulations still possible.</li>
+		<li>Fixed a bug where DAC panning was not reset correctly for music channels, leading to issues with panning.</li>
+		<li>Fixed a bug with modulation envelopes not working as intended.</li>
+		<li>Added a new PSG frequency to match the PSG table exactly with SMPS Z80.</li>
+	</ul>
+</main>
+</div>
 </body>
 </html>

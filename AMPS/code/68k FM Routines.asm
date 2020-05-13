@@ -233,7 +233,7 @@ dAMPSnextFMSFX:
 		jsr	dUpdateVolFM_SFX(pc)	; update FM volume
 
 .next
-		dbf	d0,dAMPSnextFMSFX	; make sure to run all the channels
+		dbf	d0,dAMPSnextFMSFX	; make sure to run all the FM SFX channels
 		jmp	dAMPSdoPSGSFX(pc)	; after that, process SFX PSG channels
 ; ---------------------------------------------------------------------------
 
@@ -267,7 +267,7 @@ dAMPSnextFMSFX:
 		jsr	dUpdateVolFM_SFX(pc)	; update FM volume
 
 .noupdate
-		dbf	d0,dAMPSnextFMSFX	; make sure to run all the channels
+		dbf	d0,dAMPSnextFMSFX	; make sure to run all the FM SFX channels
 		jmp	dAMPSdoPSGSFX(pc)	; after that, process SFX PSG channels
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -296,7 +296,7 @@ dAMPSnextFM:
 		jsr	dUpdateVolFM(pc)	; update FM volume
 
 .next
-		dbf	d0,dAMPSnextFM		; make sure to run all the channels
+		dbf	d0,dAMPSnextFM		; make sure to run all the music FM channels
 		jmp	dAMPSdoPSG(pc)		; after that, process music PSG channels
 ; ---------------------------------------------------------------------------
 
@@ -330,7 +330,7 @@ dAMPSnextFM:
 		jsr	dUpdateVolFM(pc)	; update FM volume
 
 .noupdate
-		dbf	d0,dAMPSnextFM		; make sure to run all the channels
+		dbf	d0,dAMPSnextFM		; make sure to run all the music FM channels
 		jmp	dAMPSdoPSG(pc)		; after that, process music PSG channels
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

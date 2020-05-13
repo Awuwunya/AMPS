@@ -152,16 +152,16 @@ SmoothCriminal_Loop1:
 	dc.b nBb2, $06
 	sModOff
 	dc.b nBb2, $03, nBb2, nAb2, nBb2, nC3, $06
-	sModAMPS	$01, $01, $03, $04
+	sModAMPS	$01, $01, $03, $03
 	dc.b nC3
 	sModOff
 	dc.b nRst, nBb2, $03, nC3, nCs3, $06
-	sModAMPS	$01, $01, $03, $04
+	sModAMPS	$01, $01, $03, $03
 	dc.b nCs3
 	sModOff
 	dc.b nRst, nC3, $03, nCs3, nB2, $01, sHold, nC3
 	dc.b $05
-	sModAMPS	$01, $01, $04, $04
+	sModAMPS	$01, $01, $04, $03
 	dc.b nAb2, $08
 	sModOff
 	dc.b nRst, $04, nRst, $06
@@ -170,23 +170,23 @@ SmoothCriminal_Loop2:
 	sCall		SmoothCriminal_Call2
 	sLoop		$00, $03, SmoothCriminal_Loop2
 	dc.b nBb2, $03, nBb2, nBb2, nF3
-	sModAMPS	$01, $01, $06, $04
+	sModAMPS	$01, $01, $06, $03
 	dc.b nEb3, $06
 	sModOff
 	dc.b nBb2, $06, nRst, $0C, nF3, $03, nF3, nF3
 	dc.b nF3
-	sModAMPS	$01, $01, $06, $04
+	sModAMPS	$01, $01, $06, $03
 	dc.b nAb3, $06
 	sModOff
 	dc.b nF3, $03, nRst, $09, nF3, $03, nF3
 	saVol		$FE
-	sModAMPS	$01, $01, $06, $04
+	sModAMPS	$01, $01, $06, $03
 	dc.b nAb3, $06
 	sModOff
 	saVol		$02
 	dc.b nF3, $03, nRst
 	saVol		$FE
-	sModAMPS	$01, $01, $06, $04
+	sModAMPS	$01, $01, $06, $03
 	dc.b nAb3, $06
 	sModOff
 	saVol		$02
@@ -215,16 +215,16 @@ SmoothCriminal_Call1:
 	dc.b nBb2, $06
 	sModOff
 	dc.b nBb2, $03, nBb2, nAb2, nBb2, nC3, $06
-	sModAMPS	$01, $01, $03, $04
+	sModAMPS	$01, $01, $03, $03
 	dc.b nC3
 	sModOff
 	dc.b nRst, nBb2, $03, nC3, nCs3, $06
-	sModAMPS	$01, $01, $03, $04
+	sModAMPS	$01, $01, $03, $03
 	dc.b nCs3
 	sModOff
 	dc.b nRst, nC3, $03, nCs3, nB2, $01, sHold, nC3
 	dc.b $05
-	sModAMPS	$01, $01, $04, $04
+	sModAMPS	$01, $01, $04, $03
 	dc.b nAb2, $08
 	sModOff
 	dc.b nRst, $04, nBb2, $06
@@ -232,12 +232,12 @@ SmoothCriminal_Call1:
 
 SmoothCriminal_Call2:
 	dc.b nBb2, $03, nBb2, nBb2, nF3
-	sModAMPS	$01, $01, $06, $04
+	sModAMPS	$01, $01, $06, $03
 	dc.b nEb3, $06
 	sModOff
 	dc.b nBb2, $06, nRst, $0C, nBb2, $03, nBb2, nBb2
 	dc.b nF3
-	sModAMPS	$01, $01, $06, $04
+	sModAMPS	$01, $01, $06, $03
 	dc.b nEb3, $06
 	sModOff
 	dc.b nBb2, nRst, nBb2, $03, nBb2, nC3, $03, nRst
@@ -246,7 +246,7 @@ SmoothCriminal_Call2:
 
 SmoothCriminal_Call3:
 	dc.b nRst, $0C, nF4, $03, nF4, nF4, nF4
-	sModAMPS	$00, $01, $06, $04
+	sModAMPS	$00, $01, $06, $03
 	sCall		SmoothCriminal_Call4
 	dc.b nRst, $06, nF4, $03, $03
 	sModOn
@@ -313,7 +313,7 @@ SmoothCriminal_Call5:
 	dc.b nEb3, $0A
 	sModOff
 	dc.b nRst, $02, nF3, $03, nF3
-	sModAMPS	$01, $01, $08, $04
+	sModAMPS	$01, $01, $08, $03
 	dc.b nE3, $01, sHold, nF3, $08
 	sModOff
 	dc.b $03, nEb3, $03, nCs3, nBb2, $06
@@ -390,7 +390,7 @@ SmoothCriminal_Loop6:
 	sVoice		$04
 	sPan		spLeft, $00
 	saVol		$0A
-	sModAMPS	$20, $01, $04, $05
+	sModAMPS	$20, $01, $04, $04
 	dc.b nBb3
 
 SmoothCriminal_Loop7:
@@ -402,7 +402,7 @@ SmoothCriminal_Loop7:
 	sPan		spCenter, $00
 	sVoice		$00
 	dc.b nRst, $0C, nCs5, $03, nCs5, nCs5, nCs5
-	sModAMPS	$01, $01, $06, $04
+	sModAMPS	$01, $01, $06, $03
 	dc.b nC5, $06
 	sModOff
 	dc.b nAb4, nRst, nBb4, $03, nC5
@@ -464,7 +464,7 @@ SmoothCriminal_Loop7:
 	sPan		spLeft, $00
 	sVoice		$04
 	saVol		$0A
-	sModAMPS	$20, $01, $04, $05
+	sModAMPS	$20, $01, $04, $04
 	dc.b nBb3, $06
 
 SmoothCriminal_Loop8:
@@ -497,7 +497,7 @@ SmoothCriminal_Loop10:
 	sVoice		$04
 	sPan		spCenter, $00
 	saVol		$0A
-	sModAMPS	$22, $01, $04, $05
+	sModAMPS	$22, $01, $04, $04
 	dc.b nCs3
 
 SmoothCriminal_Loop11:
@@ -509,7 +509,7 @@ SmoothCriminal_Loop11:
 	sVoice		$00
 	sPan		spCenter, $00
 	dc.b nRst, $0C, nBb4, $03, nBb4, nBb4, nBb4
-	sModAMPS	$02, $01, $06, $04
+	sModAMPS	$02, $01, $06, $03
 	dc.b nAb4, $06
 	sModOff
 	dc.b nEb4, nRst, nFs4, $03, nAb4
@@ -573,7 +573,7 @@ SmoothCriminal_Loop11:
 	sVoice		$04
 	sPan		spCenter, $00
 	saVol		$0A
-	sModAMPS	$22, $01, $04, $05
+	sModAMPS	$22, $01, $04, $04
 	dc.b nCs3, $06
 
 SmoothCriminal_Loop12:
@@ -605,7 +605,7 @@ SmoothCriminal_Loop13:
 	sVoice		$04
 	sPan		spRight, $00
 	saVol		$0A
-	sModAMPS	$24, $01, $04, $05
+	sModAMPS	$24, $01, $04, $04
 	dc.b nFs3
 
 SmoothCriminal_Loop14:
@@ -617,7 +617,7 @@ SmoothCriminal_Loop14:
 	sCall		SmoothCriminal_Call3
 	saVol		$0A
 	sVoice		$04
-	sModAMPS	$24, $01, $04, $05
+	sModAMPS	$24, $01, $04, $04
 	dc.b nFs3, $06
 
 SmoothCriminal_Loop15:
@@ -635,7 +635,7 @@ SmoothCriminal_PSG1:
 	dc.b nRst, $60, nRst
 
 SmoothCriminal_Loop16:
-	sModAMPS	$01, $01, $02, $04
+	sModAMPS	$01, $01, $02, $03
 	dc.b nRst, $18, nEb4, $06, nEb4, nRst, nRst, nF4
 	dc.b nF4, nRst, nRst, nEb4, nEb4, nRst, nCs4
 	sLoop		$00, $03, SmoothCriminal_Loop16
@@ -646,7 +646,7 @@ SmoothCriminal_Loop17:
 	dc.b sHold, $48, nC4, $0C, nBb3, $0C
 	sLoop		$00, $03, SmoothCriminal_Loop17
 	dc.b sHold, $30, nA3
-	sModAMPS	$08, $01, $03, $04
+	sModAMPS	$08, $01, $03, $03
 	saVol		-$10
 	dc.b nCs4, $18, nC4, nBb3, nC4, $12, nCs4, $1E
 	dc.b nC4, $18, nBb3, nA3, $12, nCs4, $1E, nC4
@@ -665,7 +665,7 @@ SmoothCriminal_PSG2:
 	dc.b nRst, $60, nRst
 
 SmoothCriminal_Loop19:
-	sModAMPS	$01, $01, $02, $04
+	sModAMPS	$01, $01, $02, $03
 	dc.b nRst, $18, nC4, $06, nC4, nRst, nRst, nCs4
 	dc.b nCs4, nRst, nRst, nC4, nC4, nRst, nCs3
 	sLoop		$00, $03, SmoothCriminal_Loop19
@@ -676,12 +676,12 @@ SmoothCriminal_Loop20:
 	dc.b sHold, $48, nAb3, $0C, nFs3, $0C
 	sLoop		$00, $03, SmoothCriminal_Loop20
 	dc.b sHold, $30, nF3
-	sModAMPS	$08, $01, $03, $04
+	sModAMPS	$08, $01, $03, $03
 	dc.b nBb3, $18, nAb3, nFs3, nAb3, $12, nBb3, $1E
 	dc.b nAb3, $18, nFs3, nF3, $12, nBb3, $1E, nAb3
 	dc.b $18, nFs3, nAb3, $12, nBb3, $1E, nAb3, $18
 	dc.b nFs3, nF3, $12
-	sModAMPS	$01, $01, $02, $04
+	sModAMPS	$01, $01, $02, $03
 	dc.b nFs3, $06
 
 SmoothCriminal_Loop21:

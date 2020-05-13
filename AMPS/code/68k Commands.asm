@@ -11,7 +11,6 @@
 dCommands:
 		add.b	d1,d1			; quadruple command ID
 		add.b	d1,d1			; since each entry is 4 bytes large
-
 		btst	#cfbCond,(a1)		; check if condition state
 		bne.w	.falsecomm		; branch if false
 		jmp	.comm-$80(pc,d1.w)	; jump to appropriate handler
@@ -80,8 +79,8 @@ dCommands:
 		bra.w	dcaTempo		; FF 1C - Add xx to music tempo (TEMPO - TEMPO_ADD)
 		bra.w	dcCondReg		; FF 20 - Get RAM table offset by y, and chk zz with cond x (COMM_CONDITION - COMM_SPEC)
 		bra.w	dcSound			; FF 24 - Play another music/sfx (SND_CMD)
-		bra.w	dcFreqOn		; FF 28 - Enable raw frequency mode (RAW_FREQ)
-		bra.w	dcFreqOff		; FF 2C - Disable raw frequency mode (RAW_FREQ - RAW_FREQ_OFF)
+		bra.w	dcsModFreq		; FF 28 - Set modulation frequency to xxxx (MOD_SET - MODS_FREQ)
+		bra.w	dcModReset		; FF 2C - Reset modulation data (MOD_SET - MODS_RESET)
 		bra.w	dcSpecFM3		; FF 30 - Enable FM3 special mode (SPC_FM3)
 		bra.w	dcFilter		; FF 34 - Set DAC filter bank. (DAC_FILTER)
 		bra.w	dcBackup		; FF 38 - Load the last song from back-up (FADE_IN_SONG)
@@ -247,7 +246,7 @@ dcsVolume:
 ; ---------------------------------------------------------------------------
 
 dcSampDAC:
-		move.w	#$100,cFreq(a1)		; reset to defualt base frequency
+		move.w	#$100,cFreq(a1)		; reset to default base frequency
 		bclr	#cfbMode,(a1)		; enable sample mode
 		rts
 ; ===========================================================================
@@ -575,11 +574,10 @@ dcPortamento:
 dcMod68K:
 	if FEATURE_MODULATION
 		move.l	a2,cMod(a1)		; set modulation data address
-		addq.w	#4,a2			; skip all the modulation data
+		addq.w	#2,a2			; skip all the modulation data
+		move.b	(a2)+,cModStep(a1)	; copy step offset
+		move.b	(a2)+,cModDelay(a1)	; copy delay
 	; continue to enabling modulation
-
-	elseif safe=1
-		AMPS_Debug_dcModulate		; display an error if disabled
 	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -590,15 +588,46 @@ dcModOn:
 	if FEATURE_MODULATION
 		bset	#cfbMod,(a1)		; enable modulation
 		rts
-
-	elseif safe=1
-		AMPS_Debug_dcModulate		; display an error if disabled
 	endif
 ; ---------------------------------------------------------------------------
 
 dcModOff:
 	if FEATURE_MODULATION
 		bclr	#cfbMod,(a1)		; disable modulation
+		rts
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Tracker command for setting modulation frequency
+; ---------------------------------------------------------------------------
+
+dcsModFreq:
+	if FEATURE_MODULATION
+		move.b	(a2)+,cModFreq(a1)	; load modulating frequency from tracker to channel
+		move.b	(a2)+,cModFreq+1(a1)	; ''
+		rts
+	endif
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; Tracker command for resetting modulation
+; ---------------------------------------------------------------------------
+
+dcModReset:
+	if FEATURE_MODULATION
+		move.l	cMod(a1),a4		; get modulation data address
+		clr.w	cModFreq(a1)		; clear frequency offset
+		move.b	(a4)+,cModSpeed(a1)	; copy speed
+
+		move.b	(a4)+,d4		; get number of steps
+		beq.s	.set			; branch if 0 specifically (otherwise this would cause a problem)
+		lsr.b	#1,d4			; halve it
+		bne.s	.set			; if result is not 0, branch
+		moveq	#1,d4			; use 1 is the initial count, not 0!
+
+.set
+		move.b	d4,cModCount(a1)	; save as the current number of steps
+		move.b	(a4)+,cModStep(a1)	; copy step offset
+		move.b	(a4)+,cModDelay(a1)	; copy delay
 		rts
 
 	elseif safe=1
@@ -613,28 +642,6 @@ dcSpecFM3:
 	if safe=1
 		AMPS_Debug_dcInvalid		; this is an invalid command
 	endif
-		rts
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Tracker command for enabling raw frequency mode
-; ---------------------------------------------------------------------------
-
-dcFreqOn:
-	if safe=1
-		AMPS_Debug_dcInvalid		; this is an invalid command
-	endif
-		rts
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; Tracker command for disabling raw frequency mode
-; ---------------------------------------------------------------------------
-
-dcFreqOff:
-	if safe=1
-		AMPS_Debug_dcInvalid		; this is an invalid command
-	endif
-
-locret_FreqOff:
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -821,6 +828,7 @@ dVoiceReg	macro	offset, reg
 	shift
 	endr
     endm
+; ---------------------------------------------------------------------------
 
 dUpdateVoiceFM:
 		move.l	a2,-(sp)		; save the tracker address to stack
@@ -829,6 +837,7 @@ dUpdateVoiceFM:
 
 		sub.w	#(VoiceRegs+1)*2,sp	; prepapre space in the stack
 		move.l	sp,a5			; copy pointer to the free space to a5
+
 		move.b	cType(a1),d2		; load channel type to d2
 		and.b	#3,d2			; keep in range
 
@@ -949,9 +958,19 @@ dUpdateVoiceFM:
 dcStop:
 		and.b	#$FF-(1<<cfbHold)-(1<<cfbRun),(a1); clear hold and running tracker flags
 	dStopChannel	0			; stop channel operation
-
 		cmpa.w	#mSFXFM3,a1		; check if this is a SFX channel
-		blo.s	.exit			; if not, skip all this
+		bhs.s	.sfx			; if yes, run SFX code
+
+		btst	#ctbDAC,cType(a1)	; check if the channel is a DAC channel
+		beq.s	.nodac			; if not, skip
+		clr.b	cPanning(a1)		; clear panning (required for DAC to work right)
+
+.nodac
+		addq.l	#2,(sp)			; go to next channel immediately (this skips a bra.s instruction)
+		rts
+; ---------------------------------------------------------------------------
+
+.sfx
 		clr.b	cPrio(a1)		; clear channel priority
 
 		lea	dSFXoverList(pc),a4	; load quick reference to the SFX override list to a4
@@ -973,7 +992,7 @@ dcStop:
 		btst	#ctbDAC,cType(a1)	; check if the channel is a DAC channel
 		bne.s	.fixch			; if yes, skip
 
-		bset	#cfbRest,(a1)		; Set channel resting flag
+		bset	#cfbRest,(a1)		; set channel resting flag
 		moveq	#0,d4
 		move.b	cVoice(a1),d4		; load FM voice ID of the channel to d4
 		jsr	dUpdateVoiceFM(pc)	; send FM voice for this channel
@@ -997,7 +1016,7 @@ dcStop:
 
 		cmp.b	#ctPSG4,cType(a4)	; check if this channel is in PSG4 mode
 		bne.s	.exit			; if not, skip
-		move.b	cStatPSG4(a4),dPSG.l	; update PSG4 status to PSG port
+		move.b	cStatPSG4(a4),dPSG	; update PSG4 status to PSG port
 		bra.s	.exit
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -1149,6 +1168,7 @@ dcCondCom:
 
 .false
 		bset	#cfbCond,(a1)		; set condition to false
+; ---------------------------------------------------------------------------
 
 .cond
 	rts			; T
