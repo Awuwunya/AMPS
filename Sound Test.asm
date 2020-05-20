@@ -35,19 +35,18 @@ SoundTest:
 
 		moveq	#$00,d0					; clear d0
 		lea	($FFFF0000).l,a1			; main RAM
-		move.w	#$FFF-1,d1				; set size of RAM
+		move.w	#$FFF0/$20-1,d1				; set size of RAM
 
 ST_ClearMain:
+	rept 8
 		move.l	d0,(a1)+				; clear RAM
-		move.l	d0,(a1)+				; ''
-		move.l	d0,(a1)+				; ''
-		move.l	d0,(a1)+				; ''
+	endr
 		dbf	d1,ST_ClearMain				; repeat til main RAM is clear
 
 	; --- Loading data ---
 
 		lea	(Pal_Sound).l,a0			; load palette data
-		lea	($FFFFFB80).w,a1			; load palette RAM
+		lea	($FFFFFB00).w,a1			; load palette RAM
 		moveq	#(((Pal_Sound_End-Pal_Sound)/4)/2)-1,d1	; set size of palette to laod
 
 ST_LoadPal:
@@ -90,14 +89,10 @@ ST_CopyMap:
 ST_LoadMapRow:
 		lea	(a1),a2					; load address to a2
 		lea	$80(a1),a1				; advance to next row for next pass
-		moveq	#($28/$08)-1,d1				; set number of tile maps to copy
 
-ST_LoadMapLine:
+	rept $28/2
 		move.l	(a0)+,(a2)+				; copy mappings to buffer
-		move.l	(a0)+,(a2)+				; ''
-		move.l	(a0)+,(a2)+				; ''
-		move.l	(a0)+,(a2)+				; ''
-		dbf	d1,ST_LoadMapLine			; repeat for entire row
+	endr
 		dbf	d2,ST_LoadMapRow			; repeat for all rows
 		bset.b	#$00,($FFFFA000).w			; set to redraw the plane
 		bsr.w	ST_SetupKeyColours			; setup the colour fades/variations for the keys
@@ -118,11 +113,7 @@ ST_LoadMapLine:
 		move.w	#$8100|%01110100,(a6)			; SDVM P100 - SMS mode (0N|1Y) | Display (0N|1Y) | V-Interrupt (0N|1Y) | DMA (0N|1Y) | V-resolution (0-1C|1-1E)
 		move.l	#VB_SoundTest,(VBlankRout).w		; set V-blank routine
 		move.b	#mus_Stop,mQueue.w			; set sound ID to "Stop music"
-
-		st.b	($FFFFF62A).w				; set 68k as ready
-	vsync							; wait for V-blank
 		jsr	SB_SoundTest				; rub subroutines
-		jsr	Pal_FadeTo				; fade in
 
 ; ---------------------------------------------------------------------------
 ; Main Loop - Sound Test

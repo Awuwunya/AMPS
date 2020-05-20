@@ -4,7 +4,9 @@
 ; ---------------------------------------------------------------------------
 
 Main		SECTION org(0)
-		opt l.
+	opt l.			; local label symbol is .
+	opt w-			; disable warnings
+
 Z80_Space =	$2000		; The amount of space reserved for Z80 driver. The compressor tool may ask you to increase the size...
 
 Drvmem =	$FFFFA480	; $4000	; sound driver memory location
@@ -273,7 +275,7 @@ GameProgram:
 		move.w	#$4EF9,HBlankRAM.w
 		move.l	#NullBlank,HBlankRout.w
 		jsr	LoadDualPCM			; load dual pcm
-		jmp	SoundTest
+		jmp	SoundTest(pc)
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
