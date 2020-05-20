@@ -7,6 +7,8 @@ SoundTest:
 	; --- Setup/clearing ---
 
 		move	#$2700,sr				; disable interrupts
+		move.l	#NullBlank,(HBlankRout).w		; set H-blank routine
+		move.l	#VB_SoundTest_NoHB,(VBlankRout).w	; set V-blank routine
 		lea	($C00000).l,a5				; load VDP data port
 		lea	$04(a5),a6				; load VDP control port
 		move.w	#$8000|%00000100,(a6)			; 00LH 01CD - Leftover SMS bar (0N|1Y) | H-Interrupt (0N|1Y) | H,V Counter (0N|1Y) | Disable video signal (0N|1Y)
@@ -53,31 +55,27 @@ ST_LoadPal:
 		move.l	(a0)+,(a1)+				; ''
 		dbf	d1,ST_LoadPal				; repeat until entire palette is loaded
 
-		move.l	#$40000000,($C00004).l			; set VRAM address to decompress to
-		lea	(Art_Piano).l,a0			; load art to decompress
-		jsr	NemDec					; decompress and dump
+	DMA	(Map_Piano-Art_Piano), Art_Piano, $40000000
+	DMA	(Art_End-Art_Extras), Art_Extras, $6C000002
+	DMA	(Art_Font-Art_Keys), Art_Keys, $50000002
+	DMA	(Map_Font-Art_Font), Art_Font, $58000002
 
-		move.l	#$50000002,($C00004).l			; set VRAM address to decompress to
-		lea	(Art_Keys).l,a0				; load art to decompress
-		jsr	NemDec					; decompress and dump
-
-		move.l	#$58000002,($C00004).l			; set VRAM address to decompress to
-		lea	(Art_Font).l,a0				; load art to decompress
-		jsr	NemDec					; decompress and dump
-
-		move.l	#$6C000002,($C00004).l			; set VRAM address to decompress to
-		lea	(Art_Extras).l,a0			; load art to decompress
-		jsr	NemDec					; decompress and dump
-
-		lea	(Map_Piano).l,a0			; load plane A map address
+		lea	Map_Piano,a0				; load plane A map address
 		lea	($FFFF6000).l,a1			; load map dumping area to a1
-		moveq	#$00,d0					; clear map add value
-		jsr	EniDec					; decompress and dump
+		move.w	#(Art_Keys-Map_Piano)/$10-1,d0		; clear map add value
+
+ST_CopyMap:
+	rept 4
+		move.l	(a0)+,(a1)+				; copy $10 bytes at once
+	endr
+		dbf	d0,ST_CopyMap				; loop until done
+
 		lea	($FFFF6000).l,a1			; load mappings
 		move.l	#$60000003,d0				; set VRAM address
 		moveq	#$28-1,d1				; set width
 		moveq	#$1C-1,d2				; set height
 		jsr	MapScreen				; load mappings to plane in VRAM
+
 		lea	($FFFF7220).l,a1			; load mappings of brighter bottom font bar area
 		moveq	#$28-1,d1				; set width
 		moveq	#$0F-1,d2				; set height
@@ -111,8 +109,6 @@ ST_LoadMapLine:
 		move.l	d0,($FFFFA030+4).w			; ''
 		move.w	#$0118,($FFFFA026).w			; set X position of text scroll
 		move.b	#$80,($FFFF9000+$0B).w			; set PCM1 and2 as already rendered (this'll force FM6 to render if no music is playing)
-		move.l	#NullBlank,(HBlankRout).w		; set H-blank routine
-		move.l	#VB_SoundTest_NoHB,(VBlankRout).w	; set V-blank routine
 
 		; reloading a5/a6 just in case...
 
@@ -122,6 +118,7 @@ ST_LoadMapLine:
 		move.w	#$8100|%01110100,(a6)			; SDVM P100 - SMS mode (0N|1Y) | Display (0N|1Y) | V-Interrupt (0N|1Y) | DMA (0N|1Y) | V-resolution (0-1C|1-1E)
 		move.l	#VB_SoundTest,(VBlankRout).w		; set V-blank routine
 		move.b	#mus_Stop,mQueue.w			; set sound ID to "Stop music"
+
 		st.b	($FFFFF62A).w				; set 68k as ready
 	vsync							; wait for V-blank
 		jsr	SB_SoundTest				; rub subroutines
@@ -139,7 +136,7 @@ ML_SoundTest:
 		tst.b	($FFFFF605).w				; has start been pressed?
 		bpl.s	ML_SoundTest				; if not, branch
 		move.l	#NullBlank,(HBlankRout).w		; set H-blank routine
-		move.l	#NullBlank,(VBlankRout).w			; set V-blank routine
+		move.l	#NullBlank,(VBlankRout).w		; set V-blank routine
 		move.b	#$04,($FFFFF600).w			; set game mode to 04 (Title Screen)
 		rts						; return
 
@@ -673,7 +670,9 @@ STC_BB_NoPlay:
 STC_Opt:	dc.l	STC_ST_Fade,	STC_Fade
 		dc.l	STC_ST_Tempo,	STC_Tempo
 		dc.l	STC_ST_Volume,	STC_Volume
+	if FEATURE_UNDERWATER
 		dc.l	STC_ST_UWater,	STC_UWater
+	endif
 		dc.l	STC_ST_Speed,	STC_Speed
 	;	dc.l	STC_ST_FM1,	STC_FM1
 	;	dc.l	STC_ST_FM2,	STC_FM2
@@ -688,9 +687,12 @@ STC_Opt:	dc.l	STC_ST_Fade,	STC_Fade
 	;	dc.l	STC_ST_PSG3,	STC_PSG3
 STC_Opt_End:
 
+	if FEATURE_UNDERWATER
+STC_ST_UWater:	dc.b	" a ON      < UNDERWATER >     OFF c ",$00
+	endif
+
 STC_ST_Tempo:	dc.b	" a UP      <  TEMPO  #1 >    DOWN c ",$00
 STC_ST_Volume:	dc.b	" a LOUD    <  VOLUME #2 >   QUIET c ",$00
-STC_ST_UWater:	dc.b	" a ON      < UNDERWATER >     OFF c ",$00
 STC_ST_Speed:	dc.b	" a ON      < SPEEDSHOES >     OFF c ",$00
 STC_ST_Fade:	dc.b	" a OR c   <  FADE OUT  >   a OR c ",$00
 STC_ST_FM1:	dc.b	" a OR c   < FM  1 MUTE >   a OR c ",$00
@@ -706,6 +708,7 @@ STC_ST_PSG2:	dc.b	" a OR c   < PSG 2 MUTE >   a OR c ",$00
 STC_ST_PSG3:	dc.b	" a OR c   < PSG 3 MUTE >   a OR c ",$00
 		even
 
+	if FEATURE_UNDERWATER
 	; --- Underwater mode ---
 
 STC_UWater:
@@ -717,6 +720,7 @@ STC_UWater:
 .b
 		move.b	#Mus_OutWater,mQueue+1.w		; remove underwater effect
 		rts
+	endif
 
 	; --- Speed shoes ---
 
@@ -1687,7 +1691,13 @@ STDP_NextRow:
 ST_BGMRAM:	dc.w mFM1, mFM2, mFM3, mFM4, mFM5		; FM
 		dc.w mDAC1, mDAC2				; DAC
 		dc.w mPSG1, mPSG2, mPSG3			; PSG
-ST_BGMFM6:	dc.w mFM6					; FM 6
+
+ST_BGMFM6:
+	if FEATURE_FM6
+		dc.w mFM6					; FM 6
+	else
+		dc.w $0000					; FM 6
+	endif
 
 ST_SFXRAM:	dc.w $0000, $0000, mSFXFM3, mSFXFM4, mSFXFM5	; SFX FM
 		dc.w mSFXDAC1, $0000				; SFX DAC
@@ -1833,22 +1843,23 @@ Pal_Sound:	incbin	"Data\Pal Piano.bin"
 		dc.w	$0000,$0000,$0000,$0000,$0000,$0000,$0000,$0000
 Pal_Sound_End:	even
 
-Art_Piano:	incbin	"Data\Art Piano.nem"
+Art_Piano:	incbin	"Data\Art Piano.unc"
 		even
-Map_Piano:	incbin	"Data\Map Piano.eni"
-		even
-
-Art_Keys:	incbin	"Data\Art Keys.nem"
+Map_Piano:	incbin	"Data\Map Piano.unc"
 		even
 
-Art_Font:	incbin	"Data\Art Font.nem"
+Art_Keys:	incbin	"Data\Art Keys.unc"
+		even
+
+Art_Font:	incbin	"Data\Art Font.unc"
 		even
 Map_Font:	incbin	"Data\Map Font.bin"
 		even
 
-Art_Extras:	incbin	"Data\Art Extras.nem"
+Art_Extras:	incbin	"Data\Art Extras.unc"
 		even
 
+Art_End:
 ; ===========================================================================
 
 

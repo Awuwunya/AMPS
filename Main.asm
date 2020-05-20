@@ -32,7 +32,7 @@ align		macro
 
 	; --- DMA to (a6) containing C00004 ---
 
-DMA:		macro	Size, Source, Destination
+DMA		macro	Size, Source, Destination
 	move.l	#(((((\Size/$02)<<$08)&$FF0000)+((\Size/$02)&$FF))+$94009300),(a6)
 	move.l	#((((((\Source&$FFFFFF)/$02)<<$08)&$FF0000)+(((\Source&$FFFFFF)/$02)&$FF))+$96009500),(a6)
 	move.l	#(((((\Source&$FFFFFF)/$02)&$7F0000)+$97000000)+((\Destination>>$10)&$FFFF)),(a6)
