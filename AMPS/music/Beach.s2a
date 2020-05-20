@@ -669,7 +669,7 @@ Beach_FM4_00:
 
 Beach_FM4_01:
 ;	ssVolBase	$06
-	sModAMPS	$10, $01, $02, $08
+	sModAMPS	$10, $01, $02, $07
 	dc.b nE5, $30, nF5, nF5, nG5, nE5, nF5, nG5
 	dc.b $18, nF5, nE5, $0C, nD5, nC5, $18
 	sRet
@@ -677,7 +677,7 @@ Beach_FM4_01:
 Beach_FM4_02:
 ;	ssVolBase	$00
 	saTranspose	$F4
-	sModAMPS	$20, $01, $02, $04
+	sModAMPS	$20, $01, $02, $03
 
 .loop	sGate		$08
 	dc.b nE5, $12, nG5, nE5, $0C, nF5, $12, nA5

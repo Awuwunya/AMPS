@@ -176,7 +176,7 @@ ColumnDive_Loop2:
 	sJump		ColumnDive_Loop1
 
 ColumnDive_FM3:
-	sModAMPS	$10, $01, $05, $05
+	sModAMPS	$10, $01, $05, $04
 	sVoice		$03
 	sPan		spLeft, $00
 	sCall		ColumnDrive_Call20
@@ -229,7 +229,7 @@ ColumnDrive_Call22:
 	sRet
 
 ColumnDive_FM5:
-	sModAMPS	$10, $01, $05, $05
+	sModAMPS	$10, $01, $05, $04
 	sVoice		$06
 	sPan		spCenter, $00
 	sCall		ColumnDrive_Call24
@@ -283,7 +283,7 @@ ColumnDive_FM4:
 
 ColumnDive_FM2:
 	sVoice		$02
-	sModAMPS	$10, $01, $05, $05
+	sModAMPS	$10, $01, $05, $04
 	dc.b nD5, $18, nG4, nC5, $08, nA4, sHold, nA4
 	dc.b $20, nRst, $08, nA4, $02, nBb4, $06, nA4
 	dc.b $08, nBb4, nG4, $18, nD5, $20, nF4, $08

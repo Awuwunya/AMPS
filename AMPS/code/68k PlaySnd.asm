@@ -260,7 +260,7 @@ dPlaySnd_Music:
 		move.w	(a4)+,(a3)+		; back up data for every channel
 	endif
 
-		moveq	#$FF-(1<<cfbInt)|(1<<cfbVol),d3; each other bit except interrupted and volume update bits
+		moveq	#$FFFFFFFF-(1<<cfbInt)|(1<<cfbVol),d3; each other bit except interrupted and volume update bits
 
 .ch =		mBackDAC1			; start at backup DAC1
 		rept Mus_Ch			; do for all music channels

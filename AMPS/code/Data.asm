@@ -4,7 +4,7 @@
 ; make it easier to debug built ROMs! If you would like easier
 ; assistance from Aurora, please keep this section intact!
 ; ---------------------------------------------------------------------------
-	dc.b "AMPS-v1.1"		; ident str
+	dc.b "AMPS-v2.1"		; ident str
 
 	if safe
 		dc.b "s"		; safe mode enabled
@@ -44,7 +44,6 @@
 	if FEATURE_BACKUP
 		dc.b "BA"		; backup enabled
 	endif
-
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define music and SFX
@@ -298,6 +297,9 @@ mdPeliBell2:	dc.b  $00, $00, $00, $01, $01, $00
 sfxaddr	incSFX				; include all sfx
 musaddr	incMus				; include all music
 musend
+
+dSoundNames:
+	allnames			; include all sound names in an array
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Include samples and filters

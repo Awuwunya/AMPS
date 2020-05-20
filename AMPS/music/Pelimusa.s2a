@@ -540,7 +540,7 @@ Pelimusa_FM3:
 
 .jousi	ssVol		$16
 	sVoice		pJousi
-	sModAMPS	$06, $01, $04, $02
+	sModAMPS	$06, $01, $04, $01
 	ssPortamento	$00
 
 .jousi2	dc.b nE5, $30
@@ -586,7 +586,7 @@ Pelimusa_FM34_Volume2	macro volume
 
 Pelimusa_FM3_Pattern8:
 	sVoice		pMelodia
-	sModAMPS	$01, $01, -$02, $08
+	sModAMPS	$01, $01, -$02, $07
 	ssPortamento	$00
 
 .loop	Pelimusa_FM34_Volume nA4, 64, 8, 32, 8, 48, 8, 32, 8
@@ -626,7 +626,7 @@ Pelimusa_FM4:
 
 .jousi	ssVol		$17
 	sVoice		pJousi
-	sModAMPS	$04, $01, $04, $03
+	sModAMPS	$04, $01, $04, $02
 	ssPortamento	$00
 
 .jousi2	dc.b nA4, $60
@@ -640,7 +640,7 @@ Pelimusa_FM4:
 
 Pelimusa_FM4_Pattern8:
 	sVoice		pMelodia
-	sModAMPS	$02, $01, -$03, $08
+	sModAMPS	$02, $01, -$03, $07
 	ssPortamento	$02
 
 .loop	dc.b nRst, $06
@@ -679,7 +679,7 @@ Pelimusa_FM5:
 	sJump		.loop
 ; ---------------------------------------------------------------------------
 
-.jousi	sModAMPS	$03, $01, $03, $02
+.jousi	sModAMPS	$03, $01, $03, $01
 	ssPortamento	$0A
 
 .jousi2	dc.b nC5, $60

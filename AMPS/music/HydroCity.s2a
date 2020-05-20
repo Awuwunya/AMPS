@@ -754,15 +754,15 @@ HCZ2_FM1:
 HCZ2_Jump7:
 	sVoice		$03
 	ssDetune	$FE
-	sModAMPS	$0F, $01, $06, $06
+	sModAMPS	$0F, $01, $06, $05
 	sCall		HCZ2_Call1
 	sVoice		$0E
 	ssDetune	$01
-	sModAMPS	$0F, $01, $06, $06
+	sModAMPS	$0F, $01, $06, $05
 	sCall		HCZ2_Call2
 	sVoice		$03
 	ssDetune	$FE
-	sModAMPS	$0F, $01, $06, $06
+	sModAMPS	$0F, $01, $06, $05
 	sCall		HCZ2_Call3
 	sJump		HCZ2_Jump7
 
@@ -861,7 +861,7 @@ HCZ2_FM2:
 HCZ2_Jump6:
 	sVoice		$15
 	ssDetune	$00
-	sModAMPS	$0F, $01, $06, $06
+	sModAMPS	$0F, $01, $06, $05
 	dc.b nC1, $0A, nRst, $02, nEb1, nRst, $04, nC1
 	dc.b $10, nRst, $02, nEb1, nRst, $04, nF1, nRst
 	dc.b $08, nEb1, $10, nRst, $02, nF1, $16, nRst
@@ -965,15 +965,15 @@ HCZ2_FM3:
 HCZ2_Jump5:
 	sVoice		$03
 	ssDetune	$02
-	sModAMPS	$0F, $01, $06, $06
+	sModAMPS	$0F, $01, $06, $05
 	sCall		HCZ2_Call1
 	sVoice		$0E
 	ssDetune	$FF
-	sModAMPS	$0F, $01, $06, $06
+	sModAMPS	$0F, $01, $06, $05
 	sCall		HCZ2_Call2
 	sVoice		$03
 	ssDetune	$02
-	sModAMPS	$0F, $01, $06, $06
+	sModAMPS	$0F, $01, $06, $05
 	sCall		HCZ2_Call3
 	sJump		HCZ2_Jump5
 
@@ -981,7 +981,7 @@ HCZ2_FM4:
 HCZ2_Jump4:
 	sVoice		$06
 	ssDetune	$01
-	sModAMPS	$0A, $01, $03, $06
+	sModAMPS	$0A, $01, $03, $05
 	dc.b nF3, $04, nRst, $08, nF3, $04, nRst, $0E
 	dc.b nF3, $04, nRst, $02, nF3, nRst, $04, nF3
 	dc.b $0A, nRst, $02, nF3, $0A, nRst, $02, nBb2
@@ -1100,7 +1100,7 @@ HCZ2_FM5:
 HCZ2_Jump3:
 	sVoice		$06
 	ssDetune	$FF
-	sModAMPS	$0A, $01, $03, $06
+	sModAMPS	$0A, $01, $03, $05
 	dc.b nBb2, $04, nRst, $08, nBb2, $04, nRst, $0E
 	dc.b nBb2, $04, nRst, $02, nBb2, nRst, $04, nBb2
 	dc.b $0A, nRst, $02, nBb2, $0A, nRst, $08, nBb2

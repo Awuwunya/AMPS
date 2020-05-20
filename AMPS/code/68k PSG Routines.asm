@@ -308,6 +308,7 @@ locret_MutePSG:
 ; Note to PSG frequency conversion table
 ; ---------------------------------------------------------------------------
 ;	dc.w	C     C#    D     Eb    E     F     F#    G     G#    A     Bb    B
+	dc.w  $0800	; <- added for sound test
 dFreqPSG:dc.w $03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03F7,$03BE,$0388; Octave 2 - (81 - 8C)
 	dc.w  $0356,$0326,$02F9,$02CE,$02A5,$0280,$025C,$023A,$021A,$01FB,$01DF,$01C4; Octave 3 - (8D - 98)
 	dc.w  $01AB,$0193,$017D,$0167,$0153,$0140,$012E,$011D,$010D,$00FE,$00EF,$00E2; Octave 4 - (99 - A4)
@@ -317,6 +318,7 @@ dFreqPSG:dc.w $03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03F7,$03BE,
 	dc.w  $001B,$001A,$0018,$0017,$0016,$0015,$0013,$0012,$0011,$0010	     ; Octave 8 - (B9 - D2)
 	dc.w  $0000								     ; Note (D3)
 dFreqPSG_:
+	dc.w  $F000	; <- added for sound test
 
 	if safe=1				; in safe mode, we have extra debug data
 .x =		$100|((dFreqPSG_-dFreqPSG)/2)	; to check if we played an invalid note
