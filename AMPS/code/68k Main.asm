@@ -252,9 +252,9 @@ dUpdateAllAMPS:
 .notempo
 		tst.b	mFadeAddr+1.w		; check if a fade program is already executing
 	if safe=1
-		beq.w	.chkregion		; branch if not
+		beq.w	.checkspeed		; branch if not
 	else
-		beq.s	.chkregion		; branch if not
+		beq.s	.checkspeed		; branch if not
 	endif
 
 		move.l	mFadeAddr.w,a4		; get the fade porogram address to a4
@@ -274,7 +274,7 @@ dUpdateAllAMPS:
 		lea	dFadeCommands(pc),a3	; load fade commands pointer table to a3
 		jsr	-$80(a3,d2.w)		; run the fade command code
 		clr.b	mFadeAddr+1.w		; mark the fade program as completed
-		bra.s	.chkregion		; go check the region
+		bra.s	.checkspeed		; go check the region
 ; ---------------------------------------------------------------------------
 
 .nofadeend
@@ -309,7 +309,7 @@ dUpdateAllAMPS:
 .fadepsg
 		move.b	(a4)+,d2		; get PSG volume byte from fade data
 		cmp.b	mMasterVolPSG.w,d2	; check if volume changed
-		beq.s	.chkregion		; if did not, branch
+		beq.s	.checkspeed		; if did not, branch
 		move.b	d2,mMasterVolPSG.w	; save new volume
 
 .ch =	mPSG1					; start at PSG1
@@ -326,23 +326,47 @@ dUpdateAllAMPS:
 		endr
 	endif
 ; ---------------------------------------------------------------------------
+; This piece of code is used to emulate the Sonic 3 & Knuckles speed
+; shoes tempo algorithm. While it used the counter method to handle
+; it, we can get the same effect with overflow method too. The game
+; would run the tracker twice per frame in order to speed up music,
+; instead of changing the tempo. This is more CPU intensive, but has
+; less limit to what is a valid tempo value for music.
+; ---------------------------------------------------------------------------
+
+.checkspeed
+		jsr	dAMPSdoSFX(pc)		; run SFX before anything
+
+		btst	#mfbSpeed,mFlags.w	; check speed shoes flag
+		beq.s	.chkregion		; if not enabled, branch
+
+	if TEMPO_ALGORITHM		; Counter method
+		subq.b	#1,mSpeedAcc.w		; sub 1 from counter
+		bne.s	.chkregion		; if nonzero, branch
+		move.b	mSpeed.w,mSpeedAcc.w	; copy tempo again
+
+	else				; Overflow method
+		move.b	mSpeed.w,d3		; get tempo to d3
+		add.b	d3,mSpeedAcc.w		; add to accumulator
+		bcc.s	.chkregion		; if carry clear, branch
+	endif
+
+		bset	#mfbRunTwice,mFlags.w	; enable run twice flag
+; ---------------------------------------------------------------------------
 ; Since PAL Mega Drive's run slower than NTSC, if we want the music to
 ; sound consistent, we need to run the sound driver 1.2 times as fast
 ; on PAL systems. This will cause issues with some songs that rely on
 ; game engine to seem "in sync". Because of that, I added a flag to
 ; disable the PAL fix (much like in Sonic 2's driver). Unlike the fix
 ; in SMPS drivers (and Sonic 3 and above), this fix will make the music
-; play at the exact right speed, instead of slightly too slow
+; play at the exact right speed, instead of slightly too slow.
 ; ---------------------------------------------------------------------------
 
 .chkregion
-		btst	#6,ConsoleRegion.w	; is this PAL system?
-		beq.s	.driver			; if not, branch
+		btst	#mfbNoPAL,mFlags.w	; check if we have disabled the PAL fix
+		bne.s	.driver			; if yes, skip
 		subq.b	#1,mCtrPal.w		; decrease PAL frame counter
 		bgt.s	.driver			; if hasn't become 0 (or lower!), branch
-
-		btst	#mfbNoPAL,mFlags.w	; check if we have disabled the PAL fix
-		bne.s	.nofix			; if yes, run music and SFX
 		bsr.s	.driver			; run the sound driver
 
 .nofix
@@ -361,19 +385,22 @@ dUpdateAllAMPS:
 ; really good for low values, as it provides very fine control over
 ; the tempo, but at high ranges it gets worse. Meanwhile the counter
 ; method isn't as good for small values, but for large value it works
-; better. You may choose this setting in the macro.asm file
+; better. You may choose this setting in the macro.asm file.
 ; ---------------------------------------------------------------------------
 
 	if TEMPO_ALGORITHM		; Counter method
-		subq.b	#1,mTempoCur.w		; sub 1 from counter
+		subq.b	#1,mTempoAcc.w		; sub 1 from counter
 		bne.s	dAMPSdoDAC		; if nonzero, branch
-		move.b	mTempo.w,mTempoCur.w	; copy tempo again
+		move.b	mTempo.w,mTempoAcc.w	; copy tempo again
 
 	else				; Overflow method
 		move.b	mTempo.w,d3		; get tempo to d3
-		add.b	d3,mTempoCur.w		; add to accumulator
+		add.b	d3,mTempoAcc.w		; add to accumulator
 		bcc.s	dAMPSdoDAC		; if carry clear, branch
 	endif
+
+		bclr	#mfbRunTwice,mFlags.w	; clear run twice flag
+		bne.s	dAMPSdoDAC		; if was set before, save a bit of time
 
 .ch =	mDAC1+cDuration				; start at DAC1 duration
 	rept Mus_Ch				; loop through all music channels

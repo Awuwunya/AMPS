@@ -23,7 +23,7 @@ dAMPSnextPSGSFX:
 
 .next
 		dbf	d0,dAMPSnextPSGSFX	; make sure to run all the channels
-		jmp	dCheckTracker(pc)	; after that, check tracker and end loop
+		rts
 ; ---------------------------------------------------------------------------
 
 .update
@@ -47,21 +47,6 @@ dAMPSnextPSGSFX:
 		bsr.w	dUpdateFreqPSG		; update hardware frequency
 		jsr	dEnvelopePSG_SFX(pc)	; run envelope program
 		dbf	d0,dAMPSnextPSGSFX	; make sure to run all the channels
-
-	; continue to check tracker and end loop
-; ===========================================================================
-; ---------------------------------------------------------------------------
-; End channel loop and check if tracker debugger should be opened
-; ---------------------------------------------------------------------------
-
-dCheckTracker:
-	if safe=1
-		tst.b	msChktracker.w		; check if tracker debugger flag was set
-		beq.s	.rts			; if not, skip
-		clr.b	msChktracker.w		; clear that flag
-		AMPS_Debug_ChkTracker		; run debugger
-	endif
-.rts
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -89,7 +74,7 @@ dAMPSnextPSG:
 
 .next
 		dbf	d0,dAMPSnextPSG		; make sure to run all the PSG channels
-		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
+		jmp	dCheckTracker(pc)	; after that, process SFX DAC channels
 ; ---------------------------------------------------------------------------
 
 .update
@@ -113,7 +98,25 @@ dAMPSnextPSG:
 		bsr.s	dUpdateFreqPSG		; update hardware frequency
 		jsr	dEnvelopePSG(pc)	; run envelope program
 		dbf	d0,dAMPSnextPSG		; make sure to run all the PSG channels
-		jmp	dAMPSdoDACSFX(pc)	; after that, process SFX DAC channels
+
+	; continue to check tracker and end loop
+; ===========================================================================
+; ---------------------------------------------------------------------------
+; End channel loop and check if tracker debugger should be opened
+; ---------------------------------------------------------------------------
+
+dCheckTracker:
+		bclr	#mfbRunTwice,mFlags.w	; clear run twice flag
+		bne.w	dAMPSdoDAC		; if was set before, run again
+
+	if safe=1
+		tst.b	msChktracker.w		; check if tracker debugger flag was set
+		beq.s	.rts			; if not, skip
+		clr.b	msChktracker.w		; clear that flag
+		AMPS_Debug_ChkTracker		; run debugger
+	endif
+.rts
+		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Write PSG frequency to hardware
@@ -157,6 +160,10 @@ dUpdateFreqPSG2:
 		bne.s	locret_UpdateFreqPSG	; if so, skip
 
 dUpdateFreqPSG3:
+	if FEATURE_SOUNDTEST
+		move.w	d2,cChipFreq(a1)	; save frequency to chip
+	endif
+
 		btst	#cfbRest,(a1)		; is this channel resting
 		bne.s	locret_UpdateFreqPSG	; if so, skip
 
@@ -275,6 +282,10 @@ dUpdateVolPSG:
 		lsr.b	#1,d1			; shift value down by 1 bit ($FF -> $7F)
 
 .nocap
+	if FEATURE_SOUNDTEST
+		move.b	d1,cChipVol(a1)		; save volume to chip
+	endif
+
 		lsr.b	#3,d1			; divide volume by 8
 		or.b	cType(a1),d1		; combine channel type value with volume
 		or.b	#$10,d1			; set volume update bit
@@ -307,8 +318,12 @@ locret_MutePSG:
 ; ---------------------------------------------------------------------------
 ; Note to PSG frequency conversion table
 ; ---------------------------------------------------------------------------
+
+	if FEATURE_SOUNDTEST
+		dc.w  $0800	; <- added for sound test
+	endif
+
 ;	dc.w	C     C#    D     Eb    E     F     F#    G     G#    A     Bb    B
-	dc.w  $0800	; <- added for sound test
 dFreqPSG:dc.w $03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03F7,$03BE,$0388; Octave 2 - (81 - 8C)
 	dc.w  $0356,$0326,$02F9,$02CE,$02A5,$0280,$025C,$023A,$021A,$01FB,$01DF,$01C4; Octave 3 - (8D - 98)
 	dc.w  $01AB,$0193,$017D,$0167,$0153,$0140,$012E,$011D,$010D,$00FE,$00EF,$00E2; Octave 4 - (99 - A4)
@@ -318,7 +333,10 @@ dFreqPSG:dc.w $03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03FF,$03F7,$03BE,
 	dc.w  $001B,$001A,$0018,$0017,$0016,$0015,$0013,$0012,$0011,$0010	     ; Octave 8 - (B9 - D2)
 	dc.w  $0000								     ; Note (D3)
 dFreqPSG_:
-	dc.w  $F000	; <- added for sound test
+
+	if FEATURE_SOUNDTEST
+		dc.w  $F000	; <- added for sound test
+	endif
 
 	if safe=1				; in safe mode, we have extra debug data
 .x =		$100|((dFreqPSG_-dFreqPSG)/2)	; to check if we played an invalid note

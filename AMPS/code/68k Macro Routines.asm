@@ -156,7 +156,10 @@ dModulate	macro jump,loop,type
 		beq.s	.started		; if not, modulate!
 		subq.b	#1,cModDelay(a1)	; decrease delay
 
-		moveq	#0,d5			; no offset
+		if (FEATURE_PORTAMENTO|FEATURE_MODENV)<>0
+			moveq	#0,d5		; no offset
+		endif
+
 		if FEATURE_PORTAMENTO
 			tst.b	cPortaSpeed(a1)	; check if portamento is active
 			bne.s	.apply		; if is, branch
@@ -166,7 +169,10 @@ dModulate	macro jump,loop,type
 			tst.b	cModEnv(a1)	; check if modulation envelope ID is not 0
 			bne.s	.apply		; if so, update frequency nonetheless
 		endif
-		bra.s	.loop
+
+		if (FEATURE_PORTAMENTO|FEATURE_MODENV)<>0
+			bra.s	.doloop
+		endif
 
 .noret
 		if FEATURE_PORTAMENTO
@@ -179,7 +185,7 @@ dModulate	macro jump,loop,type
 			bne.s	.porta		; if so, update frequency nonetheless
 		endif
 
-.loop
+.doloop
 	dGenLoops 0, \jump,\loop,\type
 ; ---------------------------------------------------------------------------
 

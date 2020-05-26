@@ -245,7 +245,7 @@ dPlaySnd_Music:
 		bset	#mfbBacked,mFlags.w	; check if song was backed up (and if not, set the bit)
 		bne.s	.noback			; if yes, preserved the backed up song
 
-		move.l	mTempoMain.w,mBackTempoMain.w; backup tempo settings
+		move.l	mSpeed.w,mBackSpeed.w	; backup tempo settings
 		move.l	mVctMus.w,mBackVctMus.w	; backup voice table address
 
 		lea	mBackUpArea.w,a4	; load source address to a4
@@ -276,20 +276,14 @@ dPlaySnd_Music:
 	endif
 ; ---------------------------------------------------------------------------
 
-		move.b	d6,mTempoSpeed.w	; save loaded value into tempo speed setting
+		move.b	d6,mSpeed.w		; save loaded value into tempo speed setting
+		move.b	d6,mSpeedAcc.w		; save loaded value as tempo speed accumulator
 		jsr	dStopMusic(pc)		; mute hardware and reset all driver memory
 		jsr	dResetVolume(pc)	; reset volumes and end any fades
 
-		moveq	#0,d3
 		move.b	(a2)+,d3		; load song tempo to d3
-		move.b	d3,mTempoMain.w		; save as regular tempo
-		btst	#mfbSpeed,mFlags.w	; check if speed shoes flag was set
-		beq.s	.tempogot		; if not, use main tempo
-		move.b	mTempoSpeed.w,d3	; load speed shoes tempo to d3 instead
-
-.tempogot
-		move.b	d3,mTempo.w		; save as the current tempo
-		move.b	d3,mTempoCur.w		; copy into the accumulator/counter
+		move.b	d3,mTempo.w		; save as the tempo accumulator
+		move.b	d3,mTempoAcc.w		; copy into the accumulator/counter
 		and.b	#$FF-(1<<mfbNoPAL),mFlags.w; enable PAL fix
 ; ---------------------------------------------------------------------------
 ; If the 7th bit (msb) of tick multiplier is set, PAL fix gets disabled.
@@ -298,7 +292,11 @@ dPlaySnd_Music:
 ; ---------------------------------------------------------------------------
 
 		move.b	(a2)+,d4		; load the tick multiplier to d4
-		bpl.s	.noPAL			; branch if the loaded value was positive
+		bmi.s	.yesPAL			; branch if the loaded value was negative
+		btst	#6,ConsoleRegion.w	; is this PAL system?
+		bne.s	.noPAL			; if yes, branch
+
+.yesPAL
 		or.b	#1<<mfbNoPAL,mFlags.w	; disable PAL fix
 
 .noPAL
@@ -869,13 +867,6 @@ dUpdateVolumeAll:
 
 dPlaySnd_ShoesOn:
 		bset	#mfbSpeed,mFlags.w	; enable speed shoes flag
-		move.b	mTempoSpeed.w,mTempoCur.w; set tempo accumulator/counter to speed shoes
-		move.b	mTempoSpeed.w,mTempo.w	; set main tempor to speed shoes
-
-	if FEATURE_BACKUP
-		move.b	mBackTempoSpeed.w,mBackTempoCur.w; do the same for backup tempos
-		move.b	mBackTempoSpeed.w,mBackTempo.w
-	endif
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -897,13 +888,6 @@ dPlaySnd_Reset:
 
 dPlaySnd_ShoesOff:
 		bclr	#mfbSpeed,mFlags.w	; disable speed shoes flag
-		move.b	mTempoMain.w,mTempoCur.w; set tempo accumulator/counter to normal
-		move.b	mTempoMain.w,mTempo.w	; set main tempor to normal
-
-	if FEATURE_BACKUP
-		move.b	mBackTempoMain.w,mBackTempoCur.w; do the same for backup tempos
-		move.b	mBackTempoMain.w,mBackTempo.w
-	endif
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

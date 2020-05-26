@@ -317,41 +317,27 @@ dcsTransp:
 
 dcsTempoShoes:
 		move.b	(a2)+,d3		; load tempo value from tracker
-		move.b	d3,mTempoSpeed.w	; save as the speed shoes tempo
-		btst	#mfbSpeed,mFlags.w	; check if speed shoes mode is active
-		bne.s	dcsTempoCur		; if is, load as current tempo too
+		move.b	d3,mSpeed.w		; save as the speed shoes tempo
+		move.b	d3,mSpeedAcc.w		; copy to speed shoes tempo accumulator
 		rts
 ; ---------------------------------------------------------------------------
 
 dcsTempo:
 		move.b	(a2)+,d3		; load tempo value from tracker
-		move.b	d3,mTempoMain.w		; save as the main tempo
-		btst	#mfbSpeed,mFlags.w	; check if speed shoes mode is active
-		bne.s	locret_Tempo		; if not, load as current tempo too
-
-dcsTempoCur:
-		move.b	d3,mTempo.w		; save as current tempo
-
-locret_Tempo:
+		move.b	d3,mTempo.w		; save as the main tempo
+		move.b	d3,mTempoAcc.w		; copy to current tempo
 		rts
 ; ---------------------------------------------------------------------------
 
 dcaTempoShoes:
 		move.b	(a2)+,d3		; load tempo value from tracker
-		add.b	d3,mTempoSpeed.w	; add to the speed shoes tempo
-		btst	#mfbSpeed,mFlags.w	; check if speed shoes mode is active
-		bne.s	dcaTempoCur		; if is, add to current tempo too
+		add.b	d3,mSpeed.w		; add to the speed shoes tempo
 		rts
 ; ---------------------------------------------------------------------------
 
 dcaTempo:
 		move.b	(a2)+,d3		; load tempo value from tracker
-		add.b	d3,mTempoMain.w		; add to the main tempo
-		btst	#mfbSpeed,mFlags.w	; check if speed shoes mode is active
-		bne.s	locret_Tempo		; if not, add to current tempo too
-
-dcaTempoCur:
-		add.b	d3,mTempo.w		; add to current tempo
+		add.b	d3,mTempo.w		; add to the main tempo
 		rts
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -687,7 +673,7 @@ dcBackup:
 		lea	dFadeInDataLog(pc),a4	; prepare stock fade in program to a4
 		jsr	dLoadFade(pc)		; initiate fade in
 
-		move.l	mBackTempoMain.w,mTempoMain.w; restore tempo settings
+		move.l	mBackSpeed.w,mSpeed.w	; restore tempo settings
 		move.l	mBackVctMus.w,mVctMus.w	; restore voice table address
 
 		lea	mBackUpLoc.w,a4		; load source address to a4
@@ -883,6 +869,17 @@ dUpdateVoiceFM:
 		add.w	d4,d3			; add algorithm to Total Level carrier offset
 
 .uwdone
+	endif
+
+	if FEATURE_SOUNDTEST
+		move.w	d3,d5			; copy to d5
+		cmp.w	#$7F,d5			; check if volume is out of range
+		bls.s	.nocapx			; if not, branch
+		spl	d5			; if positive (above $7F), set to $FF. Otherwise, set to $00
+		and.b	#$7F,d5			; keep in range for the sound test
+
+.nocapx
+		move.b	d5,cChipVol(a1)		; save volume to chip
 	endif
 ; ---------------------------------------------------------------------------
 
@@ -1112,7 +1109,7 @@ dcsComm:
 
 dcCondRegTable:
 	dc.w ConsoleRegion, mFlags	; 0
-	dc.w mTempoMain, mTempoSpeed	; 2
+	dc.w mTempo, mSpeed		; 2
 	dc.w 0, 0			; 4
 	dc.w 0, 0			; 6
 	dc.w 0, 0			; 8

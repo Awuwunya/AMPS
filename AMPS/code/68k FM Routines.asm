@@ -142,6 +142,17 @@ dUpdateVolFM2:
 .uwdone
 	endif
 
+	if FEATURE_SOUNDTEST
+		move.w	d1,d5			; copy to d5
+		cmp.w	#$7F,d5			; check if volume is out of range
+		bls.s	.nocapx			; if not, branch
+		spl	d5			; if positive (above $7F), set to $FF. Otherwise, set to $00
+		and.b	#$7F,d5			; keep in range for the sound test
+
+.nocapx
+		move.b	d5,cChipVol(a1)		; save volume to chip
+	endif
+
 		moveq	#4-1,d3			; prepare 4 operators to d3
 		move.l	sp,a5			; copy stack pointer to a5
 		subq.l	#4,sp			; reserve some space in the stack
@@ -376,6 +387,10 @@ dUpdateFreqFM2:
 		bne.s	locret_UpdFreqFM	; if is, do not update frequency
 
 dUpdateFreqFM3:
+	if FEATURE_SOUNDTEST
+		move.w	d2,cChipFreq(a1)	; save frequency to chip
+	endif
+
 		btst	#cfbRest,(a1)		; is this channel resting
 		bne.s	locret_UpdFreqFM	; if is, skip
 

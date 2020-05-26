@@ -29,6 +29,7 @@ FEATURE_UNDERWATER =	1	; set to 1 to enable underwater mode flag
 FEATURE_BACKUP =	1	; set to 1 to enable back-up channels. Used for the 1-up sound in Sonic 1, 2 and 3K
 FEATURE_BACKUPNOSFX =	1	; set to 1 to disable SFX while a song is backed up. Used for the 1-up sound
 FEATURE_FM6 =		1	; set to 1 to enable FM6 to be used in music
+FEATURE_SOUNDTEST =	1	; set to 1 to enable changes which make AMPS compatible with custom sound test
 ; ---------------------------------------------------------------------------
 
 ; Select the tempo algorithm
@@ -79,6 +80,7 @@ cModCount	rs.b 1		; number of modulation steps until reversal
 
 	if FEATURE_PORTAMENTO
 cPortaSpeed	rs.b 1		; number of frames for portamento to complete. 0 means it is disabled
+		rs.w 0
 cPortaFreq	rs.w 1		; frequency offset for portamento
 cPortaDisp	rs.w 1		; frequency displacement per frame for portamento
 	endif
@@ -92,6 +94,12 @@ cEnvPos		rs.b 1		; volume envelope position
 cModEnv		rs.b 1		; modulation envelope ID
 cModEnvPos	rs.b 1		; modulation envelope position
 cModEnvSens	rs.b 1		; sensitivity of modulation envelope
+	endif
+
+	if FEATURE_SOUNDTEST
+		rs.w 0
+cChipFreq	rs.w 1		; frequency sent to the chip
+cChipVol	rs.b 1		; volume sent to the chip
 	endif
 
 cLoop		rs.b 3		; loop counter values
@@ -201,10 +209,10 @@ mCtrPal		rs.b 1		; frame counter fo 50hz fix
 mComm		rs.b 8		; communications bytes
 mMasterVolFM =	__rs		; master volume for FM channels
 mFadeAddr	rs.l 1		; fading program address
-mTempoMain	rs.b 1		; music normal tempo
-mTempoSpeed	rs.b 1		; music speed shoes tempo
-mTempo		rs.b 1		; current tempo we are using right now
-mTempoCur	rs.b 1		; tempo counter/accumulator
+mSpeed		rs.b 1		; music speed shoes tempo
+mSpeedAcc	rs.b 1		; music speed shoes tempo accumulator
+mTempo		rs.b 1		; music normal tempo
+mTempoAcc	rs.b 1		; music normal tempo accumulator
 mQueue		rs.b 3		; sound queue
 mMasterVolPSG	rs.b 1		; master volume for PSG channels
 mVctMus		rs.l 1		; address of voice table for music
@@ -256,10 +264,10 @@ mBackPSG1	rs.b cSize	; back-up PSG 1 data
 mBackPSG2	rs.b cSize	; back-up PSG 2 data
 mBackPSG3	rs.b cSize	; back-up PSG 3 data
 
-mBackTempoMain	rs.b 1		; back-up music normal tempo
-mBackTempoSpeed	rs.b 1		; back-up music speed shoes tempo
-mBackTempo	rs.b 1		; back-up current tempo we are using right now
-mBackTempoCur	rs.b 1		; back-up tempo counter/accumulator
+mBackSpeed	rs.b 1		; back-up music speed shoes tempo
+mBackSpeedAcc	rs.b 1		; back-up music speed shoes tempo accumulator
+mBackTempo	rs.b 1		; back-up music normal tempo
+mBackTempoAcc	rs.b 1		; back-up music normal tempo accumulator
 mBackVctMus	rs.l 1		; back-up address of voice table for music
 	endif
 ; ---------------------------------------------------------------------------
@@ -281,6 +289,7 @@ mfbWater	rs.b 1		; if set, underwater mode is active
 mfbNoPAL	rs.b 1		; if set, play songs slowly in PAL region
 mfbBacked	rs.b 1		; if set, a song has been backed up
 mfbExec		rs.b 1		; if set, AMPS is currently running
+mfbRunTwice	rs.b 1		; if set, AMPS should be updated twice at some point
 mfbPaused =	$07		; if set, sound driver is paused
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

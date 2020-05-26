@@ -3,6 +3,10 @@
 ; Sound Test Screen
 ; ---------------------------------------------------------------------------
 
+	if FEATURE_SOUNDTEST=0
+		inform 3,"FEATURE_SOUNDTEST must be 1 in order for this sound test to work"
+	endif
+
 SoundTest:
 	; --- Setup/clearing ---
 
@@ -35,7 +39,7 @@ SoundTest:
 
 		moveq	#$00,d0					; clear d0
 		lea	($FFFF0000).l,a1			; main RAM
-		move.w	#$FFF0/$20-1,d1				; set size of RAM
+		move.w	#$FFE0/$20-1,d1				; set size of RAM
 
 ST_ClearMain:
 	rept 8
@@ -398,10 +402,10 @@ STDT_RenderChar:
 		lea	(a2),a1					; load font mappings address
 		bra.s	STDT_Special				; continue normally
 
-STDT_VarList:	dc.w	$F014					; #0 - Pitch
-		dc.w mTempo					; #1 - Tempo
-		dc.w	$F016					; #2 - Volume
-		dc.w	$0000					; #3 - Unused...
+STDT_VarList:	dc.w mTempo					; #0 - Pitch
+		dc.w mSpeed					; #1 - Tempo
+		dc.w $F016					; #2 - Volume
+		dc.w $0000					; #3 - Unused...
 								; #4
 								; #5 ...etc up to #9...
 
@@ -552,22 +556,19 @@ STC_TB_NoPress:
 		bcc.s	STC_TB_NoRight				; if still running, branch
 		clr.w	($FFFFA022).w				; reset draw position
 		move.w	#$0118,($FFFFA026).w			; set X position of text scroll
-		sf.b	($FFFFA00F).w				; keep at 0
+		move.b	#$06,($FFFFA00F).w			; reset hold timer
 
 STC_TB_NoHeld:
 		lsr.b	#$03,d5					; shift left into carry
 		bcc.s	STC_TB_NoLeft				; if left was not pressed, branch
-		subq.w	#$01,($FFFFA020).w			; decrease top menu X position
-		bcc.s	STC_TB_NoLeft				; if it hasn't gone below the bottom, branch
-		move.w	#SFXlast-MusOff-1,($FFFFA020).w		; set to end of list
+		moveq	#$01,d0					; load the amount to move
+		bsr.w	STC_SkipLeft				; run code
 
 STC_TB_NoLeft:
 		lsr.b	#$01,d5					; shift right into carry
 		bcc.s	STC_TB_NoRight				; if right was not pressed, branch
-		addq.w	#$01,($FFFFA020).w			; increase top menu X position
-		cmpi.w	#SFXlast-MusOff,($FFFFA020).w		; has it reached the end of the list?
-		blo.s	STC_TB_NoRight				; if not, branch
-		clr.w	($FFFFA020).w				; set to beginning of list
+		moveq	#$01,d0					; load the amount to move
+		bsr.w	STC_SkipRight				; run code
 
 STC_TB_NoRight:
 		bra.w	STC_BB_NoRight
@@ -583,7 +584,7 @@ STC_TB_Play:
 STC_TB_PlaySFX:
 ;		cmpi.b	#$A0,d0					; is it a music track from 80 to 9F?
 ;		bhs.s	STC_TB_NoDelay				; if not, branch
-		move.b	#$03,($FFFFA001).w			; set the "postpone" draw timer
+	;	move.b	#$03,($FFFFA001).w			; set the "postpone" draw timer
 
 STC_TB_NoDelay:
 		add.b	#MusOff,d0				; add music offset
@@ -665,6 +666,8 @@ STC_Opt:	dc.l	STC_ST_Fade,	STC_Fade
 		dc.l	STC_ST_UWater,	STC_UWater
 	endif
 		dc.l	STC_ST_Speed,	STC_Speed
+		dc.l	STC_ST_Shoes,	STC_Shoes
+		dc.l	STC_ST_Skip,	STC_Skip
 	;	dc.l	STC_ST_FM1,	STC_FM1
 	;	dc.l	STC_ST_FM2,	STC_FM2
 	;	dc.l	STC_ST_FM3,	STC_FM3
@@ -682,7 +685,9 @@ STC_Opt_End:
 STC_ST_UWater:	dc.b	" a ON      < UNDERWATER >     OFF c ",$00
 	endif
 
-STC_ST_Tempo:	dc.b	" a UP      <  TEMPO  #1 >    DOWN c ",$00
+STC_ST_Skip:	dc.b	" a LEFT    < SKIP SONGS >   RIGHT c ",$00
+STC_ST_Tempo:	dc.b	" a DOWN    <  TEMPO  #0 >      UP c ",$00
+STC_ST_Shoes:	dc.b	" a DOWN    <  SHOES  #1 >      UP c ",$00
 STC_ST_Volume:	dc.b	" a LOUD    <  VOLUME #2 >   QUIET c ",$00
 STC_ST_Speed:	dc.b	" a ON      < SPEEDSHOES >     OFF c ",$00
 STC_ST_Fade:	dc.b	" a OR c   <  FADE OUT  >   a OR c ",$00
@@ -698,6 +703,31 @@ STC_ST_PSG1:	dc.b	" a OR c   < PSG 1 MUTE >   a OR c ",$00
 STC_ST_PSG2:	dc.b	" a OR c   < PSG 2 MUTE >   a OR c ",$00
 STC_ST_PSG3:	dc.b	" a OR c   < PSG 3 MUTE >   a OR c ",$00
 		even
+
+	; --- Skip songs ---
+
+STC_Skip:
+		clr.w	($FFFFA022).w				; reset draw position
+		move.w	#$0118,($FFFFA026).w			; set X position of text scroll
+
+		moveq	#$10,d0					; load number of songs to skip
+		add.b	d5,d5					; shift button A to MSB
+		bpl.s	STC_SkipRight				; if it was not A, branch for B
+
+STC_SkipLeft:
+		sub.w	d0,($FFFFA020).w			; decrease top menu X position
+		bcc.s	STC_SkipDone				; if it hasn't gone below the bottom, branch
+		move.w	#SFXlast-MusOff-1,($FFFFA020).w		; set to end of list
+
+STC_SkipDone:
+		rts
+
+STC_SkipRight:
+		add.w	d0,($FFFFA020).w			; increase top menu X position
+		cmpi.w	#SFXlast-MusOff,($FFFFA020).w		; has it reached the end of the list?
+		blo.s	STC_SkipDone				; if not, branch
+		clr.w	($FFFFA020).w				; set to beginning of list
+		rts
 
 	if FEATURE_UNDERWATER
 	; --- Underwater mode ---
@@ -734,6 +764,17 @@ STC_Tempo:
 
 STC_T_NoA:
 		addq.b	#$01,mTempo.w				; increase the music tempo
+		rts						; return
+
+	; --- Speed tempo control ---
+
+STC_Shoes:
+		add.b	d5,d5					; shift button A to MSB
+		bpl.s	STC_S_NoA				; if it was not A, branch for B
+		subq.b	#$02,mSpeed.w				; decrease the music tempo
+
+STC_S_NoA:
+		addq.b	#$01,mSpeed.w				; increase the music tempo
 		rts						; return
 
 	; --- Volume control ---
@@ -1064,17 +1105,17 @@ STDK_NoHitKey:
 		jsr	(a0)					; run routine
 		beq.s	STDK_NoChannel				; if there's no frequency to read, branch
 		cmpi.b	#$5F-$0C,d2				; has the note gone outside of the keyboard?
-	;	bhi.s	STDK_NoChannel				; if so, branch and ignore
+		bhi.s	STDK_NoChannel				; if so, branch and ignore
 
 	; This is to allow SFX to display the highest octave (by moving the note down an octave)
 
-	bls.s	STDK_InRange				; if not, branch
-	bmi.s	STDK_NoChannel				; if negative, branch (outside of keyboard to the left)
-	tst.b	d4					; is this an SFX?
-	bpl.s	STDK_NoChannel				; if not, branch and don't display keys
-	subi.b	#$0C,d2					; move the note down an octave
-	cmpi.b	#$5F-$0C,d2				; has the note gone outside of the keyboard?
-	bhi.s	STDK_NoChannel				; if not, branch
+;	bls.s	STDK_InRange				; if not, branch
+;	bmi.s	STDK_NoChannel				; if negative, branch (outside of keyboard to the left)
+;	tst.b	d4					; is this an SFX?
+;	bpl.s	STDK_NoChannel				; if not, branch and don't display keys
+;	subi.b	#$0C,d2					; move the note down an octave
+;	cmpi.b	#$5F-$0C,d2				; has the note gone outside of the keyboard?
+;	bhi.s	STDK_NoChannel				; if not, branch
 
 STDK_InRange:
 		bsr.w	STDK_GetPos				; load the correct X and VRAM positions
@@ -1146,16 +1187,13 @@ STDK_ChanRouts:	dc.l	$FFFFFB22, STDK_ChanFM
 	; --- FM ---
 
 STDK_ChanFM:
-		move.b	mMasterVolFM.w,d0			; load master volume to d0
-		ext.w	d0					; extend to word
-		add.w	#-$10,d0				; offset by amount
+		moveq	#-$0C,d0				; prepare volume offset to d0
+		add.b	cChipVol(a2),d0				; add chip volume to d0
+		bpl.s	STDK_VolFM_Max				; branch if positive
+		cmp.b	#-$10,d0				; check if we underflowed
+		slt	d0					; if yes, clear d0, else set it to $FF
 
-	if FEATURE_DACFMVOLENV
-		bsr.w	STDK_CalcVol				; calculate volume
-	else
-		bsr.w	STDK_CalcVol2				; calculate volume
-	endif
-
+STDK_VolFM_Max:
 		andi.b	#$7C,d0					; get volume range 7C
 		cmpi.b	#$40,d0					; is the volume below 40?
 		blo.s	STDK_VolFM_Min				; if not, branch
@@ -1163,11 +1201,11 @@ STDK_ChanFM:
 
 STDK_VolFM_Min:
 		add.b	d0,d4					; add to key palette
-
 		lea	dFreqFM,a0				; load FM frequency table
-		move.w	cFreq(a2),d0				; load frequency
+		tst.w	cFreq(a2)				; check note frequency
 		beq.s	STDK_InvalidFM				; if it's 0000, branch
-		bsr.w	STDK_CalcFreq				; go calculate actual frequency
+
+		move.w	cChipFreq(a2),d0			; load chip frequency
 		bsr.w	STDK_GetNoteFM				; load the correct note
 		lea	($FFFF5800).l,a0			; load FM colours for keys
 		andi.b	#%11011,ccr				; clear the Z flag (so it's non-zero)
@@ -1178,15 +1216,11 @@ STDK_InvalidFM:
 	; --- PCM ---
 
 STDK_ChanPCM:
-		move.b	mMasterVolDAC.w,d0			; load master volume to d0
-		ext.w	d0					; extend to word
+		move.b	cChipVol(a2),d0				; load chip volume to d0
+		bpl.s	STDK_VolPCM_Max				; if positive, branch
+		moveq	#$7F,d0					; set to maximum volume
 
-	if FEATURE_DACFMVOLENV
-		bsr.w	STDK_CalcVol				; calculate volume
-	else
-		bsr.w	STDK_CalcVol2				; calculate volume
-	endif
-
+STDK_VolPCM_Max:
 		andi.b	#$7C,d0					; get volume range 7C
 		cmpi.b	#$40,d0					; is the volume below 40?
 		blo.s	STDK_VolPCM_Min				; if not, branch
@@ -1198,8 +1232,7 @@ STDK_VolPCM_Min:
 		add.b	d0,d4					; add to key palette
 
 		lea	dFreqDAC,a0				; load PCM frequency table
-		move.w	cFreq(a2),d0				; load frequency
-		bsr.w	STDK_CalcFreq				; go calculate actual frequency
+		move.w	cChipFreq(a2),d0			; load chip frequency
 		tst.w	d0					; check frequency
 		bpl.s	STDK_VolPCM_Frq				; branch if result is positive
 		neg.w	d0					; negate frequency
@@ -1213,24 +1246,20 @@ STDK_VolPCM_Frq:
 	; --- PSG ---
 
 STDK_ChanPSG:
-		move.b	mMasterVolPSG.w,d0			; load master volume to d0
-		ext.w	d0					; extend to word
-		add.w	#-$10,d0				; offset by amount
-		bsr.w	STDK_CalcVol				; calculate volume
-
-		lsr.b	#2,d0					; halve volume output
-		andi.b	#$3C,d0					; get volume range 7C
+		move.b	cChipVol(a2),d0				; load chip volume to d0
+		lsr.b	#2,d0					; quarter volume output
+		andi.b	#$3C,d0					; get volume range 3C
 		cmpi.b	#$40,d0					; is the volume below 40?
 		blo.s	STDK_VolPSG_Min				; if not, branch
-		moveq	#$7C,d0					; set to maximum 3C
+		moveq	#$7C,d0					; set to maximum 7C
 
 STDK_VolPSG_Min:
 		add.b	d0,d4					; add to key palette
-
 		lea	dFreqPSG-2,a0				; load PSG frequency table
-		move.w	cFreq(a2),d0				; load frequency
+		tst.w	cFreq(a2)				; check frequency
 		bmi.s	STDK_InvalidPSG				; if it's not FFFF, branch
-		bsr.s	STDK_CalcFreq				; go calculate actual frequency
+
+		move.w	cChipFreq(a2),d0			; load chip frequency
 		bsr.w	STDK_GetNoteRev				; load the correct note
 		lea	($FFFF5A00).l,a0			; load PSG colours for keys
 		andi.b	#%11011,ccr				; clear the Z flag (so it's non-zero)
@@ -1239,90 +1268,6 @@ STDK_VolPSG_Min:
 STDK_InvalidPSG:
 		ori.b	#%00100,ccr				; set the Z flag (so it's zero)
 		rts						; return
-
-STDK_CalcVol:
-		moveq	#0,d1
-		move.b	cVolEnv(a2),d1				; load modulation envelope ID to d1
-		beq.s	STDK_CalcVol2				; if 0, return
-
-		move.l	a0,d3
-		lea	VolEnvs-4,a0				; load modulation envelope data array
-		add.w	d1,d1					; quadruple modulation envelope ID
-		add.w	d1,d1					; (each entry is 4 bytes in size)
-		move.l	(a0,d1.w),a0				; get pointer to modulation envelope data
-
-		move.b	cEnvPos(a2),d1				; get envelope position to d1
-		move.b	-1(a0,d1.w),d2				; get the data in that position
-		bpl.s	STDK_GotVE				; if positive, its a normal value
-
-		cmp.b	#eLast-2,d4				; check if this is a command
-		bgt.s	STDK_GotVE				; if not it is a normal value
-		move.b	(a0,d1.w),d2				; get the data in that position
-
-STDK_GotVE:
-		ext.w	d2					; extend to a word
-		add.w	d2,d0					; add to volume
-		move.l	d3,a0
-
-STDK_CalcVol2:
-		move.b	cVolume(a2),d1				; load volume to d1
-		ext.w	d1					; extend to a word
-		add.w	d1,d0					; add to volume
-
-		cmp.w	#$7F,d0					; check if in valid range
-		blo.s	STDK_VolRange				; if yes, return
-		spl	d0					; set if overflow, clear if underflow
-		and.w	#$7F,d0					; keep in range
-
-STDK_VolRange:
-		rts
-
-STDK_CalcFreq:
-		move.b	cDetune(a2),d1				; load detune
-		ext.w	d1					; ''
-		add.w	d1,d0					; add to frequency
-
-	if FEATURE_PORTAMENTO
-		add.w	cPortaFreq(a2),d0			; add portamento offset
-	endif
-
-	if FEATURE_MODULATION
-		btst.b	#cfbMod,(a2)				; is modulation enabled?
-		beq.s	STDK_NoMod				; if not, branch
-		add.w	cModFreq(a2),d0				; add modulation frequency
-	endif
-
-STDK_NoMod:
-	if FEATURE_MODENV
-		moveq	#0,d1
-		move.b	cModEnv(a2),d1				; load modulation envelope ID to d1
-		beq.s	STDK_NoModEnv				; if 0, return
-
-		move.l	a0,d3
-		lea	ModEnvs-4,a0				; load modulation envelope data array
-		add.w	d1,d1					; quadruple modulation envelope ID
-		add.w	d1,d1					; (each entry is 4 bytes in size)
-		move.l	(a0,d1.w),a0				; get pointer to modulation envelope data
-
-		move.b	cModEnvPos(a2),d1			; get envelope position to d1
-		move.b	-1(a0,d1.w),d2				; get the data in that position
-		bpl.s	STDK_GotME				; if positive, its a normal value
-
-		cmp.b	#eLast-2,d4				; check if this is a command
-		bgt.s	STDK_GotME				; if not it is a normal value
-		move.b	(a0,d1.w),d2				; get the data in that position
-
-STDK_GotME:
-		move.b	cModEnvSens(a2),d1			; load sensitivity to d1 (unsigned value - effective range is ~ -$7000 to $8000)
-		ext.w	d1					; extend to displacement to a word
-		addq.w	#1,d1					; increment sensitivity by 1 (range of 1 to $100)
-		muls	d1,d2					; signed multiply loaded value with sensitivity
-		add.w	d2,d0					; add the frequency to channel frequency
-		move.l	d3,a0
-	endif
-
-STDK_NoModEnv:
-		rts
 
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
@@ -1373,15 +1318,15 @@ STDK_KeyPos:	dc.w	$FFFF,$0000
 STDK_GetNoteFM:
 		move.w	d0,d2					; load frequency
 		andi.w	#$07FF,d2				; clear octave
-		cmpi.w	#$0284-$25,d2	; 25E to 284		; is it down an octave?
+		cmpi.w	#$025E-$25,d2	; 25E to 284		; is it down an octave?
 		bhi.s	STDKGNFM_NoDown				; if not, branch
-		subi.w	#$05C4-$40,d0	; 5E2 TO 5C4		; move frequency down a single octave
+		subi.w	#$05E2-$40,d0	; 5E2 TO 5C4		; move frequency down a single octave
 		bra.s	STDK_GetNote				; continue
 
 STDKGNFM_NoDown:
-		cmpi.w	#$04C0+$40,d2	; 47C to 4C0		; is it up an octave?
+		cmpi.w	#$047C+$40,d2	; 47C to 4C0		; is it up an octave?
 		blo.s	STDK_GetNote				; if not, branch
-		addi.w	#$05C4-$40,d0	; 5E2 TO 5C4		; move frequency up a single octave
+		addi.w	#$05E2-$40,d0	; 5E2 TO 5C4		; move frequency up a single octave
 
 	; --- Normal get note (just happens that only PCM is normal, how ironic) ---
 
@@ -1528,12 +1473,22 @@ ST_CheckFM6:
 
 	; --- FM 6 ---
 
+		tst.b	mFM6.w					; check if FM 6 is enabled
+		spl	d0					; if disabled, set d0, else clear it
+		bpl.s	ST_HandleState				; if not enabled, branch
+
+		move.b	mDAC2.w,d1				; check if DAC 2 is enabled
+		or.b	mDAC1.w,d1				; or DAC 1
+		or.b	mSFXDAC1.w,d1				; or SFX DAC 1
+		bpl.s	ST_HandleState				; branch if not
+
 	stopZ80
 		move.b	dZ80+StatusDAC,d0			; load DAC status to d0
 	startZ80
-
 		tst.b	d0					; check if both are off
 		sne	d0					; either 00 or FF
+
+ST_HandleState:
 		cmp.b	($FFFF900F).w,d0			; check if the last value was the same
 		beq.s	ST_SkipRedraw				; branch if so
 		move.b	d0,($FFFF900F).w

@@ -210,6 +210,10 @@ dUpdateFreqDAC3:
 		AMPS_Debug_FreqDAC		; check if DAC frequency is in bounds
 	endif
 
+	if FEATURE_SOUNDTEST
+		move.w	d2,cChipFreq(a1)	; save frequency to chip
+	endif
+
 		move.b	d2,d3			; copy the frequency to d3
 		lsr.w	#8,d2			; get the upper byte to the lower byte
 		btst	#ctbPt2,cType(a1)	; check if DAC1
@@ -354,6 +358,10 @@ dUpdateVolDAC2:
 		and.b	#$80,d1			; change volume of $FF to $80 (this mutes DAC)
 
 .nocap
+	if FEATURE_SOUNDTEST
+		move.b	d1,cChipVol(a1)		; save volume to chip
+	endif
+
 	stopZ80					; wait for Z80 to stop
 		move.b	#$D2,dZ80+PCM_ChangeVolume; set volume change flag
 
