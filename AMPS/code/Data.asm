@@ -44,6 +44,10 @@
 	if FEATURE_BACKUP
 		dc.b "BA"		; backup enabled
 	endif
+
+	if FEATURE_SOUNDTEST
+		dc.b "ST"		; soundtest enabled
+	endif
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Define music and SFX
@@ -58,10 +62,10 @@ __mus =		MusOff
 
 MusicIndex:
 	ptrMusic Test, $00
-	ptrMusic Pelimusa, $1A, MysticCave, $34, DIS, $1E, ZaxxRemix, $00
-	ptrMusic ColumnDive, $3C, Pray, $0B, HydroCity, $1E, GameNo, $74
-	ptrMusic TowerPuppet, $00, ChoosePath, $0E, Shop, $74, Beach, $32
-	ptrMusic SmoothCriminal, $2A, S82, $00
+	ptrMusic Pelimusa, $20, MysticCave, $20, DIS, $20, ZaxxRemix, $20
+	ptrMusic ColumnDive, $20, Pray, $20, HydroCity, $20, GameNo, $20
+	ptrMusic TowerPuppet, $20, ChoosePath, $20, Shop, $20, Beach, $20
+	ptrMusic SmoothCriminal, $20, S82, $20
 
 MusCount =	__mus-MusOff		; number of installed music tracks
 SFXoff =	__mus			; first SFX ID

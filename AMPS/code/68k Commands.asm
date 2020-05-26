@@ -902,7 +902,7 @@ dUpdateVoiceFM:
 	endif
 
 .slot
-		cmp.w	#$80,d5			; check if volume is out of range
+		cmp.w	#$7F,d5			; check if volume is out of range
 		bls.s	.nocap			; if not, branch
 		spl	d5			; if positive (above $7F), set to $FF. Otherwise, set to $00
 
