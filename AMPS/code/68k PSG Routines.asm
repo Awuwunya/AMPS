@@ -189,11 +189,11 @@ dUpdateFreqPSG3:
 ; such case, but beware of this issue!
 ; ---------------------------------------------------------------------------
 
+		move.b	d6,dPSG			; write frequency low nibble and latch channel
 		lsr.w	#4,d2			; get the 2 higher nibbles of frequency
 	if FEATURE_SAFE_PSGFREQ
 		andi.b	#$3F,d2			; clear any extra bits that aren't valid
 	endif
-		move.b	d6,dPSG			; write frequency low nibble and latch channel
 		move.b	d2,dPSG			; write frequency high nibbles to PSG
 
 locret_UpdateFreqPSG:

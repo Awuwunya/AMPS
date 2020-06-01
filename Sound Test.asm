@@ -15,6 +15,7 @@ SoundTest:
 		move.l	#VB_SoundTest_NoHB,(VBlankRout).w	; set V-blank routine
 		lea	($C00000).l,a5				; load VDP data port
 		lea	$04(a5),a6				; load VDP control port
+
 		move.w	#$8000|%00000100,(a6)			; 00LH 01CD - Leftover SMS bar (0N|1Y) | H-Interrupt (0N|1Y) | H,V Counter (0N|1Y) | Disable video signal (0N|1Y)
 		move.w	#$8100|%01110100,(a6)			; SDVM P100 - SMS mode (0N|1Y) | Display (0N|1Y) | V-Interrupt (0N|1Y) | DMA (0N|1Y) | V-resolution (0-1C|1-1E)
 		move.w	#$8200|((($C000)>>$0A)&$FF),(a6)	; 00FE DCBA - Scroll Plane A Map Table VRam address
@@ -117,7 +118,8 @@ ST_LoadMapRow:
 		move.w	#$8100|%01110100,(a6)			; SDVM P100 - SMS mode (0N|1Y) | Display (0N|1Y) | V-Interrupt (0N|1Y) | DMA (0N|1Y) | V-resolution (0-1C|1-1E)
 		move.l	#VB_SoundTest,(VBlankRout).w		; set V-blank routine
 		move.b	#mus_Stop,mQueue.w			; set sound ID to "Stop music"
-		jsr	SB_SoundTest				; rub subroutines
+		jsr	LoadDualPCM				; load dual pcm
+		jsr	SB_SoundTest				; run subroutines
 
 ; ---------------------------------------------------------------------------
 ; Main Loop - Sound Test

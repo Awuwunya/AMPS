@@ -151,11 +151,26 @@ dPortamento	macro jump,loop,type
 dModulate	macro jump,loop,type
 	if FEATURE_MODULATION
 		btst	#cfbMod,(a1)		; check if modulation is active
-		beq.s	.noret			; if not, update volume and return
+		bne.s	.moden			; if yes, update modulation
+
+		if FEATURE_PORTAMENTO
+			tst.b	cPortaSpeed(a1)	; check if portamento is active
+			bne.s	.porta		; if is, branch
+		endif
+
+		if FEATURE_MODENV
+			tst.b	cModEnv(a1)	; check if modulation envelope ID is not 0
+			bne.s	.porta		; if so, update frequency nonetheless
+		endif
+			bra.s	.doloop
+; ---------------------------------------------------------------------------
+
+.moden
 		tst.b	cModDelay(a1)		; check if there is delay left
 		beq.s	.started		; if not, modulate!
 		subq.b	#1,cModDelay(a1)	; decrease delay
 
+.checkapply
 		if (FEATURE_PORTAMENTO|FEATURE_MODENV)<>0
 			moveq	#0,d5		; no offset
 		endif
@@ -170,28 +185,13 @@ dModulate	macro jump,loop,type
 			bne.s	.apply		; if so, update frequency nonetheless
 		endif
 
-		if (FEATURE_PORTAMENTO|FEATURE_MODENV)<>0
-			bra.s	.doloop
-		endif
-
-.noret
-		if FEATURE_PORTAMENTO
-			tst.b	cPortaSpeed(a1)	; check if portamento is active
-			bne.s	.porta		; if is, branch
-		endif
-
-		if FEATURE_MODENV
-			tst.b	cModEnv(a1)	; check if modulation envelope ID is not 0
-			bne.s	.porta		; if so, update frequency nonetheless
-		endif
-
 .doloop
 	dGenLoops 0, \jump,\loop,\type
 ; ---------------------------------------------------------------------------
 
 .started
 		subq.b	#1,cModSpeed(a1)	; decrease modulation speed counter
-		bne.s	.noret			; if there's still delay left, update vol and return
+		bne.s	.checkapply		; if there's still delay left, update vol and return
 		movea.l	cMod(a1),a4		; get modulation data offset to a1
 		move.b	(a4)+,cModSpeed(a1)	; reload modulation speed counter
 
