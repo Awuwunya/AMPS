@@ -230,16 +230,15 @@ initz80	z80prog 0
 		ld	de,(YM_BufferEnd-YM_Buffer1)/8	; to end of Z80 RAM, setting it to 0FFh
 
 	.loop:
-		ld	a,0FFh				; load 0FFh to a
 		rept 8
-			ld	(hl),a			; set address to 0FFh
+			dec	(hl)			; set address to 0FFh
 			inc	hl			; go to next address
 		endr
 
 		dec	de				; decrease loop counter
 		ld	a,d				; load d to a
 		zor	e				; check if both d and e are 0
-		jr	nz, .loop			; if no, clear more memory
+		jr	nz, .loop			; if no, clear more memoty
 		jr	*				; trap CPU execution
 	z80prog
 		even
@@ -254,23 +253,18 @@ endinit
 
 GameProgram:
 		move	#$2700,sr			; disable interrupts
-		lea	$C00004,a6
 
-.waitdma
-		move.w	(a6),ccr			; load status (this resets the 2nd write flag too)
-		bvs.s	.waitdma			; if the VDP DMA busy flag was set (bit 1), branch to wait til finished...
+;		lea	$C00004,a6
+;		move.w	#$8F01,(a6)			; VRAM pointer increment: $0001
+;		move.l	#(($9400|((($FFFF)&$FF00)>>8))<<16)|($9300|(($FFFF)&$FF)),(a6) ; DMA length ...
+;		move.w	#$9780,(a6)			; VRAM fill
+;		move.l	#$40000080|((0&$3FFF)<<16)|((0&$C000)>>14),(a6) ; Start at ...
+;		move.w	#0<<8,-4(a6)			; Fill with byte
 
-		move.w	#$8F01,(a6)			; VRAM pointer increment: $0001
-		move.l	#(($9400|((($FFFF)&$FF00)>>8))<<16)|($9300|(($FFFF)&$FF)),(a6) ; DMA length ...
-		move.w	#$9780,(a6)			; VRAM fill
-		move.l	#$40000080|((0&$3FFF)<<16)|((0&$C000)>>14),(a6) ; Start at ...
-		move.w	#0<<8,-4(a6)			; Fill with byte
-
-.loop
-		move.w	(a6),d1
-		btst	#1,d1
-		bne.s	.loop				; busy loop until the VDP is finished filling...
-		move.w	#$8F02,(a6)			; VRAM pointer increment: $0002
+;.loop		move.w	(a6),d1
+;		btst	#1,d1
+;		bne.s	.loop				; busy loop until the VDP is finished filling...
+;		move.w	#$8F02,(a6)			; VRAM pointer increment: $0002
 
 		move.b	$A10001,d0			; get System version bits
 		andi.b	#$C0,d0
@@ -280,6 +274,7 @@ GameProgram:
 		move.l	#NullBlank,VBlankRout.w
 		move.w	#$4EF9,HBlankRAM.w
 		move.l	#NullBlank,HBlankRout.w
+		jsr	LoadDualPCM			; load dual pcm
 		jmp	SoundTest(pc)
 
 ; ===========================================================================
