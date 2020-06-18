@@ -223,15 +223,15 @@ SetupValues:	dc.w $8000		; XREF: PortA_Ok
 		dc.l $40000080
 
 initz80	z80prog 0
-
 		di
 		im	1
 		ld	hl,YM_Buffer1			; we need to clear from YM_Buffer1
 		ld	de,(YM_BufferEnd-YM_Buffer1)/8	; to end of Z80 RAM, setting it to 0FFh
 
-	.loop:
+.loop
+		ld	a,0FFh				; load 0FFh to a
 		rept 8
-			dec	(hl)			; set address to 0FFh
+			ld	(hl),a			; save a to address
 			inc	hl			; go to next address
 		endr
 
@@ -239,8 +239,7 @@ initz80	z80prog 0
 		ld	a,d				; load d to a
 		zor	e				; check if both d and e are 0
 		jr	nz, .loop			; if no, clear more memoty
-		jr	*				; trap CPU execution
-	z80prog
+.pc		jr	.pc				; trap CPU execution
 		even
 endinit
 		dc.w $8174			; value	for VDP	display	mode
