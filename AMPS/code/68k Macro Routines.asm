@@ -63,20 +63,30 @@ dCalcFreq	macro
 ; Macro for generating portamento + modulation code
 ; ---------------------------------------------------------------------------
 
-dModPorta	macro jump,loop,type
+dModPortaWait	macro jump,loop,type
 	if FEATURE_MODENV
 		jsr	dModEnvProg(pc)
 	endif
 
-	dPortamento	\jump,\loop,\type
-	dModulate	\jump,\loop,\type
+	dPortamentoWait	\jump,\loop,\type
+	dModulateWait	\jump,\loop,\type
+    endm
+; ---------------------------------------------------------------------------
+
+dModPortaTrk	macro type
+	if FEATURE_MODENV
+		jsr	dModEnvProg(pc)
+	endif
+
+	dPortamentoTrk	\type
+	dModulateTrk
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Macro for generating portamento code
 ; ---------------------------------------------------------------------------
 
-dPortamento	macro jump,loop,type
+dPortamentoWait	macro jump,loop,type
 	if FEATURE_PORTAMENTO
 		if FEATURE_MODULATION=0
 			tst.b	cPortaSpeed(a1)	; check if portamento is active
@@ -89,9 +99,23 @@ dPortamento	macro jump,loop,type
 
 			dGenLoops 1, \jump,\loop,\type
 		endif
+		dPortamento	\type		; include portamento code
+	endif
+    endm
 ; ---------------------------------------------------------------------------
 
+dPortamentoTrk	macro type
+	if FEATURE_PORTAMENTO
+		tst.b	cPortaSpeed(a1)		; check if portamento is active
+		beq.s	.nowrap			; if not, skip updating portamento
+		dPortamento	\type		; include portamento code
+	endif
+    endm
+; ---------------------------------------------------------------------------
+
+dPortamento	macro type
 .doporta
+
 		move.w	cPortaFreq(a1),d5	; load portamento frequency offset to d5
 		beq.s	.nochk			; branch if 0 already
 		bmi.s	.ppos			; branch if negative
@@ -114,41 +138,58 @@ dPortamento	macro jump,loop,type
 		add.w	d5,d2			; add it to the current frequency
 ; ---------------------------------------------------------------------------
 
-		if (\type=0)|(\type=1)		; the following code skips from $x4C0 to $x25D of next octave, and vice versa
-			move.w	d2,d5		; special FM code to skip over some frequencies, because it sounds bad
-			move.w	#$800+$25D-$4C0,d4; prepare value into d4
+	if (\type=0)|(\type=1)			; the following code skips from $x4C0 to $x25D of next octave, and vice versa
+		move.w	d2,d5			; special FM code to skip over some frequencies, because it sounds bad
+		move.w	#$800+$25D-$4C0,d4	; prepare value into d4
 
-			and.w	#$7FF,d5	; get only the frequency offset
-			sub.w	#$25D,d5	; sub the lower bound
-			cmp.w	#$4C0-$25D,d5	; check if out of range of safe frequencies
-			bls.s	.nowrap		; branch if not
-			bpl.s	.pos		; branch if negative
+		and.w	#$7FF,d5		; get only the frequency offset
+		sub.w	#$25D,d5		; sub the lower bound
+		cmp.w	#$4C0-$25D,d5		; check if out of range of safe frequencies
+		bls.s	.nowrap			; branch if not
+		bpl.s	.pos			; branch if negative
 
-			sub.w	d4,d2		; add frequency offset to d4
-			sub.w	d4,cPortaFreq(a1); fix portamento frequency also
-			bpl.s	.nowrap		; branch if overflow did not occur
-			bra.s	.wrap2
+		sub.w	d4,d2			; add frequency offset to d4
+		sub.w	d4,cPortaFreq(a1)	; fix portamento frequency also
+		bpl.s	.nowrap			; branch if overflow did not occur
+		bra.s	.wrap2
 
-		.pos:
-			add.w	d4,d2		; add frequency offset to d4
-			add.w	d4,cPortaFreq(a1); fix portamento frequency also
-			bmi.s	.nowrap		; branch if overflow did not occur
+.pos
+		add.w	d4,d2			; add frequency offset to d4
+		add.w	d4,cPortaFreq(a1)	; fix portamento frequency also
+		bmi.s	.nowrap			; branch if overflow did not occur
 
-		.wrap2:
-			move.w	cPortaFreq(a1),d4; get portamento to d4 again
-			sub.w	d4,d2		; fix frequency, again
-			clr.w	cPortaFreq(a1)	; reset portamento frequency
-		endif
+.wrap2
+		move.w	cPortaFreq(a1),d4	; get portamento to d4 again
+		sub.w	d4,d2			; fix frequency, again
+		clr.w	cPortaFreq(a1)		; reset portamento frequency
+	endif
 
 .nowrap
-	endif
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Macro for generating frequency modulation code
 ; ---------------------------------------------------------------------------
 
-dModulate	macro jump,loop,type
+dModulateTrk	macro
+	if FEATURE_MODULATION
+		btst	#cfbMod,(a1)		; check if modulation is active
+		beq.s	.porta			; if not, don't update modulation
+
+		tst.b	cModDelay(a1)		; check if there is delay left
+		beq.s	.started		; if not, modulate!
+		subq.b	#1,cModDelay(a1)	; decrease delay
+
+.checkapply
+		moveq	#0,d5			; no offset
+		bra.s	.apply			; if is, branch
+
+		dModulate			; include modulation code
+	endif
+    endm
+; ---------------------------------------------------------------------------
+
+dModulateWait	macro jump,loop,type
 	if FEATURE_MODULATION
 		btst	#cfbMod,(a1)		; check if modulation is active
 		bne.s	.moden			; if yes, update modulation
@@ -162,7 +203,7 @@ dModulate	macro jump,loop,type
 			tst.b	cModEnv(a1)	; check if modulation envelope ID is not 0
 			bne.s	.porta		; if so, update frequency nonetheless
 		endif
-			bra.s	.doloop
+		bra.s	.doloop
 ; ---------------------------------------------------------------------------
 
 .moden
@@ -186,22 +227,27 @@ dModulate	macro jump,loop,type
 		endif
 
 .doloop
-	dGenLoops 0, \jump,\loop,\type
+		dGenLoops 0, \jump,\loop,\type
+		dModulate			; include modulation code
+	endif
+    endm
 ; ---------------------------------------------------------------------------
 
+dModulate	macro
 .started
 		subq.b	#1,cModSpeed(a1)	; decrease modulation speed counter
 		bne.s	.checkapply		; if there's still delay left, update vol and return
 		movea.l	cMod(a1),a4		; get modulation data offset to a1
 		move.b	(a4)+,cModSpeed(a1)	; reload modulation speed counter
 
-		subq.b	#1,cModCount(a1)	; decrease step counter
+		tst.b	cModCount(a1)		; check step counter
 		bne.s	.norev			; if it isnt 0, don't reverse
 		move.b	(a4)+,cModCount(a1)	; reload steps counter
 		beq.s	.norev			; $00 means the modulation is actually infinite
 		neg.b	cModStep(a1)		; negate step amount
 
 .norev
+		subq.b	#1,cModCount(a1)	; decrease step counter
 		move.b	cModStep(a1),d5		; get step offset into d5
 		ext.w	d5			; extend to word
 
@@ -211,7 +257,6 @@ dModulate	macro jump,loop,type
 		add.w	d5,d2			; add to frequency
 
 .porta
-	endif
     endm
 ; ===========================================================================
 ; ---------------------------------------------------------------------------

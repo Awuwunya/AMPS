@@ -234,7 +234,7 @@ dAMPSnextFMSFX:
 		beq.w	.update			; if timed out, update channel
 
 	dCalcFreq				; calculate channel base frequency
-	dModPorta dAMPSdoPSGSFX, dAMPSnextFMSFX, 1; run modulation + portamento code
+	dModPortaWait	dAMPSdoPSGSFX, dAMPSnextFMSFX, 1; run modulation + portamento code
 		bsr.w	dUpdateFreqFM3		; send FM frequency to hardware
 
 	if FEATURE_DACFMVOLENV=0
@@ -297,7 +297,7 @@ dAMPSnextFM:
 
 	dGateFM					; handle FM-specific gate behavior
 	dCalcFreq				; calculate channel base frequency
-	dModPorta dAMPSdoPSG, dAMPSnextFM, 0	; run modulation + portamento code
+	dModPortaWait dAMPSdoPSG, dAMPSnextFM, 0; run modulation + portamento code
 		bsr.w	dUpdateFreqFM2		; send FM frequency to hardware
 
 	if FEATURE_DACFMVOLENV=0
@@ -366,20 +366,7 @@ dUpdateFreqFM:
 		move.b	cDetune(a1),d3		; load detune value to d3
 		ext.w	d3			; extend to word
 		add.w	d3,d2			; add to channel base frequency to d2
-
-	if FEATURE_MODENV
-		jsr	dModEnvProg(pc)		; process modulation envelope
-	endif
-
-	if FEATURE_PORTAMENTO
-		add.w	cPortaFreq(a1),d2	; add portamento speed to frequency
-	endif
-
-	if FEATURE_MODULATION
-		btst	#cfbMod,(a1)		; check if channel is modulating
-		beq.s	dUpdateFreqFM2		; if not, branch
-		add.w	cModFreq(a1),d2		; add channel modulation frequency offset to d2
-	endif
+	dModPortaTrk	0			; run modulation and portamento code
 ; ---------------------------------------------------------------------------
 
 dUpdateFreqFM2:

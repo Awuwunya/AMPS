@@ -301,6 +301,7 @@ mdPeliBell2:	dc.b  $00, $00, $00, $01, $01, $00
 sfxaddr	incSFX				; include all sfx
 musaddr	incMus				; include all music
 musend
+	even
 
 dSoundNames:
 	allnames			; include all sound names in an array

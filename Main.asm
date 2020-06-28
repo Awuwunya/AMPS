@@ -240,6 +240,7 @@ initz80	z80prog 0
 		zor	e				; check if both d and e are 0
 		jr	nz, .loop			; if no, clear more memoty
 .pc		jr	.pc				; trap CPU execution
+	z80prog
 		even
 endinit
 		dc.w $8174			; value	for VDP	display	mode

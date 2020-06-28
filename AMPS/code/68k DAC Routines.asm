@@ -17,7 +17,7 @@ dAMPSnextDAC:
 
 	dGateDAC	 			; handle DAC-specific gate behavior
 	dCalcFreq				; calculate channel base frequency
-	dModPorta dAMPSdoFM, dAMPSnextDAC, 4	; run modulation + portamento code
+	dModPortaWait	dAMPSdoFM, dAMPSnextDAC, 4; run modulation + portamento code
 		bsr.w	dUpdateFreqDAC		; if frequency needs changing, do it
 
 	if FEATURE_DACFMVOLENV=0
@@ -176,20 +176,7 @@ dUpdateFreqOffDAC:
 		move.b	cDetune(a1),d3		; get detune value
 		ext.w	d3			; extend to word
 		add.w	d3,d2			; add it to d2
-
-	if FEATURE_MODENV
-		jsr	dModEnvProg(pc)		; process modulation envelope
-	endif
-
-	if FEATURE_PORTAMENTO
-		add.w	cPortaFreq(a1),d2	; add portamento speed to frequency
-	endif
-
-	if FEATURE_MODULATION
-		btst	#cfbMod,(a1)		; check if channel is modulating
-		beq.s	dUpdateFreqDAC3		; if not, branch
-		add.w	cModFreq(a1),d2		; add modulation frequency offset to d2
-	endif
+	dModPortaTrk	4			; run modulation and portamento code
 		bra.s	dUpdateFreqDAC3
 ; ---------------------------------------------------------------------------
 
@@ -252,7 +239,7 @@ dAMPSdoDACSFX:
 		beq.w	.update			; if timed out, update channel
 
 	dCalcFreq				; calculate channel base frequency
-	dModPorta dAMPSdoFMSFX, dAMPSdoFMSFX, 5	; run modulation + portamento code
+	dModPortaWait	dAMPSdoFMSFX, dAMPSdoFMSFX, 5; run modulation + portamento code
 		bsr.w	dUpdateFreqDAC2		; if frequency needs changing, do it
 
 	if FEATURE_DACFMVOLENV=0
