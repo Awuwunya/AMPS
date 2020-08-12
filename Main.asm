@@ -253,18 +253,17 @@ endinit
 
 GameProgram:
 		move	#$2700,sr			; disable interrupts
+		lea	$C00004,a6
 
-;		lea	$C00004,a6
-;		move.w	#$8F01,(a6)			; VRAM pointer increment: $0001
-;		move.l	#(($9400|((($FFFF)&$FF00)>>8))<<16)|($9300|(($FFFF)&$FF)),(a6) ; DMA length ...
-;		move.w	#$9780,(a6)			; VRAM fill
-;		move.l	#$40000080|((0&$3FFF)<<16)|((0&$C000)>>14),(a6) ; Start at ...
-;		move.w	#0<<8,-4(a6)			; Fill with byte
+		move.l	#$8F019780,(a6)			; VRAM fill, VRAM pointer increment: $0001
+		move.l	#(($9400|((($FFFF)&$FF00)>>8))<<16)|($9300|(($FFFF)&$FF)),(a6) ; DMA length ...
+		move.l	#$40000080|((0&$3FFF)<<16)|((0&$C000)>>14),(a6) ; Start at ...
+		move.w	#0<<8,-4(a6)			; Fill with byte
 
-;.loop		move.w	(a6),d1
-;		btst	#1,d1
-;		bne.s	.loop				; busy loop until the VDP is finished filling...
-;		move.w	#$8F02,(a6)			; VRAM pointer increment: $0002
+.loop		move.w	(a6),d1
+		btst	#1,d1
+		bne.s	.loop				; busy loop until the VDP is finished filling...
+		move.w	#$8F02,(a6)			; VRAM pointer increment: $0002
 
 		move.b	$A10001,d0			; get System version bits
 		andi.b	#$C0,d0
