@@ -1,2 +1,0 @@
-Sample Rate:	14000
-Interpolation:	LINEAR
