@@ -2,14 +2,11 @@
 
 AMPS is a sound driver software package aimed at making Mega Drive audio development easier and more comfortable for musicians and programmers. The driver is a Motorola 68000 & Zilog Z80 based software, that is responsible for managing the audio hardware on the Sega Mega Drive. It can be controlled via 68000 software and does not need a lot to set up. Currently, there are variations available for the ASM68K and AS Macro Assembler, with great portability of tracker files across both assemblers as well. AMPS aims to be faster, more reliable, feature richer, and easier to use than previous sound drivers. It is based on Sound-Source which was commonly used by Japanese game developers at the time. Unlike Sound-Source, AMPS has a single standardized version that allows porting music from other formats to best of its ability without sacrifising the features the driver supports. AMPS also aims to build a repository of tools to eventually make native music development for AMPS easy for everyone. See the Releases tab for stable versions, or the source code for unstable development versions.
 
-# More info
-[Sonic Stuff Research Group](http://sonicresearch.org/community/index.php?threads/amps-ample-music-playback-system.5634) - [Sonic Retro](https://forums.sonicretro.org/index.php?threads/amps-ample-music-playback-system.38583)
-
 # Example implmentations
-* [AMPS test program](https://github.com/NatsumiFox/AMPS)
-* [Sonic 1 2005 implementation](https://github.com/NatsumiFox/AMPS-Sonic-1-2005)
-* [Sonic 1 Git implementation](https://github.com/NatsumiFox/AMPS-Sonic-1-Git)
-* [Sonic 2 Git implementation](https://github.com/NatsumiFox/AMPS-Sonic-2)
+* [AMPS test program](https://github.com/Awuwunya/AMPS)
+* [Sonic 1 2005 implementation](https://github.com/Awuwunya/AMPS-Sonic-1-2005)
+* [Sonic 1 Git implementation](https://github.com/Awuwunya/AMPS-Sonic-1-Git)
+* [Sonic 2 Git implementation](https://github.com/Awuwunya/AMPS-Sonic-2)
 
 # Features
 * Highly optimized code, that will ensure that no unnecessary time is wasted in processing the 68k side code.
